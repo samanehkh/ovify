@@ -24,23 +24,23 @@ sequenceDiagram
     rect rgb(245, 243, 255)
         Note over Dev, Local: Phase 1: Local Specification
         Dev->>Local: Write spec.md & run `specify validate`
-        Local-->>Dev: Spec structure validated (OK)
-        Dev->>GH: git push (Staging branch & PR)
+        Local-->>Dev: "Spec structure validated (OK)"
+        Dev->>GH: "git push (Staging branch & PR)"
     end
 
     %% Phase 2: Swarm Launch (Amber Background)
     rect rgb(255, 251, 235)
         Note over GH, Orch: Phase 2: Workflow Trigger & Swarm Init
-        GH->>GH: Trigger Actions Runner VM (timeout-minutes guard active)
-        GH->>GH: Run gitleaks & Dependabot scans (fail-fast on secret/CVE)
+        GH->>GH: "Trigger Actions Runner VM (timeout-minutes guard active)"
+        GH->>GH: "Run gitleaks & Dependabot scans (fail-fast on secret/CVE)"
         GH->>Orch: Restore SDLCState & Launch Python process
-        Orch->>Orch: Initialise per-run token/cost budget (abort if exceeded)
+        Orch->>Orch: "Initialise per-run token/cost budget (abort if exceeded)"
     end
     
     %% Phase 3: Planning (Light Green Background)
     rect rgb(240, 253, 244)
         Note over Orch, Arch: Phase 3: Architectural Planning
-        Orch->>Arch: Trigger Architecture Node (Passes spec.md)
+        Orch->>Arch: "Trigger Architecture Node (Passes spec.md)"
         Arch->>Arch: Scrub PII from payload
         Arch->>Arch: Query Gemini Pro & Parse JSON with Pydantic
         Arch-->>Orch: Returns plan.md & tasks.md
@@ -49,20 +49,20 @@ sequenceDiagram
     %% Phase 4: Implementation Loop (Mint/Teal Background)
     rect rgb(236, 253, 245)
         Note over Orch, QA: Phase 4: Iterative Implementation & QA Loop
-        loop Dev-QA Cycle (until passed OR iteration >= max_iterations=3)
-            Orch->>Coder: Trigger Developer Node (Passes ONLY relevant slice of tasks.md)
+        loop "Dev-QA Cycle (until passed OR iteration >= max_iterations=3)"
+            Orch->>Coder: "Trigger Developer Node (Passes ONLY relevant slice of tasks.md)"
             Note right of Coder: Input guard: PII scrub + token-budget check
-            Coder->>Coder: Query Gemini Flash (temp≈0.2)
-            Coder-->>Orch: Returns code (Pydantic-validated; bad JSON → auto-fix, max 2)
-            Orch->>QA: Trigger QA Node (Passes code & test scripts)
-            QA->>QA: Execute pytest & eslint in VM Shell (temp=0)
+            Coder->>Coder: "Query Gemini Flash (temp≈0.2)"
+            Coder-->>Orch: "Returns code (Pydantic-validated; bad JSON → auto-fix, max 2)"
+            Orch->>QA: "Trigger QA Node (Passes code & test scripts)"
+            QA->>QA: "Execute pytest & eslint in VM Shell (temp=0)"
             alt Tests Fail AND iteration < max
-                QA-->>Orch: Returns logs, critic_feedback, iteration++
+                QA-->>Orch: "Returns logs, critic_feedback, iteration++"
                 Orch->>Coder: Route back to Developer Agent for fix
             else Tests Fail AND iteration == max
-                QA-->>Orch: status="failed" — halt gracefully, persist logs for human
+                QA-->>Orch: "status='failed' — halt gracefully, persist logs for human"
             else Tests Pass
-                QA-->>Orch: Returns Success (passed: true)
+                QA-->>Orch: "Returns Success (passed: true)"
             end
         end
     end
@@ -71,16 +71,16 @@ sequenceDiagram
     rect rgb(239, 246, 255)
         Note over Orch, Azure: Phase 5: Security Gates & Azure Deployment
         Coder->>GH: Open Pull Request with approved code
-        Orch->>SecOps: Trigger SecOps Node (Passes Terraform IaC)
+        Orch->>SecOps: "Trigger SecOps Node (Passes Terraform IaC)"
         SecOps->>SecOps: Run Checkov static analysis scan
         SecOps-->>Orch: IaC validation passed
         Orch->>GH: Pause run & request Human Environment Approval
         Dev->>GH: Approve production environment deployment
-        GH->>Azure: OIDC handshake (exchange JWT for Azure token)
-        GH->>Azure: Run `terraform apply` (Deploy SWA & PostgreSQL)
+        GH->>Azure: "OIDC handshake (exchange JWT for Azure token)"
+        GH->>Azure: "Run `terraform apply` (Deploy SWA & PostgreSQL)"
         Azure-->>GH: Cloud infrastructure provisioned successfully
         Orch->>GH: Persist final SDLCState to Workflow Artifacts
-        GH-->>Dev: PR marked ready for merge (Status: green)
+        GH-->>Dev: "PR marked ready for merge (Status: green)"
     end
 ```
 
