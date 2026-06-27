@@ -3,7 +3,7 @@ This document outlines the architecture for an open-source, serverless, and extr
 
 The design has been simplified to run the entire **control plane on GitHub-hosted runners (ephemeral VMs)**. Azure acts strictly as the **deployment target (Role 3)**, resulting in zero compute infrastructure costs for hosting the agent orchestrator.
 
-> **Companion docs:** agent personas, behaviour/token guardrails, cost management, and persistent-memory guidance live in [`agents_and_guardrails.md`](agents_and_guardrails.md). Runtime flow → [`sequence_diagram.md`](sequence_diagram.md). Component connectivity → [`component_diagram.md`](component_diagram.md).
+> **Companion docs:** agent personas, behaviour/token guardrails, cost management, and persistent-memory guidance live in [`agents_and_guardrails.md`](agents_and_guardrails.md). A full learning guide to LLMOps, RAG, evals, guardrails, security, and tooling is in [`llmops_deep_dive.md`](llmops_deep_dive.md). Runtime flow → [`sequence_diagram.md`](sequence_diagram.md). Component connectivity → [`component_diagram.md`](component_diagram.md).
 
 ---
 
