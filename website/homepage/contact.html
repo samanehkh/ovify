@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact Ovify | Book a Demo & Clinic FAQs</title>
+  <meta name="description" content="Ready to optimize your clinic's patient adherence? Contact the Ovify team to book a live workflow demonstration or launch a 6-month B2B pilot." />
+  <meta name="keywords" content="contact Ovify, book IVF demo, health tech pilot" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://www.ovify.com/contact.html" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.ovify.com/contact.html" />
+  <meta property="og:title" content="Contact Ovify | Book a Demo & Clinic FAQs" />
+  <meta property="og:description" content="Ready to optimize your clinic's patient adherence? Contact the Ovify team to book a live workflow demonstration or launch a 6-month B2B pilot." />
+  <meta property="og:image" content="https://www.ovify.com/assets/Logo-OvaSync.jpg" />
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://www.ovify.com/contact.html" />
+  <meta property="twitter:title" content="Contact Ovify | Book a Demo & Clinic FAQs" />
+  <meta property="twitter:description" content="Ready to optimize your clinic's patient adherence? Contact the Ovify team to book a live workflow demonstration or launch a 6-month B2B pilot." />
+  <meta property="twitter:image" content="https://www.ovify.com/assets/Logo-OvaSync.jpg" />
+  <!-- Security Headers -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self';" />
+  
+  
+  
+  
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;600;700&family=Manrope:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    /* Contact and FAQ page specific styles */
+    .contact-hero {
+      padding: 100px 0 80px;
+      background: radial-gradient(600px 400px at 50% 100%, rgba(19, 35, 60, 0.08), transparent 70%);
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 56px;
+      align-items: flex-start;
+    }
+
+    .contact-info h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+      margin-bottom: 20px;
+    }
+
+    .contact-info .sub {
+      font-size: 1.15rem;
+      color: var(--text-dim-dark);
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+
+    .privacy-notice {
+      background: var(--navy-light);
+      border-radius: 12px;
+      padding: 20px;
+      font-size: 0.9rem;
+      color: var(--text-dark);
+      margin-top: 36px;
+      border-left: 3px solid var(--navy);
+    }
+
+    /* Contact Form styling */
+    .form-card {
+      background: var(--white);
+      border: 1px solid var(--line-dark);
+      border-radius: var(--radius);
+      padding: 40px;
+      box-shadow: 0 20px 40px -16px rgba(19, 35, 60, 0.1);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-family: var(--data);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 14px 18px;
+      border: 1px solid var(--line-dark);
+      border-radius: 10px;
+      background: var(--ivory);
+      font-family: var(--body);
+      font-size: 0.95rem;
+      color: var(--text-dark);
+      transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--navy);
+      background: var(--white);
+      box-shadow: 0 0 0 4px rgba(19, 35, 60, 0.1);
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    /* FAQ Accordion styling */
+    .faq-section {
+      background: var(--white);
+      border-top: 1px solid var(--line-dark);
+      padding: 50px 0;
+    }
+
+    .faq-list {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .faq-item {
+      border-bottom: 1px solid var(--line-dark);
+      padding: 24px 0;
+    }
+
+    .faq-item:first-child {
+      border-top: 1px solid var(--line-dark);
+    }
+
+    .faq-trigger {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: none;
+      border: none;
+      text-align: left;
+      font-family: var(--head);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      cursor: pointer;
+      padding: 0;
+      transition: color 0.15s ease;
+    }
+
+    .faq-trigger:hover {
+      color: var(--navy);
+    }
+
+    .faq-icon {
+      font-size: 1.1rem;
+      color: var(--navy);
+      transition: transform 0.2s ease;
+    }
+
+    .faq-item.open .faq-icon {
+      transform: rotate(45deg);
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .faq-answer p {
+      color: var(--text-dim-dark);
+      font-size: 0.98rem;
+      line-height: 1.6;
+      padding-top: 14px;
+    }
+
+    @media (max-width: 992px) {
+      .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      .form-card {
+        padding: 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header id="header">
+    <div class="wrap nav">
+      <a href="index.html" class="brand">
+        <img src="assets/Logo-OvaSync.jpg" alt="Ovify logo" />
+        OVIFY
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="how-it-works.html">How It Works</a>
+        <a href="ai-features.html">AI Features</a>
+        <a href="for-clinics.html">For Clinics</a>
+        <a href="pricing.html">Pricing</a>
+      </nav>
+      <a href="contact.html" class="btn btn-primary">Request a Demo</a>
+      <button class="burger" id="burger">☰</button>
+    </div>
+  </header>
+  <div class="mmenu" id="mmenu">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="how-it-works.html">How It Works</a>
+    <a href="ai-features.html">AI Features</a>
+    <a href="for-clinics.html">For Clinics</a>
+    <a href="pricing.html">Pricing</a>
+    <a href="contact.html">Request a Demo</a>
+  </div>
+
+  <!-- ===== HERO & FORM ===== -->
+  <section class="contact-hero">
+    <div class="wrap contact-grid reveal">
+      <div class="contact-info">
+        <span class="eyebrow">Connect With Us</span>
+        <h1>Support with Ovify to<br /><span class="grad-text">Optimize Patient Adherence.</span></h1>
+        <p class="sub">Reduce nurse workload, prevent patient dropout, and enhance cycle success. Share a few details, and our B2B team will contact you to schedule a demonstration or clinical pilot.</p>
+
+        <div class="privacy-notice">
+          <strong>Privacy Commitment:</strong>
+          <p style="margin-top: 6px; font-size: 0.85rem; color: var(--text-dim-dark); line-height: 1.4;">We will only contact you about Ovify clinical platforms and solutions. Your details are treated with professional confidentiality.</p>
+        </div>
+      </div>
+
+      <!-- Contact Form Card -->
+      <div class="form-card">
+        <form action="#" method="POST" id="contactForm">
+          <!-- Honeypot anti-spam field (hidden from users, traps bots) -->
+          <div style="position: absolute; left: -9999px; opacity: 0; height: 0; width: 0; overflow: hidden;" aria-hidden="true">
+            <label for="website_url">Leave empty</label>
+            <input type="text" id="website_url" name="website_url" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <div class="form-group">
+            <label for="name">Your Name</label>
+            <input type="text" id="name" name="name" class="form-control" placeholder="e.g., Sarah Smith" required />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="name@domain.com" required />
+          </div>
+
+          <div class="form-group">
+            <label for="region">Your Region</label>
+            <input type="text" id="region" name="region" class="form-control" placeholder="e.g., Abu Dhabi, UAE / GCC" required />
+          </div>
+
+          <div class="form-group">
+            <label for="role">Who Are You?</label>
+            <select id="role" name="role" class="form-control" required style="appearance: none; background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%226%22 viewBox=%220 0 10 6%22><path fill=%22%232D3A32%22 d=%22M0,0 L5,5 L10,0 Z%22/></svg>'); background-repeat: no-repeat; background-position: right 18px center; background-size: 10px 6px;">
+              <option value="" disabled selected>Select your role...</option>
+              <option value="Clinic Owner / Director">Clinic Owner / Director</option>
+              <option value="Nurse / Staff Representative">Nurse / Staff Representative</option>
+              <option value="Clinic">Clinic / Healthcare System</option>
+              <option value="Employer">Employer (Fertility Benefits)</option>
+              <option value="Bank">Financial Institution / Bank</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" class="form-control" placeholder="What are your clinic's patient adherence goals, or how can we help?" required></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 16px;">Send Message</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FAQ SECTION ===== -->
+  <section class="faq-section">
+    <div class="wrap reveal">
+      <div class="sec-head">
+        <span class="eyebrow">Questions &amp; Answers</span>
+        <h2>Frequently Asked Questions</h2>
+        <p>Everything you need to know about the Ovify platform, privacy, and white-label options.</p>
+      </div>
+
+      <div class="faq-list">
+        <!-- FAQ 1 -->
+        <div class="faq-item">
+          <button class="faq-trigger">
+            <span>Is Ovify a medical device?</span>
+            <span class="faq-icon">＋</span>
+          </button>
+          <div class="faq-answer">
+            <p>No. Ovify is an administrative and care coordination tool. It provides organizational and compliance support, and does not diagnose, prescribe, or replace clinical decisions. It runs safely alongside clinic workflows.</p>
+          </div>
+        </div>
+
+        <!-- FAQ 2 -->
+        <div class="faq-item">
+          <button class="faq-trigger">
+            <span>Does Ovify replace my doctor?</span>
+            <span class="faq-icon">＋</span>
+          </button>
+          <div class="faq-answer">
+            <p>Never. Ovify is built to reinforce the clinic's protocols. It translates existing clinical plans into daily patient tasks, acting as a coordination bridge between visits.</p>
+          </div>
+        </div>
+
+        <!-- FAQ 3 -->
+        <div class="faq-item">
+          <button class="faq-trigger">
+            <span>Is CalmSeed therapy?</span>
+            <span class="faq-icon">＋</span>
+          </button>
+          <div class="faq-answer">
+            <p>No. CalmSeed provides patient-guided nervous-system regulation (somatic grounding and paced breathing). It is an educational and support tool, not clinical therapy.</p>
+          </div>
+        </div>
+
+        <!-- FAQ 4 -->
+        <div class="faq-item">
+          <button class="faq-trigger">
+            <span>Can clinics white-label the app?</span>
+            <span class="faq-icon">＋</span>
+          </button>
+          <div class="faq-answer">
+            <p>Yes. Clinics can offer Ovify under their own brand, styling, and name, while the core intelligence, automated reminders, and CalmSeed support engine stay exactly the same.</p>
+          </div>
+        </div>
+
+        <!-- FAQ 5 -->
+        <div class="faq-item">
+          <button class="faq-trigger">
+            <span>Can support networks use Ovify too?</span>
+            <span class="faq-icon">＋</span>
+          </button>
+          <div class="faq-answer">
+            <p>Yes. Ovify includes a connected support portal that shares medication timing, appointment check-ins, and coordination reminders to align support at home.</p>
+          </div>
+        </div>
+
+        <!-- FAQ 6 -->
+        <div class="faq-item">
+          <button class="faq-trigger">
+            <span>Is my data private?</span>
+            <span class="faq-icon">＋</span>
+          </button>
+          <div class="faq-answer">
+            <p>Absolutely. Emotional logs, voice biometrics, and treatment data are treated with strict confidentiality. All compliance and stress insights shared with the clinic are encrypted and used solely to support your experience inside the platform.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="wrap">
+      <div class="foot-grid">
+        <div>
+          <a href="index.html" class="brand">
+            <img src="assets/Logo-BlueBackground.jpg" alt="Ovify logo" />
+            OVIFY
+          </a>
+          <p class="foot-about">Intelligent, AI-enabled, structured, and calm companion during IVF Journey.</p>
+        </div>
+        <div class="foot-col">
+          <h4>Ecosystem</h4>
+          <a href="index.html">Home</a>
+          <a href="about.html">About Us</a>
+          <a href="how-it-works.html">How It Works</a>
+        </div>
+        <div class="foot-col">
+          <h4>Platform</h4>
+          <a href="ai-features.html">AI Features</a>
+          <a href="for-clinics.html">For Clinics</a>
+          <a href="pricing.html">Pricing & Licensing</a>
+          <a href="contact.html">Request Demo</a>
+        </div>
+        <div class="foot-col">
+          <h4>Contact</h4>
+          <a href="mailto:hello@ovify.com">hello@ovify.com</a>
+          <p style="font-size: 0.9rem; color: var(--text-dim-light); margin-top: 10px;">Abu Dhabi, UAE</p>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <span>© 2026 Ovify. AI Infrastructure for Reproductive Medicine. All rights reserved.</span>
+        <span>Ethical AI · Support, Not Surveillance.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Header shadow on scroll
+    const header = document.getElementById('header');
+    window.addEventListener('scroll', () => {
+      header.classList.toggle('scrolled', window.scrollY > 10);
+    });
+
+    // Mobile menu toggle
+    const burger = document.getElementById('burger');
+    const mmenu = document.getElementById('mmenu');
+    burger.onclick = () => mmenu.classList.toggle('open');
+    mmenu.querySelectorAll('a').forEach(link => {
+      link.onclick = () => mmenu.classList.remove('open');
+    });
+
+    // Scroll Reveal Intersection Observer
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    // ── Form Security: Honeypot + Input Sanitization ──
+    const contactForm = document.getElementById('contactForm');
+    if (contactForm) {
+      contactForm.addEventListener('submit', function(e) {
+        // Honeypot check — if the hidden field is filled, it's a bot
+        const honeypot = document.getElementById('website_url');
+        if (honeypot && honeypot.value.trim() !== '') {
+          e.preventDefault();
+          return false;
+        }
+
+        // Basic input sanitization — strip HTML tags from all text inputs
+        const textInputs = contactForm.querySelectorAll('input[type="text"], input[type="email"], textarea');
+        textInputs.forEach(function(input) {
+          input.value = input.value.replace(/<[^>]*>/g, '').trim();
+        });
+
+        // Email format validation
+        const emailField = document.getElementById('email');
+        if (emailField) {
+          const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+          if (!emailRegex.test(emailField.value)) {
+            e.preventDefault();
+            alert('Please enter a valid email address.');
+            emailField.focus();
+            return false;
+          }
+        }
+
+        // Rate limiting — prevent double submissions
+        const submitBtn = contactForm.querySelector('button[type="submit"]');
+        if (submitBtn.dataset.submitting === 'true') {
+          e.preventDefault();
+          return false;
+        }
+        submitBtn.dataset.submitting = 'true';
+        submitBtn.textContent = 'Sending...';
+        submitBtn.style.opacity = '0.6';
+        submitBtn.style.pointerEvents = 'none';
+
+        // Reset after 5 seconds in case submission fails
+        setTimeout(function() {
+          submitBtn.dataset.submitting = 'false';
+          submitBtn.textContent = 'Send Message';
+          submitBtn.style.opacity = '1';
+          submitBtn.style.pointerEvents = 'auto';
+        }, 5000);
+      });
+    }
+
+    // FAQ Accordion logic
+    document.querySelectorAll('.faq-trigger').forEach(trigger => {
+      trigger.onclick = () => {
+        const item = trigger.parentElement;
+        const answer = item.querySelector('.faq-answer');
+        const isOpen = item.classList.contains('open');
+
+        // Close all items
+        document.querySelectorAll('.faq-item').forEach(x => {
+          x.classList.remove('open');
+          x.querySelector('.faq-answer').style.maxHeight = null;
+        });
+
+        // Open clicked item if it wasn't open
+        if (!isOpen) {
+          item.classList.add('open');
+          answer.style.maxHeight = answer.scrollHeight + 'px';
+        }
+      };
+    });
+
+    // Pre-fill role from URL query param if present
+    const urlParams = new URLSearchParams(window.location.search);
+    const roleParam = urlParams.get('role');
+    if (roleParam) {
+      const selectRole = document.getElementById('role');
+      // Capitalize first letter to match value
+      const capitalized = roleParam.charAt(0).toUpperCase() + roleParam.slice(1);
+      if (['Patient', 'Support', 'Clinic', 'Employer', 'Bank'].includes(capitalized)) {
+        selectRole.value = capitalized;
+      }
+    }
+
+    // Dummy form submission handling
+    document.getElementById('contactForm').onsubmit = (e) => {
+      e.preventDefault();
+      alert('Thank you for your interest! Your message has been sent successfully. We will contact you soon.');
+      document.getElementById('contactForm').reset();
+    };
+  </script>
+</body>
+</html>

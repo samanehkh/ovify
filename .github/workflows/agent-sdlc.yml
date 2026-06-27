@@ -1,0 +1,57 @@
+name: Agentic SDLC Pipeline
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  id-token: write  # Required for Azure OIDC Federated Credentials
+  contents: read   # Required for repository checkout
+
+jobs:
+  agent-swarm:
+    name: Execute Agent Swarm
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install langgraph langchain-core langchain-google-genai pydantic checkov gitleaks
+
+      - name: Restore SDLC State (if available)
+        uses: actions/download-artifact@v4
+        with:
+          name: sdlc-state
+          path: .spec-kit/state/
+          ignore-on-missing: true
+
+      - name: Run LangGraph Agent Swarm
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python SDLC_design/orchestrator.py
+
+      - name: Upload SDLC State Checkpoint
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdlc-state
+          path: .spec-kit/state/sdlc_state.json
+          retention-days: 5

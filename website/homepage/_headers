@@ -1,0 +1,29 @@
+# Ovify — Netlify HTTP Security Headers
+# These headers apply to all pages served from this site.
+
+/*
+  # Prevent MIME-type sniffing
+  X-Content-Type-Options: nosniff
+
+  # Block clickjacking (no iframe embedding)
+  X-Frame-Options: DENY
+
+  # Only send referrer for same-origin; strip on cross-origin
+  Referrer-Policy: strict-origin-when-cross-origin
+
+  # Restrict browser features
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+
+  # Force HTTPS for 1 year (enable once HTTPS is confirmed)
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+
+  # Content Security Policy
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';
+
+  # Prevent cross-origin resource leaks
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+  Cross-Origin-Embedder-Policy: credentialless
+
+  # Prevent browsers from caching sensitive pages
+  X-DNS-Prefetch-Control: on

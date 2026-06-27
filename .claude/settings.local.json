@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd /Users/samaneh/Documents/Ovify/SDLC_design && mkdir -p assets && cp \"/Users/samaneh/.gemini/antigravity/brain/c74dac94-ff5b-4a5f-a3c5-d9b3df07c5f1/sdlc_layers_architecture_1782494827513.png\" assets/sdlc_layers.png && ls -la assets/)"
+    ]
+  }
+}

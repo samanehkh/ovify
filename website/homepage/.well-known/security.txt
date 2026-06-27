@@ -1,0 +1,8 @@
+# Ovify Security Contact
+# https://securitytxt.org/
+
+Contact: mailto:security@ovify.com
+Preferred-Languages: en
+Canonical: https://www.ovify.com/.well-known/security.txt
+Policy: https://www.ovify.com/security-policy.html
+Expires: 2027-06-19T00:00:00.000Z

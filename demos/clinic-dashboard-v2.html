@@ -1,0 +1,2333 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ovify — Clinic Command Center</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #091220, #091220);
+            color: #F8F5F2;
+            height: 100vh;
+            overflow: hidden
+        }
+
+        .shell {
+            width: 100%;
+            height: 100vh;
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 14px;
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 20px
+        }
+
+        /* LEFT PANEL */
+        .lp {
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding-right: 6px
+        }
+
+        .lp::-webkit-scrollbar {
+            width: 3px
+        }
+
+        .lp::-webkit-scrollbar-thumb {
+            background: rgba(158, 140, 239, .2);
+            border-radius: 10px
+        }
+
+        .logo-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(158, 140, 239, .1)
+        }
+
+        .logo-row img {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            object-fit: cover
+        }
+
+        .logo-row h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 18px;
+            font-weight: 700
+        }
+
+        .logo-row h1 em {
+            font-style: normal;
+            color: #9E8CEF
+        }
+
+        .logo-row p {
+            font-size: 10px;
+            color: #64748B;
+            letter-spacing: .5px
+        }
+
+        .persona {
+            background: rgba(158, 140, 239, .05);
+            border: 1px solid rgba(158, 140, 239, .1);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 14px
+        }
+
+        .persona-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px
+        }
+
+        .persona-av {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #F5C6CF, #9E8CEF);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px
+        }
+
+        .persona h4 {
+            font-size: 14px;
+            font-weight: 600
+        }
+
+        .persona .role {
+            font-size: 11px;
+            color: #F5C6CF
+        }
+
+        .persona .bio {
+            font-size: 11px;
+            color: #94A3B8;
+            line-height: 1.5;
+            margin-top: 6px
+        }
+
+        /* CONTEXT CARD */
+        .context {
+            background: rgba(15, 26, 42, .6);
+            border: 1px solid rgba(158, 140, 239, .08);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 14px
+        }
+
+        .ctx-label {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px
+        }
+
+        .ctx-label span {
+            font-size: 9px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 99px;
+            letter-spacing: .8px;
+            text-transform: uppercase
+        }
+
+        .ctx-label .j {
+            background: rgba(245, 198, 207, .12);
+            color: #F5C6CF;
+            border: 1px solid rgba(245, 198, 207, .15)
+        }
+
+        .ctx-label .s {
+            background: linear-gradient(135deg, #9E8CEF, #C8B4FF);
+            color: #091220
+        }
+
+        .ctx-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            line-height: 1.3
+        }
+
+        .ctx-desc {
+            font-size: 13px;
+            color: rgba(248, 245, 242, .65);
+            line-height: 1.6;
+            margin-bottom: 12px
+        }
+
+        .ctx-points {
+            display: flex;
+            flex-direction: column;
+            gap: 5px
+        }
+
+        .ctx-pt {
+            display: flex;
+            gap: 7px;
+            font-size: 11px;
+            color: rgba(248, 245, 242, .55);
+            line-height: 1.4
+        }
+
+        .ctx-pt .ic {
+            flex-shrink: 0
+        }
+
+        .dots {
+            display: flex;
+            gap: 3px;
+            margin-bottom: 12px
+        }
+
+        .dot {
+            height: 3px;
+            flex: 1;
+            background: rgba(158, 140, 239, .12);
+            border-radius: 2px;
+            cursor: pointer;
+            transition: .3s
+        }
+
+        .dot.on {
+            background: linear-gradient(90deg, #9E8CEF, #9E8CEF);
+            box-shadow: 0 0 6px rgba(158, 140, 239, .25)
+        }
+
+        .dot.done {
+            background: rgba(158, 140, 239, .35)
+        }
+
+        .navrow {
+            display: flex;
+            gap: 8px;
+            margin-top: auto;
+            padding-top: 12px
+        }
+
+        .nb {
+            flex: 1;
+            padding: 12px;
+            border-radius: 99px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .2s;
+            border: none
+        }
+
+        .nb.pr {
+            background: linear-gradient(135deg, #9E8CEF, #C8B4FF);
+            color: #091220
+        }
+
+        .nb.pr:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(158, 140, 239, .3)
+        }
+
+        .nb.sc {
+            background: transparent;
+            border: 2px solid rgba(158, 140, 239, .35);
+            color: #9E8CEF
+        }
+
+        .nb:disabled {
+            opacity: .2;
+            cursor: not-allowed
+        }
+
+        /* RIGHT — TABLET */
+        .rp {
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        .tablet {
+            width: 100%;
+            max-width: 860px;
+            height: calc(100vh - 48px);
+            background: #111;
+            border-radius: 20px;
+            padding: 8px;
+            box-shadow: 0 24px 48px rgba(0, 0, 0, .5), 0 0 0 1px rgba(255, 255, 255, .04);
+            position: relative
+        }
+
+        .tscreen {
+            width: 100%;
+            height: 100%;
+            background: #F7F5F2;
+            border-radius: 14px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative
+        }
+
+        /* APP CHROME */
+        .topbar {
+            background: #091220;
+            padding: 10px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between
+        }
+
+        .topbar .tl {
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .topbar .tl img {
+            width: 24px;
+            height: 24px;
+            border-radius: 5px;
+            object-fit: cover
+        }
+
+        .topbar .tl span {
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: #F8F5F2
+        }
+
+        .topbar .tl em {
+            font-style: normal;
+            color: #9E8CEF
+        }
+
+        .topbar .tr {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .topbar .tr .clinic-name {
+            font-size: 11px;
+            color: #94A3B8
+        }
+
+        .notif-bell {
+            position: relative;
+            cursor: pointer;
+            font-size: 16px
+        }
+
+        .notif-dot {
+            position: absolute;
+            top: -2px;
+            right: -4px;
+            width: 8px;
+            height: 8px;
+            background: #EF4444;
+            border-radius: 50%;
+            border: 2px solid #091220
+        }
+
+        .user-av {
+            width: 26px;
+            height: 26px;
+            background: linear-gradient(135deg, #9E8CEF, #F5C6CF);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: #091220
+        }
+
+        /* TABS */
+        .tabs {
+            background: #fff;
+            border-bottom: 1px solid #E8E5E0;
+            display: flex;
+            padding: 0 18px
+        }
+
+        .tab {
+            padding: 9px 14px;
+            font-size: 11px;
+            font-weight: 500;
+            color: #94A3B8;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            transition: .2s;
+            white-space: nowrap
+        }
+
+        .tab.on {
+            color: #091220;
+            border-bottom-color: #9E8CEF;
+            font-weight: 600
+        }
+
+        .tab .tbadge {
+            background: #EF4444;
+            color: #fff;
+            font-size: 8px;
+            font-weight: 700;
+            padding: 1px 5px;
+            border-radius: 8px;
+            margin-left: 4px
+        }
+
+        /* BODY */
+        .tbody {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 18px;
+            background: #F4F1EE
+        }
+
+        .tbody::-webkit-scrollbar {
+            width: 4px
+        }
+
+        .tbody::-webkit-scrollbar-thumb {
+            background: #D4D0CB;
+            border-radius: 4px
+        }
+
+        /* VIEWS */
+        .vw {
+            display: none;
+            animation: fi .3s ease
+        }
+
+        .vw.on {
+            display: block
+        }
+
+        @keyframes fi {
+            from {
+                opacity: 0;
+                transform: translateY(4px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* === COMMAND CENTER VIEW === */
+        .cmd-strip {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px
+        }
+
+        .cmd-chip {
+            background: #fff;
+            padding: 10px 14px;
+            border-radius: 10px;
+            flex: 1;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+            transition: .15s
+        }
+
+        .cmd-chip:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .05)
+        }
+
+        .cmd-chip .cn {
+            font-family: 'Outfit', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #091220;
+            line-height: 1
+        }
+
+        .cmd-chip .cl {
+            font-size: 9px;
+            color: #94A3B8;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-top: 2px
+        }
+
+        .cmd-chip.cg {
+            border-left-color: #22C55E
+        }
+
+        .cmd-chip.ca {
+            border-left-color: #F59E0B
+        }
+
+        .cmd-chip.cr {
+            border-left-color: #EF4444;
+            background: #FEF2F2
+        }
+
+        .urgents-hd {
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: #091220;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .urgents-hd .pulse {
+            width: 8px;
+            height: 8px;
+            background: #EF4444;
+            border-radius: 50%;
+            animation: blink 1.5s infinite
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: .3
+            }
+        }
+
+        /* ALERT CARDS — the star of the show */
+        .acard {
+            background: #fff;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 10px;
+            border: 1px solid #E8E5E0;
+            position: relative;
+            overflow: hidden;
+            transition: .2s
+        }
+
+        .acard.ur {
+            border-left: 4px solid #EF4444;
+            background: #FFFBFB
+        }
+
+        .acard.at {
+            border-left: 4px solid #F59E0B;
+            background: #FFFDF5
+        }
+
+        .acard-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 6px
+        }
+
+        .acard-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #091220
+        }
+
+        .acard-meta {
+            font-size: 10px;
+            color: #94A3B8;
+            margin-top: 1px
+        }
+
+        .acard-time {
+            font-size: 10px;
+            font-weight: 600;
+            color: #EF4444
+        }
+
+        .acard-time.amber {
+            color: #D97706
+        }
+
+        .acard-issue {
+            font-size: 12px;
+            color: #374151;
+            line-height: 1.4;
+            margin-bottom: 8px
+        }
+
+        .acard-issue strong {
+            color: #091220
+        }
+
+        /* Cycle timeline bar */
+        .cycle-bar {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 8px
+        }
+
+        .cycle-bar .cb-label {
+            font-size: 9px;
+            color: #94A3B8;
+            white-space: nowrap;
+            width: 50px
+        }
+
+        .cb-track {
+            flex: 1;
+            height: 6px;
+            background: #E8E5E0;
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative
+        }
+
+        .cb-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width .5s
+        }
+
+        .cb-fill.fg {
+            background: linear-gradient(90deg, #22C55E, #86EFAC)
+        }
+
+        .cb-fill.fa {
+            background: linear-gradient(90deg, #F59E0B, #FCD34D)
+        }
+
+        .cb-fill.fr {
+            background: linear-gradient(90deg, #EF4444, #FCA5A5)
+        }
+
+        .cb-day {
+            font-size: 9px;
+            color: #64748B;
+            font-weight: 600;
+            white-space: nowrap;
+            width: 40px;
+            text-align: right
+        }
+
+        /* AI whisper — contextual */
+        .ai-whisper {
+            background: linear-gradient(135deg, #F5F3FF, #EFF6FF);
+            border: 1px solid #E0D7FE;
+            border-radius: 8px;
+            padding: 8px 10px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+            font-size: 10px;
+            color: #5B21B6;
+            line-height: 1.4
+        }
+
+        .ai-whisper .ab {
+            background: linear-gradient(135deg, #7C6FE0, #5B8DEF);
+            color: #fff;
+            font-size: 7px;
+            font-weight: 700;
+            padding: 2px 5px;
+            border-radius: 3px;
+            flex-shrink: 0;
+            margin-top: 1px
+        }
+
+        /* Inline actions */
+        .acard-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap
+        }
+
+        .aa {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            transition: .15s
+        }
+
+        .aa:hover {
+            transform: translateY(-1px)
+        }
+
+        .aa.call {
+            background: #EF4444;
+            color: #fff
+        }
+
+        .aa.resolve {
+            background: #22C55E;
+            color: #fff
+        }
+
+        .aa.view {
+            background: #F4F2EF;
+            color: #64748B
+        }
+
+        .aa.schedule {
+            background: #9E8CEF;
+            color: #fff
+        }
+
+        .aa.snooze {
+            background: transparent;
+            border: 1px solid #E8E5E0;
+            color: #94A3B8
+        }
+
+        /* GREEN PATIENT */
+        .gcard {
+            background: #fff;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 6px;
+            display: grid;
+            grid-template-columns: 1fr 80px 60px 30px 50px;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            border: 1px solid #E8E5E0;
+            transition: .15s;
+            cursor: pointer
+        }
+
+        .gcard:hover {
+            box-shadow: 0 2px 6px rgba(0, 0, 0, .04);
+            transform: translateX(2px)
+        }
+
+        .gcard .gn {
+            font-weight: 600;
+            color: #091220;
+            font-size: 12px
+        }
+
+        .gcard .gm {
+            font-size: 10px;
+            color: #94A3B8
+        }
+
+        .gcard .gs {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 9px;
+            font-weight: 600
+        }
+
+        .gs.ok {
+            background: #DCFCE7;
+            color: #16A34A
+        }
+
+        .gs.trig {
+            background: #EDE9FE;
+            color: #7C3AED
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748B;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            margin-top: 14px;
+            margin-bottom: 8px
+        }
+
+        /* === REGISTER WIZARD === */
+        .wizard {
+            background: #fff;
+            border-radius: 14px;
+            padding: 20px;
+            max-width: 580px
+        }
+
+        .wiz-steps {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 0
+        }
+
+        .ws {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            flex: 1
+        }
+
+        .ws-circle {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            border: 2px solid #E8E5E0;
+            color: #94A3B8;
+            transition: .3s;
+            flex-shrink: 0
+        }
+
+        .ws-circle.on {
+            background: #9E8CEF;
+            border-color: #9E8CEF;
+            color: #fff
+        }
+
+        .ws-circle.done {
+            background: #22C55E;
+            border-color: #22C55E;
+            color: #fff
+        }
+
+        .ws-line {
+            flex: 1;
+            height: 2px;
+            background: #E8E5E0;
+            margin: 0 6px
+        }
+
+        .ws-line.done {
+            background: #22C55E
+        }
+
+        .ws-lbl {
+            font-size: 9px;
+            color: #94A3B8;
+            text-align: center;
+            margin-top: 4px
+        }
+
+        .wiz-page {
+            display: none;
+            animation: fi .3s
+        }
+
+        .wiz-page.on {
+            display: block
+        }
+
+        .wiz-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: #091220;
+            margin-bottom: 4px
+        }
+
+        .wiz-sub {
+            font-size: 11px;
+            color: #94A3B8;
+            margin-bottom: 16px
+        }
+
+        .fg {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px
+        }
+
+        .fi {
+            margin-bottom: 0
+        }
+
+        .fi.full {
+            grid-column: 1/-1
+        }
+
+        .fi label {
+            display: block;
+            font-size: 10px;
+            font-weight: 500;
+            color: #64748B;
+            margin-bottom: 3px
+        }
+
+        .fi input,
+        .fi select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #E5E7EB;
+            border-radius: 7px;
+            font-size: 12px;
+            color: #091220;
+            background: #FAFAFA;
+            outline: none;
+            font-family: 'Inter', sans-serif
+        }
+
+        .fi input:focus,
+        .fi select:focus {
+            border-color: #9E8CEF;
+            background: #fff
+        }
+
+        .tmpl-row {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-bottom: 10px
+        }
+
+        .tmpl {
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid #E0D7FE;
+            color: #7C3AED;
+            background: #F9F5FF;
+            transition: .15s
+        }
+
+        .tmpl:hover {
+            background: #EDE9FE
+        }
+
+        .tmpl.sel {
+            background: #9E8CEF;
+            color: #fff;
+            border-color: #9E8CEF
+        }
+
+        .med-entry {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 24px;
+            gap: 6px;
+            align-items: end;
+            margin-bottom: 6px
+        }
+
+        .add-med {
+            background: none;
+            border: 1px dashed #9E8CEF;
+            color: #9E8CEF;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer
+        }
+
+        .wiz-nav {
+            display: flex;
+            gap: 8px;
+            margin-top: 18px
+        }
+
+        .wb {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            transition: .15s
+        }
+
+        .wb.next {
+            background: #9E8CEF;
+            color: #fff
+        }
+
+        .wb.next:hover {
+            background: #9580FF;
+            transform: translateY(-1px)
+        }
+
+        .wb.back {
+            background: #F4F2EF;
+            color: #64748B
+        }
+
+        .wb.send {
+            background: #22C55E;
+            color: #fff
+        }
+
+        .wb.send:hover {
+            background: #16A34A
+        }
+
+        /* SUMMARY REVIEW */
+        .review-card {
+            background: #F9F7F5;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 10px
+        }
+
+        .review-card h4 {
+            font-size: 12px;
+            font-weight: 600;
+            color: #091220;
+            margin-bottom: 6px
+        }
+
+        .rv-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            padding: 3px 0;
+            color: #64748B
+        }
+
+        .rv-row .rv-val {
+            color: #091220;
+            font-weight: 500
+        }
+
+        /* AI validation */
+        .ai-valid {
+            background: #F0FDF4;
+            border: 1px solid #BBF7D0;
+            border-radius: 8px;
+            padding: 8px 10px;
+            margin-top: 10px;
+            font-size: 10px;
+            color: #16A34A;
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .ai-warn {
+            background: #FEF3C7;
+            border: 1px solid #FDE68A;
+            border-radius: 8px;
+            padding: 8px 10px;
+            margin-top: 10px;
+            font-size: 10px;
+            color: #92400E;
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        /* CONFIRM */
+        .confirm-ov {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 26, 42, .5);
+            backdrop-filter: blur(3px);
+            z-index: 100;
+            align-items: center;
+            justify-content: center
+        }
+
+        .confirm-ov.show {
+            display: flex
+        }
+
+        .conf-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 24px;
+            max-width: 340px;
+            text-align: center;
+            animation: pop .3s
+        }
+
+        @keyframes pop {
+            from {
+                transform: scale(.9);
+                opacity: 0
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1
+            }
+        }
+
+        .conf-card .ck {
+            width: 50px;
+            height: 50px;
+            background: #DCFCE7;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin: 0 auto 12px
+        }
+
+        .conf-card h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: #091220;
+            margin-bottom: 4px
+        }
+
+        .conf-card p {
+            font-size: 12px;
+            color: #64748B;
+            line-height: 1.5;
+            margin-bottom: 14px
+        }
+
+        .conf-card .sent-items {
+            text-align: left;
+            background: #F9F7F5;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 14px
+        }
+
+        .conf-card .si {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #374151;
+            padding: 3px 0
+        }
+
+        .conf-card .si .ic {
+            font-size: 14px
+        }
+
+        .conf-btns {
+            display: flex;
+            gap: 6px
+        }
+
+        .conf-btns button {
+            flex: 1;
+            padding: 9px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-family: 'Inter', sans-serif
+        }
+
+        .conf-btns .c-view {
+            background: #9E8CEF;
+            color: #fff
+        }
+
+        .conf-btns .c-another {
+            background: #F4F2EF;
+            color: #64748B
+        }
+
+        /* BOTTOM BAR */
+        .bbar {
+            background: #fff;
+            border-top: 1px solid #E8E5E0;
+            padding: 6px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .bbar-left {
+            display: flex;
+            gap: 14px
+        }
+
+        .bb-stat {
+            text-align: center
+        }
+
+        .bb-stat .bbn {
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: #091220
+        }
+
+        .bb-stat .bbl {
+            font-size: 8px;
+            color: #94A3B8;
+            text-transform: uppercase;
+            letter-spacing: .3px
+        }
+
+        .bbar-right .add-pt {
+            background: linear-gradient(135deg, #9E8CEF, #9580FF);
+            color: #fff;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: .15s
+        }
+
+        .bbar-right .add-pt:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(158, 140, 239, .3)
+        }
+
+        /* === PATIENT DETAIL VIEW === */
+        .det-header {
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px 20px;
+            border: 1px solid #E8E5E0;
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .det-header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .det-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #9E8CEF, #F5C6CF);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: #091220;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .det-title h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: #091220;
+            margin-bottom: 2px;
+        }
+
+        .det-title p {
+            font-size: 11px;
+            color: #64748B;
+        }
+
+        .det-header-right {
+            text-align: right;
+            font-size: 11px;
+            color: #64748B;
+            line-height: 1.5;
+        }
+
+        .det-header-right strong {
+            color: #091220;
+        }
+
+        .det-grid {
+            display: grid;
+            grid-template-columns: 1.25fr 1fr;
+            gap: 16px;
+            margin-top: 14px;
+        }
+
+        .det-stats-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .det-stat-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 12px;
+            flex: 1;
+            border: 1px solid #E8E5E0;
+            text-align: center;
+        }
+
+        .det-stat-val {
+            font-family: 'Outfit', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #091220;
+            line-height: 1.2;
+        }
+
+        .det-stat-lbl {
+            font-size: 8px;
+            color: #94A3B8;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-top: 2px;
+        }
+
+        .det-panel {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid #E8E5E0;
+            margin-bottom: 14px;
+        }
+
+        .det-panel-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: #091220;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #F1EEF5;
+            padding-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .det-med-item {
+            background: #F8F6F4;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-left: 4px solid #E8E5E0;
+        }
+
+        .det-med-item.missed { border-left-color: #EF4444; }
+        .det-med-item.ok { border-left-color: #22C55E; }
+        .det-med-item.warn { border-left-color: #F59E0B; }
+
+        .det-med-top {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 600;
+            color: #091220;
+            margin-bottom: 2px;
+        }
+
+        .det-med-desc {
+            font-size: 10px;
+            color: #64748B;
+            line-height: 1.3;
+        }
+
+        .mood-log {
+            display: flex;
+            gap: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid #F1EEF5;
+        }
+
+        .mood-log:last-child {
+            border-bottom: none;
+        }
+
+        .mood-log-left {
+            font-weight: 700;
+            font-size: 11px;
+            color: #091220;
+            width: 45px;
+            flex-shrink: 0;
+        }
+
+        .mood-log-right {
+            flex: 1;
+            font-size: 10px;
+            color: #374151;
+            line-height: 1.3;
+        }
+
+        .mood-badge {
+            display: inline-block;
+            padding: 1px 5px;
+            border-radius: 6px;
+            font-size: 8px;
+            font-weight: 600;
+            background: #F1EEF5;
+            margin-bottom: 2px;
+        }
+
+        /* Chat view */
+        .chat-container {
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #E8E5E0;
+            border-radius: 8px;
+            padding: 10px;
+            background: #FAF8F6;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .chat-bubble {
+            max-width: 85%;
+            padding: 8px 10px;
+            border-radius: 10px;
+            font-size: 10px;
+            line-height: 1.3;
+        }
+
+        .chat-bubble.patient {
+            background: #E0E7FF;
+            color: #312E81;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+
+        .chat-bubble.ai {
+            background: #F3E8FF;
+            color: #5B21B6;
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+            border-left: 2px solid #A855F7;
+        }
+
+        .chat-time {
+            font-size: 7px;
+            color: #94A3B8;
+            margin-top: 3px;
+            text-align: right;
+        }
+
+        .det-action-btn {
+            width: 100%;
+            padding: 9px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 6px;
+            transition: .15s;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .det-action-btn.primary {
+            background: linear-gradient(135deg, #9E8CEF, #9580FF);
+            color: #fff;
+        }
+
+        .det-action-btn.secondary {
+            background: #F4F2EF;
+            color: #64748B;
+            border: 1px solid #E8E5E0;
+        }
+
+        .det-action-btn:hover {
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="shell">
+        <!-- LEFT -->
+        <div class="lp">
+            <div class="logo-row">
+                <img src="../../ovify-logo.jpg" alt="Ovify">
+                <div>
+                    <h1>Ova<em>Sync</em></h1>
+                    <p>Clinic Command Center — Interactive Demo</p>
+                </div>
+            </div>
+
+            <div class="persona">
+                <div class="persona-head">
+                    <div class="persona-av">🩺</div>
+                    <div>
+                        <h4>Nurse Mariam Al-Rasheed</h4>
+                        <div class="role">IVF Coordinator — Abu Dhabi Fertility Center</div>
+                    </div>
+                </div>
+                <div class="bio">8 years in IVF nursing. Manages 43 active patients. Spends 2+ hours/day on WhatsApp.
+                    Today is her first morning using Ovify.</div>
+            </div>
+
+            <div class="dots" id="dots"></div>
+
+            <div class="context" id="ctx">
+                <div class="ctx-label"><span class="j" id="cj"></span><span class="s" id="cs"></span></div>
+                <div class="ctx-title" id="ct"></div>
+                <div class="ctx-desc" id="cd"></div>
+                <div class="ctx-points" id="cp"></div>
+            </div>
+
+            <div class="navrow">
+                <button class="nb sc" id="pbtn" onclick="prev()" disabled>← Back</button>
+                <button class="nb pr" id="nbtn" onclick="next()">Next →</button>
+            </div>
+        </div>
+
+        <!-- RIGHT — TABLET -->
+        <div class="rp">
+            <div class="tablet">
+                <div class="tscreen">
+                    <div class="topbar">
+                        <div class="tl"><img src="../../ovify-logo.jpg" alt=""><span>Ovi<em>fy</em></span></div>
+                        <div class="tr">
+                            <span class="clinic-name">Abu Dhabi Fertility Center</span>
+                            <div class="notif-bell">🔔<div class="notif-dot"></div>
+                            </div>
+                            <div class="user-av">MR</div>
+                        </div>
+                    </div>
+
+                    <div class="tabs" id="tabs">
+                        <div class="tab on" data-v="cmd" onclick="sv('cmd')">🏠 Command Center<span
+                                class="tbadge">2</span></div>
+                        <div class="tab" data-v="reg" onclick="sv('reg')">➕ New Patient</div>
+                        <div class="tab" data-v="all" onclick="sv('all')">👥 All Patients</div>
+                        <div class="tab" data-v="det" onclick="sv('det')" style="display:none;" id="det-tab">👤 Patient Profile</div>
+                    </div>
+
+                    <div class="tbody">
+                        <!-- CMD VIEW -->
+                        <div class="vw on" id="v-cmd">
+                            <div class="cmd-strip">
+                                <div class="cmd-chip cr">
+                                    <div class="cn">2</div>
+                                    <div class="cl">Urgent</div>
+                                </div>
+                                <div class="cmd-chip ca">
+                                    <div class="cn">5</div>
+                                    <div class="cl">Attention</div>
+                                </div>
+                                <div class="cmd-chip cg">
+                                    <div class="cn">34</div>
+                                    <div class="cl">On Track</div>
+                                </div>
+                                <div class="cmd-chip" style="border-left-color:#9E8CEF">
+                                    <div class="cn">92%</div>
+                                    <div class="cl">Adherence</div>
+                                </div>
+                            </div>
+
+                            <div class="urgents-hd">
+                                <div class="pulse"></div> Urgent — Act Now
+                            </div>
+
+                            <div class="acard ur" id="alert1">
+                                <div class="acard-top">
+                                    <div>
+                                        <div class="acard-name">Sarah K.</div>
+                                        <div class="acard-meta">Day 9 · Antagonist Protocol</div>
+                                    </div>
+                                    <div class="acard-time">2h overdue</div>
+                                </div>
+                                <div class="cycle-bar">
+                                    <div class="cb-label">Cycle</div>
+                                    <div class="cb-track">
+                                        <div class="cb-fill fr" style="width:64%"></div>
+                                    </div>
+                                    <div class="cb-day">Day 9/14</div>
+                                </div>
+                                <div class="acard-issue"><strong>Missed Gonal-F 150IU</strong> — scheduled 7:00 PM.
+                                    Support Ahmed notified at 8:30 PM. No confirmation from either.</div>
+                                <div class="ai-whisper"><span class="ab">AI</span> Sarah has confirmed late 3 of last 5
+                                    days. Pattern suggests she may need her reminder time shifted to 7:30 PM.</div>
+                                <div class="acard-actions">
+                                    <button class="aa call" onclick="resolveAlert('alert1','called')">📞 Call
+                                        Sarah</button>
+                                    <button class="aa resolve" onclick="resolveAlert('alert1','resolved')">✅ She took
+                                        it</button>
+                                    <button class="aa view" onclick="showPatientDetail('sarah_k')">📋 Full Profile</button>
+                                    <button class="aa snooze">⏰ Snooze 30m</button>
+                                </div>
+                            </div>
+
+                            <div class="acard ur" id="alert2">
+                                <div class="acard-top">
+                                    <div>
+                                        <div class="acard-name">Fatima M.</div>
+                                        <div class="acard-meta">Day 12 · Long Protocol</div>
+                                    </div>
+                                    <div class="acard-time">8h ago</div>
+                                </div>
+                                <div class="cycle-bar">
+                                    <div class="cb-label">Cycle</div>
+                                    <div class="cb-track">
+                                        <div class="cb-fill fr" style="width:85%"></div>
+                                    </div>
+                                    <div class="cb-day">Day 12/14</div>
+                                </div>
+                                <div class="acard-issue"><strong>Intent to discontinue</strong> — told AI chatbot at
+                                    11:30 PM: "I can't do this anymore, what's the point."</div>
+                                <div class="ai-whisper"><span class="ab">AI</span> Fatima's mood has declined for 5
+                                    days. She's 2 days from trigger — discontinuing now means losing the entire cycle
+                                    investment.</div>
+                                <div class="acard-actions">
+                                    <button class="aa schedule">📅 Schedule Urgent Call</button>
+                                    <button class="aa view" onclick="showPatientDetail('fatima_m')">💬 View AI Conversation</button>
+                                    <button class="aa call">📞 Call Now</button>
+                                </div>
+                            </div>
+
+                            <div class="urgents-hd" style="margin-top:12px">🟡 Attention — Monitor Today</div>
+
+                            <div class="acard at">
+                                <div class="acard-top">
+                                    <div>
+                                        <div class="acard-name">Noor H.</div>
+                                        <div class="acard-meta">Day 11 · Long Protocol</div>
+                                    </div>
+                                    <div class="acard-time amber">4 days anxious</div>
+                                </div>
+                                <div class="cycle-bar">
+                                    <div class="cb-label">Cycle</div>
+                                    <div class="cb-track">
+                                        <div class="cb-fill fa" style="width:78%"></div>
+                                    </div>
+                                    <div class="cb-day">Day 11/14</div>
+                                </div>
+                                <div class="acard-issue">Adherence is 100% but mood has been 😟 Anxious for <strong>4
+                                        consecutive days</strong>. All injections confirmed on time.</div>
+                                <div class="ai-whisper"><span class="ab">AI</span> Patients with 4+ day anxiety streaks
+                                    have 35% higher dropout risk. A 2-minute supportive call can reduce this by 60%.
+                                </div>
+                                <div class="acard-actions">
+                                    <button class="aa schedule">📞 Quick Check-in</button>
+                                    <button class="aa view" onclick="showPatientDetail('noor_h')">📋 Mood Timeline</button>
+                                </div>
+                            </div>
+
+                            <div class="acard at">
+                                <div class="acard-top">
+                                    <div>
+                                        <div class="acard-name">Layla A.</div>
+                                        <div class="acard-meta">Day 6 · Antagonist</div>
+                                    </div>
+                                    <div class="acard-time amber">Pattern forming</div>
+                                </div>
+                                <div class="cycle-bar">
+                                    <div class="cb-label">Cycle</div>
+                                    <div class="cb-track">
+                                        <div class="cb-fill fa" style="width:42%"></div>
+                                    </div>
+                                    <div class="cb-day">Day 6/14</div>
+                                </div>
+                                <div class="acard-issue">Confirmed <strong>late 3 of last 5 days</strong> (avg 23 min
+                                    late). No missed doses yet.</div>
+                                <div class="ai-whisper"><span class="ab">AI</span> Late pattern + Day 6 = 60% chance of
+                                    a full miss within 48h. Consider reminder time adjustment or support nudge.</div>
+                                <div class="acard-actions">
+                                    <button class="aa view" onclick="showPatientDetail('layla_a')">⏰ Adjust Time</button>
+                                    <button class="aa snooze">👍 Noted</button>
+                                </div>
+                            </div>
+
+                            <div class="section-title">🟢 On Track (34 patients)</div>
+                            <div class="gcard">
+                                <div><span class="gn">Maria S.</span><br><span class="gm">Day 8 · Antagonist</span>
+                                </div>
+                                <div class="gm">All on time</div>
+                                <div><span class="gs ok">✓ OK</span></div>
+                                <div>😊</div>
+                                <div class="gm">7:01</div>
+                            </div>
+                            <div class="gcard">
+                                <div><span class="gn">Aisha R.</span><br><span class="gm">Day 3 · Baseline</span></div>
+                                <div class="gm">New patient</div>
+                                <div><span class="gs ok">✓ OK</span></div>
+                                <div>😊</div>
+                                <div class="gm">8:15</div>
+                            </div>
+                            <div class="gcard">
+                                <div><span class="gn">Hana T.</span><br><span class="gm">Day 14 · Trigger</span></div>
+                                <div class="gm">100% ✨</div>
+                                <div><span class="gs trig">Trigger</span></div>
+                                <div>😊</div>
+                                <div class="gm">9:00</div>
+                            </div>
+                            <div class="gcard">
+                                <div><span class="gn">Reem K.</span><br><span class="gm">Day 5 · Antagonist</span></div>
+                                <div class="gm">All on time</div>
+                                <div><span class="gs ok">✓ OK</span></div>
+                                <div>😐</div>
+                                <div class="gm">7:12</div>
+                            </div>
+                            <div class="gcard">
+                                <div><span class="gn">Dana M.</span><br><span class="gm">Day 10 · Long</span></div>
+                                <div class="gm">All on time</div>
+                                <div><span class="gs ok">✓ OK</span></div>
+                                <div>😊</div>
+                                <div class="gm">6:58</div>
+                            </div>
+                        </div>
+
+                        <!-- REG WIZARD VIEW -->
+                        <div class="vw" id="v-reg">
+                            <div class="wizard">
+                                <div class="wiz-steps">
+                                    <div class="ws">
+                                        <div class="ws-circle on" id="wc1">1</div>
+                                    </div>
+                                    <div class="ws-line" id="wl1"></div>
+                                    <div class="ws">
+                                        <div class="ws-circle" id="wc2">2</div>
+                                    </div>
+                                    <div class="ws-line" id="wl2"></div>
+                                    <div class="ws">
+                                        <div class="ws-circle" id="wc3">3</div>
+                                    </div>
+                                    <div class="ws-line" id="wl3"></div>
+                                    <div class="ws">
+                                        <div class="ws-circle" id="wc4">4</div>
+                                    </div>
+                                </div>
+
+                                <!-- PAGE 1 -->
+                                <div class="wiz-page on" id="wp1">
+                                    <div class="wiz-title">Patient Details</div>
+                                    <div class="wiz-sub">30 seconds — just the basics</div>
+                                    <div class="fg">
+                                        <div class="fi"><label>Full Name *</label><input type="text"
+                                                placeholder="Sarah Ahmed" id="rn"></div>
+                                        <div class="fi"><label>Phone (SMS) *</label><input type="text"
+                                                placeholder="+971 50 XXX XXXX" id="rp"></div>
+                                        <div class="fi"><label>Date of Birth</label><input type="date"></div>
+                                        <div class="fi"><label>Cycle Type</label><select>
+                                                <option>Fresh IVF</option>
+                                                <option>FET</option>
+                                                <option>IUI</option>
+                                            </select></div>
+                                    </div>
+                                    <div class="wiz-nav">
+                                        <div style="flex:1"></div><button class="wb next" onclick="wizNext()">Next:
+                                            Protocol →</button>
+                                    </div>
+                                </div>
+
+                                <!-- PAGE 2 -->
+                                <div class="wiz-page" id="wp2">
+                                    <div class="wiz-title">Protocol Setup</div>
+                                    <div class="wiz-sub">Use a template or customize — 45 seconds</div>
+                                    <div class="tmpl-row">
+                                        <div class="tmpl" onclick="selTmpl(this,'ant')">Standard Antagonist</div>
+                                        <div class="tmpl" onclick="selTmpl(this,'long')">Long Protocol</div>
+                                        <div class="tmpl" onclick="selTmpl(this,'fet')">FET Natural</div>
+                                        <div class="tmpl" onclick="selTmpl(this,'custom')">Custom</div>
+                                    </div>
+                                    <div id="medsArea">
+                                        <div class="med-entry">
+                                            <div class="fi"><label>Drug</label><select id="md1">
+                                                    <option>Gonal-F</option>
+                                                    <option>Menopur</option>
+                                                    <option>Cetrotide</option>
+                                                    <option>Ovidrel</option>
+                                                    <option>Progesterone</option>
+                                                </select></div>
+                                            <div class="fi"><label>Dose</label><input placeholder="150 IU" id="ds1">
+                                            </div>
+                                            <div class="fi"><label>Time</label><input type="time" value="19:00"
+                                                    id="tm1"></div>
+                                            <div style="color:#ccc;cursor:pointer;padding-bottom:2px">✕</div>
+                                        </div>
+                                    </div>
+                                    <button class="add-med" onclick="addMedW()">+ Add Medication</button>
+                                    <div class="wiz-nav"><button class="wb back" onclick="wizBack()">←
+                                            Back</button><button class="wb next" onclick="wizNext()">Next: Support
+                                            →</button></div>
+                                </div>
+
+                                <!-- PAGE 3 -->
+                                <div class="wiz-page" id="wp3">
+                                    <div class="wiz-title">Support Network</div>
+                                    <div class="wiz-sub">Optional — support receives daily tips, not medical info</div>
+                                    <div class="fg">
+                                        <div class="fi"><label>Support Name</label><input type="text"
+                                                placeholder="Ahmed" id="pn"></div>
+                                        <div class="fi"><label>Support Phone</label><input type="text"
+                                                placeholder="+971 55 XXX XXXX" id="pp"></div>
+                                    </div>
+                                    <div style="margin-top:10px;font-size:10px;color:#94A3B8;line-height:1.5">
+                                        💡 Support will receive: daily support tips, injection presence reminders,
+                                        emotional awareness alerts.<br>
+                                        ❌ Support will NOT receive: medical details, test results, dosage information.
+                                    </div>
+                                    <div class="wiz-nav"><button class="wb back" onclick="wizBack()">←
+                                            Back</button><button class="wb next" onclick="wizNext()">Review →</button>
+                                    </div>
+                                </div>
+
+                                <!-- PAGE 4 — REVIEW -->
+                                <div class="wiz-page" id="wp4">
+                                    <div class="wiz-title">Review & Send</div>
+                                    <div class="wiz-sub">Confirm everything looks right</div>
+                                    <div class="review-card">
+                                        <h4>👤 Patient</h4>
+                                        <div class="rv-row"><span>Name</span><span class="rv-val" id="rv-name">—</span>
+                                        </div>
+                                        <div class="rv-row"><span>Phone</span><span class="rv-val"
+                                                id="rv-phone">—</span></div>
+                                        <div class="rv-row"><span>Cycle</span><span class="rv-val">Fresh IVF</span>
+                                        </div>
+                                    </div>
+                                    <div class="review-card">
+                                        <h4>💊 Protocol</h4>
+                                        <div class="rv-row"><span>Drug</span><span class="rv-val" id="rv-drug">—</span>
+                                        </div>
+                                        <div class="rv-row"><span>Dose</span><span class="rv-val" id="rv-dose">—</span>
+                                        </div>
+                                        <div class="rv-row"><span>Time</span><span class="rv-val" id="rv-time">—</span>
+                                        </div>
+                                    </div>
+                                    <div class="review-card" id="rv-support-card">
+                                        <h4>💑 Support</h4>
+                                        <div class="rv-row"><span>Name</span><span class="rv-val" id="rv-pname">—</span>
+                                        </div>
+                                        <div class="rv-row"><span>Phone</span><span class="rv-val"
+                                                id="rv-pphone">—</span></div>
+                                    </div>
+                                    <div class="ai-valid" id="ai-ok">✅ AI Validation passed — no issues detected</div>
+                                    <div class="wiz-nav"><button class="wb back" onclick="wizBack()">←
+                                            Edit</button><button class="wb send" onclick="sendReg()">✅ Register & Send
+                                            Invite</button></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ALL PATIENTS VIEW -->
+                        <div class="vw" id="v-all">
+                            <div class="section-title">All Active Patients (43)</div>
+                            <div class="gcard" style="border-left:3px solid #EF4444" onclick="showPatientDetail('sarah_k')">
+                                <div><span class="gn">Sarah K.</span><br><span class="gm">Day 9 · Antagonist</span>
+                                </div>
+                                <div class="gm">Missed</div>
+                                <div><span class="gs" style="background:#FEE2E2;color:#DC2626">Missed</span></div>
+                                <div>😟</div>
+                                <div class="gm">—</div>
+                            </div>
+                            <div class="gcard" style="border-left:3px solid #EF4444" onclick="showPatientDetail('fatima_m')">
+                                <div><span class="gn">Fatima M.</span><br><span class="gm">Day 12 · Long</span></div>
+                                <div class="gm">At Risk</div>
+                                <div><span class="gs" style="background:#FEE2E2;color:#DC2626">Risk</span></div>
+                                <div>😢</div>
+                                <div class="gm">11:30</div>
+                            </div>
+                            <div class="gcard" style="border-left:3px solid #F59E0B" onclick="showPatientDetail('noor_h')">
+                                <div><span class="gn">Noor H.</span><br><span class="gm">Day 11 · Long</span></div>
+                                <div class="gm">4 days anxious</div>
+                                <div><span class="gs" style="background:#FEF3C7;color:#D97706">Monitor</span></div>
+                                <div>😟</div>
+                                <div class="gm">6:45</div>
+                            </div>
+                            <div class="gcard" style="border-left:3px solid #F59E0B" onclick="showPatientDetail('layla_a')">
+                                <div><span class="gn">Layla A.</span><br><span class="gm">Day 6 · Antagonist</span>
+                                </div>
+                                <div class="gm">3 late</div>
+                                <div><span class="gs" style="background:#FEF3C7;color:#D97706">Pattern</span></div>
+                                <div>😐</div>
+                                <div class="gm">7:03</div>
+                            </div>
+                            <div class="gcard">
+                                <div><span class="gn">Maria S.</span><br><span class="gm">Day 8 · Antagonist</span>
+                                </div>
+                                <div class="gm">All on time</div>
+                                <div><span class="gs ok">✓ OK</span></div>
+                                <div>😊</div>
+                                <div class="gm">7:01</div>
+                            </div>
+                            <div class="gcard">
+                                <div><span class="gn">Aisha R.</span><br><span class="gm">Day 3 · Baseline</span></div>
+                                <div class="gm">New patient</div>
+                                <div><span class="gs ok">✓ OK</span></div>
+                                <div>😊</div>
+                                <div class="gm">8:15</div>
+                            </div>
+                            <div class="gcard">
+                                <div><span class="gn">Hana T.</span><br><span class="gm">Day 14 · Trigger</span></div>
+                                <div class="gm">100% ✨</div>
+                                <div class="gs trig">Trigger</div>
+                                <div>😊</div>
+                                <div class="gm">9:00</div>
+                            </div>
+                        </div>
+
+                        <!-- PATIENT DETAIL VIEW -->
+                        <div class="vw" id="v-det">
+                            <div class="det-header">
+                                <div class="det-header-left">
+                                    <div class="det-avatar" id="det-av">SK</div>
+                                    <div class="det-title">
+                                        <h2 id="det-name">Sarah K.</h2>
+                                        <p id="det-proto">Day 9 · Antagonist Protocol</p>
+                                    </div>
+                                </div>
+                                <div class="det-header-right">
+                                    <div>Phone: <strong id="det-phone">+971 50 482 9102</strong></div>
+                                    <div>Support: <strong id="det-support">Ahmed K. (Connected 🟢)</strong></div>
+                                </div>
+                            </div>
+
+                            <div class="det-stats-row">
+                                <div class="det-stat-card">
+                                    <div class="det-stat-val" id="det-adh">88%</div>
+                                    <div class="det-stat-lbl">Adherence</div>
+                                </div>
+                                <div class="det-stat-card" style="border-top:3px solid #EF4444">
+                                    <div class="det-stat-val" style="color:#EF4444" id="det-missed">1 Missed</div>
+                                    <div class="det-stat-lbl">Missed Doses</div>
+                                </div>
+                                <div class="det-stat-card">
+                                    <div class="det-stat-val" id="det-delay">+23 min</div>
+                                    <div class="det-stat-lbl">Avg Confirm Delay</div>
+                                </div>
+                                <div class="det-stat-card" style="border-top:3px solid #F59E0B">
+                                    <div class="det-stat-val" style="color:#D97706" id="det-mood">😟 Anxious</div>
+                                    <div class="det-stat-lbl">Mood Status</div>
+                                </div>
+                            </div>
+
+                            <div class="det-grid">
+                                <div>
+                                    <!-- Protocol & Adherence Timeline Panel -->
+                                    <div class="det-panel">
+                                        <div class="det-panel-title">
+                                            <span>📅 Medication Adherence History</span>
+                                            <span style="font-size:10px;color:#94A3B8">Real-time sync status</span>
+                                        </div>
+                                        <div id="det-meds-list">
+                                            <!-- Dynamically filled -->
+                                        </div>
+                                    </div>
+
+                                    <!-- Emotional Health Timeline Panel -->
+                                    <div class="det-panel">
+                                        <div class="det-panel-title">
+                                            <span>🌱 CalmSeed Emotional Support Logs</span>
+                                            <span style="font-size:10px;color:#94A3B8">Patient-initiated entries</span>
+                                        </div>
+                                        <div id="det-mood-logs">
+                                            <!-- Dynamically filled -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <!-- AI Chatbot Logs Panel -->
+                                    <div class="det-panel">
+                                        <div class="det-panel-title">
+                                            <span>🤖 Ask Ovify AI Conversation</span>
+                                            <span style="font-size:10px;color:#7C3AED;font-weight:600">Auto-resolved</span>
+                                        </div>
+                                        <div class="chat-container" id="det-chat-container">
+                                            <!-- Dynamically filled -->
+                                        </div>
+                                        <div style="font-size:10px;color:#64748B;line-height:1.4;margin-bottom:12px;background:#F8F6F4;padding:8px;border-radius:6px">
+                                            ℹ️ <em>Ovify AI provides guardrailed patient support, keeping nurses focused on clinical emergencies. 70%+ queries auto-resolved.</em>
+                                        </div>
+                                    </div>
+
+                                    <!-- Action Panel -->
+                                    <div class="det-panel">
+                                        <div class="det-panel-title">⚡ Clinic Intervention Panel</div>
+                                        <button class="det-action-btn primary" onclick="alert('WhatsApp message sent to patient with updated protocol details.')">📲 Send Protocol Sync Update</button>
+                                        <button class="det-action-btn secondary" onclick="alert('Opening secure tele-call channel with patient...')">📞 Contact Patient Directly</button>
+                                        <button class="det-action-btn secondary" onclick="alert('Adjusting patient medication reminder schedule. A PWA push will sync it.')">⏰ Adjust Reminder Schedule</button>
+                                        <button class="det-action-btn secondary" onclick="alert('Marking current alert as manually resolved. Clinic logs updated.')">✅ Resolve Outstanding Alert</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bbar">
+                        <div class="bbar-left">
+                            <div class="bb-stat">
+                                <div class="bbn">92%</div>
+                                <div class="bbl">Adherence</div>
+                            </div>
+                            <div class="bb-stat">
+                                <div class="bbn">14</div>
+                                <div class="bbl">AI Handled</div>
+                            </div>
+                            <div class="bb-stat">
+                                <div class="bbn">8 min</div>
+                                <div class="bbl">Avg Confirm</div>
+                            </div>
+                            <div class="bb-stat">
+                                <div class="bbn">67%</div>
+                                <div class="bbl">Support Read</div>
+                            </div>
+                        </div>
+                        <div class="bbar-right"><button class="add-pt" onclick="sv('reg');goStep(2)">➕ New
+                                Patient</button></div>
+                    </div>
+
+                    <div class="confirm-ov" id="confOv">
+                        <div class="conf-card">
+                            <div class="ck">✅</div>
+                            <h3 id="conf-name">Patient registered</h3>
+                            <p>Registration complete. Invites are being sent now.</p>
+                            <div class="sent-items">
+                                <div class="si"><span class="ic">📱</span> SMS + PWA invite → Patient (sending...)</div>
+                                <div class="si" id="conf-support-line"><span class="ic">💑</span> Support invite →
+                                    Sending...</div>
+                                <div class="si"><span class="ic">⏰</span> First reminder scheduled</div>
+                                <div class="si"><span class="ic">🤖</span> AI assistant configured</div>
+                            </div>
+                            <div class="conf-btns">
+                                <button class="c-view" onclick="closeConf();sv('cmd')">View Dashboard</button>
+                                <button class="c-another" onclick="closeConf();resetWiz();sv('reg')">Register
+                                    Another</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const steps = [
+            {
+                j: "CLINIC VIEW", s: "1 of 6", t: "Command Center — Triage in 60 Seconds", d: "Mariam opens Ovify. No login required (SSO). The first thing she sees: 2 red alerts, 5 amber flags, 34 green patients. She doesn't need to think — the system tells her exactly what to do first.", pts: [
+                    { i: "🔴", t: "Alert-first design: urgent patients are impossible to miss" },
+                    { i: "📊", t: "Cycle progress bars show exactly where each patient is in treatment" },
+                    { i: "🤖", t: "AI whispers next to each alert — 'Sarah confirmed late 3/5 days, shift reminder time'" },
+                    { i: "⚡", t: "Inline actions: Call, Resolve, Snooze — no page navigation needed" }
+                ], view: "cmd"
+            },
+            {
+                j: "CLINIC VIEW", s: "2 of 6", t: "Urgent Alert — Missed Injection", d: "Sarah K. missed her Gonal-F 2 hours ago. The card shows: cycle day (9/14), escalation status (support notified), and the AI's behavioral insight. Mariam can call Sarah, mark it resolved, or snooze — all without leaving this screen.", pts: [
+                    { i: "💉", t: "Cycle timeline bar: Day 9 of 14 — losing this cycle means losing 30,000 AED" },
+                    { i: "💑", t: "Support Ahmed was auto-notified at T+90 min — no nurse action needed" },
+                    { i: "🤖", t: "AI: 'Late 3/5 days — suggest shifting reminder time to 7:30 PM'" },
+                    { i: "✅", t: "One-tap resolution: 'She took it' → logs, alerts support, updates dashboard" }
+                ], view: "cmd"
+            },
+            {
+                j: "CLINIC VIEW", s: "3 of 6", t: "Critical Save — Patient Wants to Quit", d: "Fatima told the AI chatbot at 11:30 PM she wants to stop treatment. She's on Day 12 of 14 — two days from trigger. Without Ovify, this would be invisible until her next appointment, by which point she may have already stopped.", pts: [
+                    { i: "💬", t: "AI captured 'I can't do this anymore' at 11:30 PM — invisible to human staff" },
+                    { i: "🧠", t: "AI context: mood declined 5 days straight. She's 2 days from trigger shot" },
+                    { i: "💰", t: "Losing this cycle = 30,000 AED revenue + devastating patient experience" },
+                    { i: "📞", t: "Mariam can schedule an urgent call or view the full AI conversation transcript" }
+                ], view: "cmd"
+            },
+            {
+                j: "REGISTER", s: "4 of 6", t: "Register New Patient — 90-Second Wizard", d: "New referral from Dr. Hassan. Instead of a form wall, Mariam gets a 4-step wizard: Patient → Protocol → Support → Review. Protocol templates auto-fill medications. AI validates before sending.", pts: [
+                    { i: "📋", t: "Step-by-step wizard reduces cognitive load — one decision at a time" },
+                    { i: "⚡", t: "Protocol templates pre-fill drug, dose, and timing in one click" },
+                    { i: "💑", t: "Support network step — support is optional, with clear privacy explanation" },
+                    { i: "🤖", t: "AI validates: flags unusual times, duplicate patients, drug interactions" }
+                ], view: "reg"
+            },
+            {
+                j: "REGISTER", s: "5 of 6", t: "Review & Send — AI Validates Everything", d: "Before sending, Mariam sees a clean summary. AI confirms no issues. One tap → patient gets SMS + PWA invite within 30 seconds, support gets a separate consent-based invite, reminders are auto-scheduled.", pts: [
+                    { i: "✅", t: "Review screen catches errors before they reach the patient" },
+                    { i: "📱", t: "SMS + PWA invite fires within 30 seconds — no app store needed" },
+                    { i: "🤖", t: "AI auto-configures: reminder timing, chatbot context, escalation rules" },
+                    { i: "⏱️", t: "Total registration: ~90 seconds for experienced user" }
+                ], view: "reg"
+            },
+            {
+                j: "CLINIC VIEW", s: "6 of 6", t: "Morning Done — 12 Minutes vs. 2+ Hours", d: "Mariam triaged 2 urgent alerts, reviewed 5 attention items, registered a new patient, and checked AI insights — all in 12 minutes. Before Ovify, this would have been 2+ hours of scattered manual messaging, phone calls, and sticky notes.", pts: [
+                    { i: "⏱️", t: "12-minute morning workflow replaces 2+ hours of manual work" },
+                    { i: "🤖", t: "AI handled 14 patient questions overnight — only 2 needed a nurse" },
+                    { i: "💰", t: "Estimated savings: 130,000 AED/year in nurse time alone" },
+                    { i: "🔮", t: "Fatima's cycle was saved because AI caught her distress at 11:30 PM" }
+                ], view: "cmd"
+            }
+        ];
+
+        let cur = 0;
+
+        function buildDots() { const d = document.getElementById('dots'); d.innerHTML = ''; steps.forEach((_, i) => { const el = document.createElement('div'); el.className = 'dot' + (i === 0 ? ' on' : ''); el.onclick = () => goStep(i); d.appendChild(el) }) }
+
+        function upd() {
+            const s = steps[cur];
+            document.getElementById('cj').textContent = s.j;
+            document.getElementById('cs').textContent = 'STEP ' + s.s;
+            document.getElementById('ct').textContent = s.t;
+            document.getElementById('cd').textContent = s.d;
+            document.getElementById('cp').innerHTML = s.pts.map(p => `<div class="ctx-pt"><span class="ic">${p.i}</span><span>${p.t}</span></div>`).join('');
+            document.querySelectorAll('.dot').forEach((d, i) => { d.className = 'dot' + (i === cur ? ' on' : i < cur ? ' done' : '') });
+            document.getElementById('pbtn').disabled = cur === 0;
+            document.getElementById('nbtn').textContent = cur === steps.length - 1 ? 'Demo Complete ✓' : 'Next →';
+            document.getElementById('nbtn').disabled = cur === steps.length - 1;
+            sv(s.view);
+            if (cur === 3) { resetWiz(); wizPage = 0; updateWizUI() }
+            if (cur === 4) { wizPage = 3; updateWizUI(); fillReview() }
+        }
+
+        function next() { if (cur < steps.length - 1) { cur++; upd() } }
+        function prev() { if (cur > 0) { cur--; upd() } }
+        function goStep(i) { cur = i; upd() }
+
+        function sv(v) {
+            document.querySelectorAll('.vw').forEach(e => e.classList.remove('on'));
+            document.getElementById('v-' + v).classList.add('on');
+            document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.v === v));
+            const detTab = document.getElementById('det-tab');
+            if (detTab) {
+                if (v === 'det') {
+                    detTab.style.display = 'block';
+                } else {
+                    detTab.style.display = 'none';
+                }
+            }
+        }
+
+        function resolveAlert(id, action) {
+            const el = document.getElementById(id);
+            if (action === 'resolved') { el.style.opacity = '.4'; el.innerHTML = '<div style="text-align:center;padding:10px;color:#16A34A;font-weight:600">✅ Resolved — Injection confirmed & logged</div>' }
+            if (action === 'called') { el.querySelector('.acard-actions').innerHTML = '<div style="font-size:11px;color:#64748B;padding:4px 0">📞 Calling Sarah... <button class="aa resolve" onclick="resolveAlert(\'' + id + '\',\'resolved\')" style="margin-left:8px">✅ Mark Resolved</button></div>' }
+        }
+
+        // WIZARD
+        let wizPage = 0;
+        function updateWizUI() {
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById('wp' + i).classList.toggle('on', i === wizPage + 1);
+                const c = document.getElementById('wc' + i);
+                c.className = 'ws-circle' + (i === wizPage + 1 ? ' on' : i <= wizPage ? ' done' : '');
+                if (i < 4) { document.getElementById('wl' + i).className = 'ws-line' + (i <= wizPage ? ' done' : '') }
+            }
+        }
+        function wizNext() { if (wizPage < 3) { wizPage++; updateWizUI(); if (wizPage === 3) fillReview() } }
+        function wizBack() { if (wizPage > 0) { wizPage--; updateWizUI() } }
+        function resetWiz() { wizPage = 0; updateWizUI() }
+
+        function fillReview() {
+            document.getElementById('rv-name').textContent = document.getElementById('rn').value || 'Sarah Ahmed';
+            document.getElementById('rv-phone').textContent = document.getElementById('rp').value || '+971 50 XXX XXXX';
+            document.getElementById('rv-drug').textContent = document.getElementById('md1')?.value || 'Gonal-F';
+            document.getElementById('rv-dose').textContent = document.getElementById('ds1')?.value || '150 IU';
+            document.getElementById('rv-time').textContent = document.getElementById('tm1')?.value || '19:00';
+            const pn = document.getElementById('pn').value;
+            document.getElementById('rv-pname').textContent = pn || 'Not provided';
+            document.getElementById('rv-pphone').textContent = document.getElementById('pp').value || '—';
+            document.getElementById('rv-support-card').style.display = pn ? 'block' : 'none';
+        }
+
+        function selTmpl(el, type) {
+            document.querySelectorAll('.tmpl').forEach(t => t.classList.remove('sel'));
+            el.classList.add('sel');
+            const m = document.getElementById('md1'), d = document.getElementById('ds1'), t = document.getElementById('tm1');
+            if (type === 'ant') { m.value = 'Gonal-F'; d.value = '150 IU'; t.value = '19:00' }
+            if (type === 'long') { m.value = 'Menopur'; d.value = '75 IU'; t.value = '20:00' }
+            if (type === 'fet') { m.value = 'Progesterone'; d.value = '200 mg'; t.value = '22:00' }
+        }
+
+        function addMedW() {
+            const c = document.getElementById('medsArea');
+            const r = document.createElement('div'); r.className = 'med-entry';
+            r.innerHTML = '<div class="fi"><label>Drug</label><select><option>Cetrotide</option><option>Gonal-F</option><option>Menopur</option></select></div><div class="fi"><label>Dose</label><input placeholder="0.25mg"></div><div class="fi"><label>Time</label><input type="time" value="08:00"></div><div style="color:#EF4444;cursor:pointer;padding-bottom:2px" onclick="this.parentElement.remove()">✕</div>';
+            c.appendChild(r);
+        }
+
+        function sendReg() {
+            const n = document.getElementById('rn').value || 'New Patient';
+            const pn = document.getElementById('pn').value;
+            document.getElementById('conf-name').textContent = n + ' registered ✅';
+            document.getElementById('conf-support-line').style.display = pn ? 'flex' : 'none';
+            if (pn) document.getElementById('conf-support-line').innerHTML = '<span class="ic">💑</span> Support invite → ' + pn;
+            document.getElementById('confOv').classList.add('show');
+        }
+
+        function closeConf() { document.getElementById('confOv').classList.remove('show') }
+
+        const patientData = {
+            'sarah_k': {
+                name: "Sarah K.",
+                protocol: "Day 9 · Antagonist Protocol",
+                avatar: "SK",
+                phone: "+971 50 482 9102",
+                support: "Ahmed K. (Connected 🟢)",
+                adherence: "88%",
+                missed: "1 Missed",
+                avgDelay: "+23 min",
+                mood: "😟 Anxious",
+                meds: [
+                    { name: "Gonal-F 150 IU", time: "19:00", status: "Missed", statusClass: "missed", note: "Overdue by 2 hours. Support Ahmed notified at 20:30." },
+                    { name: "Cetrotide 0.25mg", time: "08:00", status: "Confirmed", statusClass: "ok", note: "Injected at 08:02 AM." },
+                    { name: "Gonal-F 150 IU (Day 8)", time: "19:00", status: "Confirmed (Late)", statusClass: "warn", note: "Injected at 19:42 PM (42 min delay)." }
+                ],
+                moodTimeline: [
+                    { day: "Day 9", mood: "😟 Anxious", text: "Stressed about needle pain. Feel like I'm doing it wrong." },
+                    { day: "Day 8", mood: "😐 Okay", text: "A bit bloated, but got the injection done." },
+                    { day: "Day 7", mood: "😊 Good", text: "No side effects today. Support helped me set up." }
+                ],
+                aiChat: [
+                    { sender: "patient", time: "19:45", text: "I have a huge air bubble in my Gonal-F pen, is it safe to inject?" },
+                    { sender: "ai", time: "19:45", text: "It's common to see small air bubbles in the pen. Gently tap the pen with your finger so the bubble rises to the top, and push the needle up slightly until a drop appears. Don't worry, a tiny bubble is completely safe and won't cause harm! Always contact your clinic if you feel unsure." },
+                    { sender: "patient", time: "20:00", text: "My injection site is bleeding a little bit, did I mess up?" },
+                    { sender: "ai", time: "20:00", text: "A small drop of blood or bruising at the site is very normal and happens if you hit a tiny capillary. Just press clean gauze or a cotton ball gently on the site for a minute. You did not mess up! If bleeding doesn't stop or you see severe swelling, contact your coordinator." }
+                ]
+            },
+            'fatima_m': {
+                name: "Fatima M.",
+                protocol: "Day 12 · Long Protocol",
+                avatar: "FM",
+                phone: "+971 52 771 0029",
+                support: "Yousef M. (Connected 🟢)",
+                adherence: "91%",
+                missed: "0 Missed",
+                avgDelay: "+12 min",
+                mood: "😢 Distressed",
+                meds: [
+                    { name: "Menopur 75 IU", time: "20:00", status: "Confirmed", statusClass: "ok", note: "Injected at 20:12 PM." },
+                    { name: "Decapeptyl 0.1mg", time: "08:00", status: "Confirmed", statusClass: "ok", note: "Injected at 08:05 AM." }
+                ],
+                moodTimeline: [
+                    { day: "Day 12", mood: "😢 Distressed", text: "Told AI: 'I can't do this anymore. The bloating is too much, I want to stop treatment.'" },
+                    { day: "Day 11", mood: "😟 Anxious", text: "So tired of daily needles. Stomach is bruised." },
+                    { day: "Day 10", mood: "😟 Anxious", text: "Bloating is worsening. Hard to sleep." }
+                ],
+                aiChat: [
+                    { sender: "patient", time: "23:30", text: "I can't do this anymore. The bloating is too much, I want to stop treatment." },
+                    { sender: "ai", time: "23:30", text: "I hear how exhausted and overwhelmed you are. IVF is incredibly heavy, and stomach bruising and bloating are very difficult to carry. I've flagged this for your clinic nurse immediately so they can consult you on comfort. Please know you are not alone, and it's okay to feel this way. Please rest tonight, and a coordinator will contact you first thing in the morning." }
+                ]
+            },
+            'noor_h': {
+                name: "Noor H.",
+                protocol: "Day 11 · Long Protocol",
+                avatar: "NH",
+                phone: "+971 54 391 8822",
+                support: "Zaid H. (Connected 🟢)",
+                adherence: "100%",
+                missed: "0 Missed",
+                avgDelay: "+4 min",
+                mood: "😟 Anxious",
+                meds: [
+                    { name: "Menopur 150 IU", time: "19:30", status: "Confirmed", statusClass: "ok", note: "Injected at 19:34 PM." }
+                ],
+                moodTimeline: [
+                    { day: "Day 11", mood: "😟 Anxious", text: "Worried about the egg retrieval procedure. What if they get 0 eggs?" },
+                    { day: "Day 10", mood: "😟 Anxious", text: "Feeling very nervous. Reading forums constantly." },
+                    { day: "Day 9", mood: "😟 Anxious", text: "Bloated. Support trying to support but I feel lonely." }
+                ],
+                aiChat: [
+                    { sender: "patient", time: "21:15", text: "What happens if they get 0 eggs during retrieval? I am so scared." },
+                    { sender: "ai", time: "21:15", text: "It's completely normal to feel scared before retrieval, Noor. However, getting 0 eggs is extremely rare, especially with your close monitoring scans showing follicle growth. Your clinical team tracks your hormone levels precisely to ensure egg maturity. Try to focus on one day at a time. Your coordinator will walk you through the details during your pre-op check." }
+                ]
+            },
+            'layla_a': {
+                name: "Layla A.",
+                protocol: "Day 6 · Antagonist Protocol",
+                avatar: "LA",
+                phone: "+971 50 119 2384",
+                support: "Tariq A. (Not Connected 🔴)",
+                adherence: "94%",
+                missed: "0 Missed",
+                avgDelay: "+23 min",
+                mood: "😐 Okay",
+                meds: [
+                    { name: "Gonal-F 225 IU", time: "20:00", status: "Confirmed (Late)", statusClass: "warn", note: "Injected at 20:38 PM (38 min delay)." },
+                    { name: "Cetrotide 0.25mg", time: "08:00", status: "Confirmed (Late)", statusClass: "warn", note: "Injected at 08:24 AM (24 min delay)." }
+                ],
+                moodTimeline: [
+                    { day: "Day 6", mood: "😐 Okay", text: "Injections are getting late because of work hours." },
+                    { day: "Day 5", mood: "😐 Okay", text: "Busy day, barely remembered." }
+                ],
+                aiChat: [
+                    { sender: "patient", time: "20:45", text: "Is it okay if I take my Gonal-F 30 minutes late?" },
+                    { sender: "ai", time: "20:45", text: "Taking it 30 minutes late is generally safe, but try to keep it within a tight 1-hour window to maintain stable hormone levels. Since this has happened a few times, would you like me to suggest a reminder shift or double check if your work schedule permits an earlier or later slot?" }
+                ]
+            }
+        };
+
+        function showPatientDetail(key) {
+            const p = patientData[key];
+            if (!p) return;
+
+            document.getElementById('det-name').textContent = p.name;
+            document.getElementById('det-proto').textContent = p.protocol;
+            document.getElementById('det-av').textContent = p.avatar;
+            document.getElementById('det-phone').textContent = p.phone;
+            document.getElementById('det-support').textContent = p.support;
+
+            document.getElementById('det-adh').textContent = p.adherence;
+            document.getElementById('det-missed').textContent = p.missed;
+            document.getElementById('det-delay').textContent = p.avgDelay;
+            document.getElementById('det-mood').textContent = p.mood;
+
+            // Fill Meds
+            const medsList = document.getElementById('det-meds-list');
+            medsList.innerHTML = p.meds.map(m => `
+                <div class="det-med-item ${m.statusClass}">
+                    <div class="det-med-top">
+                        <span>💊 ${m.name}</span>
+                        <span class="gs ${m.statusClass === 'missed' ? 'missed' : m.statusClass === 'warn' ? 'pattern' : 'ok'}" style="${m.statusClass === 'missed' ? 'background:#FEE2E2;color:#DC2626' : m.statusClass === 'warn' ? 'background:#FEF3C7;color:#D97706' : 'background:#DCFCE7;color:#16A34A'}">${m.status}</span>
+                    </div>
+                    <div class="det-med-desc">Scheduled at ${m.time}. ${m.note}</div>
+                </div>
+            `).join('');
+
+            // Fill Mood logs
+            const moodLogs = document.getElementById('det-mood-logs');
+            moodLogs.innerHTML = p.moodTimeline.map(m => `
+                <div class="mood-log">
+                    <div class="mood-log-left">${m.day}</div>
+                    <div class="mood-log-right">
+                        <span class="mood-badge">${m.mood}</span>
+                        <div>${m.text}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Fill Chat logs
+            const chatContainer = document.getElementById('det-chat-container');
+            chatContainer.innerHTML = p.aiChat.map(c => `
+                <div class="chat-bubble ${c.sender}">
+                    <div>${c.text}</div>
+                    <div class="chat-time">${c.time}</div>
+                </div>
+            `).join('');
+
+            sv('det');
+            
+            // Scroll chat to bottom
+            setTimeout(() => {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 50);
+        }
+
+        document.addEventListener('keydown', e => { if (e.key === 'ArrowRight') next(); if (e.key === 'ArrowLeft') prev() });
+
+        buildDots(); upd();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ovify Pricing & Plans | B2B SaaS IVF Licensing</title>
+  <meta name="description" content="Explore B2B SaaS plans for Ovify. Scalable, band-based licensing designed for GCC clinics with local hosting (PDPL) and Malaffi integration." />
+  <meta name="keywords" content="IVF SaaS pricing, clinic software license, health IT compliance UAE" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://www.ovify.com/pricing.html" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.ovify.com/pricing.html" />
+  <meta property="og:title" content="Ovify Pricing & Plans | B2B SaaS IVF Licensing" />
+  <meta property="og:description" content="Explore B2B SaaS plans for Ovify. Scalable, band-based licensing designed for GCC clinics with local hosting (PDPL) and Malaffi integration." />
+  <meta property="og:image" content="https://www.ovify.com/assets/Logo-OvaSync.jpg" />
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://www.ovify.com/pricing.html" />
+  <meta property="twitter:title" content="Ovify Pricing & Plans | B2B SaaS IVF Licensing" />
+  <meta property="twitter:description" content="Explore B2B SaaS plans for Ovify. Scalable, band-based licensing designed for GCC clinics with local hosting (PDPL) and Malaffi integration." />
+  <meta property="twitter:image" content="https://www.ovify.com/assets/Logo-OvaSync.jpg" />
+  <!-- Security Headers -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self';" />
+  
+  
+  
+  
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;600;700&family=Manrope:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    /* Pricing specific layouts and details */
+    .pricing-hero {
+      padding: 100px 0 60px;
+      text-align: center;
+      background: radial-gradient(700px 450px at 50% 100%, rgba(158, 140, 239, 0.08), transparent 70%);
+    }
+
+    .pricing-hero h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+      margin-bottom: 20px;
+    }
+
+    .pricing-hero .sub {
+      font-size: 1.15rem;
+      color: var(--text-dim-dark);
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    /* Plans Grid */
+    .plans-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    .plan-card {
+      background: var(--white);
+      border: 1px solid var(--line-dark);
+      border-radius: var(--radius);
+      padding: 40px 32px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 20px rgba(19, 32, 53, 0.02);
+    }
+
+    .plan-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 24px 48px -12px rgba(19, 32, 53, 0.08);
+      border-color: rgba(158, 140, 239, 0.3);
+    }
+
+    /* Highlighted / Popular Growth Tier */
+    .plan-card.featured {
+      border: 2px solid var(--lavender);
+      background: linear-gradient(180deg, var(--white), var(--lavender-light) 100%);
+      box-shadow: 0 12px 30px rgba(158, 140, 239, 0.06);
+    }
+
+    .plan-card.featured:hover {
+      box-shadow: 0 30px 60px -15px rgba(158, 140, 239, 0.15);
+    }
+
+    .plan-card.featured::before {
+      content: "Recommended for Growth";
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--lavender);
+      color: var(--white);
+      font-family: var(--data);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 6px 16px;
+      border-radius: 99px;
+      white-space: nowrap;
+      box-shadow: 0 4px 10px rgba(158, 140, 239, 0.2);
+    }
+
+    .plan-header {
+      margin-bottom: 28px;
+    }
+
+    .plan-name {
+      font-size: 1.5rem;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+
+    .plan-price {
+      font-family: var(--head);
+      font-weight: 700;
+      font-size: 1.8rem;
+      color: var(--text-dark);
+      margin: 16px 0 8px;
+    }
+
+    .plan-desc {
+      font-size: 0.92rem;
+      color: var(--text-dim-dark);
+      line-height: 1.4;
+    }
+
+    .plan-features-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 40px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      flex-grow: 1;
+    }
+
+    .plan-features-list li {
+      font-size: 0.92rem;
+      color: var(--text-dark);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      line-height: 1.4;
+    }
+
+    .plan-features-list li::before {
+      content: "✓";
+      color: var(--lavender-deep);
+      font-weight: 700;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .plan-card.featured .plan-features-list li::before {
+      color: var(--lavender-deep);
+    }
+
+    .plan-card .btn {
+      width: 100%;
+      text-align: center;
+    }
+
+    /* Trust / Compliance Layout */
+    .trust-section {
+      background-color: var(--navy-deep);
+      color: var(--text-light);
+      padding: 80px 0;
+    }
+
+    .trust-section h2 {
+      color: var(--text-light);
+    }
+
+    .trust-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .trust-features {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .trust-item h3 {
+      font-size: 1.25rem;
+      margin-bottom: 8px;
+      color: var(--white);
+    }
+
+    .trust-item p {
+      font-size: 0.92rem;
+      color: var(--text-dim-light);
+      line-height: 1.5;
+    }
+
+    .trust-image-container {
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--line-light);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    }
+
+    .trust-image-container img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.6s ease;
+    }
+
+    .trust-image-container:hover img {
+      transform: scale(1.03);
+    }
+
+    /* FAQs Section Removed */
+
+    @media (max-width: 992px) {
+      .plans-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        max-width: 500px;
+        margin: 40px auto 0;
+      }
+      .trust-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      .plan-card.featured::before {
+        top: -14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header id="header">
+    <div class="wrap nav">
+      <a href="index.html" class="brand">
+        <img src="assets/Logo-OvaSync.jpg" alt="Ovify logo" />
+        OVIFY
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="how-it-works.html">How It Works</a>
+        <a href="ai-features.html">AI Features</a>
+        <a href="for-clinics.html">For Clinics</a>
+        <a href="pricing.html" class="active">Pricing</a>
+      </nav>
+      <a href="contact.html" class="btn btn-primary">Request a Demo</a>
+      <button class="burger" id="burger">☰</button>
+    </div>
+  </header>
+  <div class="mmenu" id="mmenu">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="how-it-works.html">How It Works</a>
+    <a href="ai-features.html">AI Features</a>
+    <a href="for-clinics.html">For Clinics</a>
+    <a href="pricing.html" class="active">Pricing</a>
+    <a href="contact.html">Request a Demo</a>
+  </div>
+
+  <!-- ===== HERO SECTION ===== -->
+  <section class="pricing-hero">
+    <div class="wrap reveal">
+      <span class="eyebrow">Licensing &amp; Scale</span>
+      <h1>B2B SaaS Models Designed for the IVF Ecosystem</h1>
+      <p class="sub">
+        Ovify provides secure, predictable platform licensing configured to connect patients, support networks, and clinics into a unified care loop.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== PLANS SECTION ===== -->
+  <section style="padding: 20px 0 80px;">
+    <div class="wrap reveal">
+      <div class="plans-grid">
+        
+        <!-- PLAN 1: STARTER -->
+        <div class="plan-card">
+          <div class="plan-header">
+            <h3 class="plan-name">Starter</h3>
+            <p class="plan-desc">Best for pilot clinics proving adherence ROI.</p>
+            <div class="plan-price">Starter / Pilot</div>
+          </div>
+          <ul class="plan-features-list">
+            <li><strong>1–2 Nurse Seats</strong></li>
+            <li><strong>Up to 100 cycles/year</strong></li>
+            <li><strong>Patient Web App</strong></li>
+            <li><strong>Adherence Dashboard</strong></li>
+            <li><strong>Local Data Hosting</strong></li>
+          </ul>
+          <a href="contact.html" class="btn btn-ghost">Launch a Pilot</a>
+        </div>
+
+        <!-- PLAN 2: GROWTH (FEATURED) -->
+        <div class="plan-card featured">
+          <div class="plan-header">
+            <h3 class="plan-name">Growth</h3>
+            <p class="plan-desc">Full automation for active fertility clinics.</p>
+            <div class="plan-price">Growth Platform</div>
+          </div>
+          <ul class="plan-features-list">
+            <li><strong>Unlimited Nurse Seats</strong></li>
+            <li><strong>Up to 500 cycles/year</strong></li>
+            <li><strong>AI Patient Companion</strong></li>
+            <li><strong>AI Triage Dashboard</strong></li>
+            <li><strong>SMS &amp; WhatsApp Reminders</strong></li>
+            <li><strong>Malaffi-Ready Profiles</strong></li>
+          </ul>
+          <a href="contact.html" class="btn btn-accent">Request Live Demo</a>
+        </div>
+
+        <!-- PLAN 3: ENTERPRISE -->
+        <div class="plan-card">
+          <div class="plan-header">
+            <h3 class="plan-name">Enterprise</h3>
+            <p class="plan-desc">Multi-site networks and hospital systems.</p>
+            <div class="plan-price">Enterprise Tier</div>
+          </div>
+          <ul class="plan-features-list">
+            <li><strong>Unlimited Cycles</strong></li>
+            <li><strong>EMR Integration</strong></li>
+            <li><strong>Multi-Site Portal</strong></li>
+            <li><strong>Dedicated Manager</strong></li>
+            <li><strong>Custom SLAs</strong></li>
+          </ul>
+          <a href="contact.html" class="btn btn-ghost">Contact Sales</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TRUST & COMPLIANCE SECTION ===== -->
+  <section class="trust-section">
+    <div class="wrap reveal">
+      <div class="trust-grid">
+        
+        <div>
+          <span class="eyebrow light">Security &amp; Compliance</span>
+          <h2 style="font-size: 2.2rem; margin-bottom: 24px;">Built for Regulated Health IT</h2>
+          <div class="trust-features">
+            
+            <div class="trust-item">
+              <h3>UAE PDPL Compliant</h3>
+              <p>100% local, in-region data hosting. End-to-end encryption and compliance audit trails designed for UAE data-protection laws from day one.</p>
+            </div>
+
+            <div class="trust-item">
+              <h3>Malaffi Aligned</h3>
+              <p>Secure, interoperable API pathways ready to connect with Abu Dhabi’s unified health information exchange.</p>
+            </div>
+
+            <div class="trust-item">
+              <h3>Non-Diagnostic AI</h3>
+              <p>Workflow triage only. Ranks nurse dashboards to prioritize care, without diagnosing, prescribing, or crossing into medical-device regulation.</p>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="trust-image-container">
+          <img src="assets/clinical_enterprise_trust.png" alt="Clinical Enterprise Trust Diagram" />
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQs Section Removed -->
+
+  <!-- CTA Demo Section Removed -->
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="wrap">
+      <div class="foot-grid">
+        <div>
+          <a href="index.html" class="brand">
+            <img src="assets/Logo-BlueBackground.jpg" alt="Ovify logo" />
+            OVIFY
+          </a>
+          <p class="foot-about">Intelligent, AI-enabled, structured, and calm companion during IVF Journey.</p>
+        </div>
+        <div class="foot-col">
+          <h4>Ecosystem</h4>
+          <a href="index.html">Home</a>
+          <a href="about.html">About Us</a>
+          <a href="how-it-works.html">How It Works</a>
+        </div>
+        <div class="foot-col">
+          <h4>Platform</h4>
+          <a href="ai-features.html">AI Features</a>
+          <a href="for-clinics.html">For Clinics</a>
+          <a href="pricing.html">Pricing & Licensing</a>
+          <a href="contact.html">Request Demo</a>
+        </div>
+        <div class="foot-col">
+          <h4>Contact</h4>
+          <a href="mailto:hello@ovify.com">hello@ovify.com</a>
+          <p style="font-size: 0.9rem; color: var(--text-dim-light); margin-top: 10px;">Abu Dhabi, UAE</p>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <span>© 2026 Ovify. AI Infrastructure for Reproductive Medicine. All rights reserved.</span>
+        <span>Ethical AI · Support, Not Surveillance.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Header shadow on scroll
+    const header = document.getElementById('header');
+    window.addEventListener('scroll', () => {
+      header.classList.toggle('scrolled', window.scrollY > 10);
+    });
+
+    // Mobile menu toggle
+    const burger = document.getElementById('burger');
+    const mmenu = document.getElementById('mmenu');
+    burger.onclick = () => mmenu.classList.toggle('open');
+    mmenu.querySelectorAll('a').forEach(link => {
+      link.onclick = () => mmenu.classList.remove('open');
+    });
+
+    // Scroll Reveal Intersection Observer
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    // Accordion functionality removed
+  </script>
+</body>
+</html>

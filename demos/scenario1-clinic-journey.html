@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ovify — Clinic Journey Demo</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #091220 0%, #091220 100%);
+            color: #F8F5F2;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .screen-viewer {
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 32px;
+            background: rgba(26, 35, 50, 0.5);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 28px;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(158, 140, 239, 0.12);
+            overflow: hidden;
+        }
+
+        /* ===== LEFT PANEL ===== */
+        .left-col {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 20px;
+            overflow-y: auto;
+            padding-right: 12px;
+        }
+
+        .left-col::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .left-col::-webkit-scrollbar-track {
+            background: rgba(158, 140, 239, 0.08);
+            border-radius: 10px;
+        }
+
+        .left-col::-webkit-scrollbar-thumb {
+            background: rgba(158, 140, 239, 0.25);
+            border-radius: 10px;
+        }
+
+        .top-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .inline-header {
+            text-align: left;
+            margin-bottom: 0;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(158, 140, 239, 0.1);
+        }
+
+        .inline-header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #F8F5F2;
+            margin-bottom: 4px;
+            letter-spacing: -0.3px;
+        }
+
+        .inline-header .subtitle {
+            font-size: 11px;
+            color: #9E8CEF;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+        }
+
+        /* Persona */
+        .persona-card {
+            background: rgba(158, 140, 239, 0.05);
+            border: 1px solid rgba(158, 140, 239, 0.1);
+            border-radius: 12px;
+            padding: 14px;
+        }
+
+        .persona-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .persona-av {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, rgba(245, 198, 207, 0.3), rgba(158, 140, 239, 0.3));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #F5C6CF;
+            border: 1px solid rgba(245, 198, 207, 0.2);
+        }
+
+        .persona-text h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #F8F5F2;
+        }
+
+        .persona-text .role {
+            font-size: 11px;
+            color: rgba(248, 245, 242, 0.5);
+        }
+
+        /* Progress */
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(158, 140, 239, 0.15);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #9E8CEF, #9E8CEF);
+            border-radius: 999px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 12px rgba(158, 140, 239, 0.4);
+        }
+
+        .progress-text {
+            text-align: center;
+            font-size: 11px;
+            color: rgba(248, 245, 242, 0.5);
+            font-weight: 500;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+
+        /* Screen Info */
+        .screen-info {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .labels-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .act-label {
+            background: rgba(245, 198, 207, 0.15);
+            color: #F5C6CF;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            border: 1px solid rgba(245, 198, 207, 0.2);
+        }
+
+        .screen-number {
+            background: linear-gradient(135deg, #9E8CEF, #C8B4FF);
+            color: #091220;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(158, 140, 239, 0.3);
+        }
+
+        .screen-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #F8F5F2;
+            line-height: 1.3;
+            letter-spacing: -0.3px;
+        }
+
+        .screen-description {
+            font-size: 14px;
+            color: rgba(248, 245, 242, 0.7);
+            line-height: 1.65;
+        }
+
+        /* Bottom Section */
+        .bottom-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .navigation {
+            display: flex;
+            gap: 12px;
+        }
+
+        .nav-button {
+            flex: 1;
+            padding: 16px 28px;
+            background: linear-gradient(135deg, #9E8CEF, #C8B4FF);
+            color: #091220;
+            border: none;
+            border-radius: 999px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'DM Sans', sans-serif;
+            box-shadow: 0 4px 12px rgba(158, 140, 239, 0.2);
+        }
+
+        .nav-button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #C8B4FF, #D8C4FF);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(158, 140, 239, 0.4);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.25;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .nav-button.secondary {
+            background: transparent;
+            border: 2px solid rgba(158, 140, 239, 0.5);
+            color: #9E8CEF;
+            box-shadow: none;
+        }
+
+        .nav-button.secondary:hover:not(:disabled) {
+            background: rgba(158, 140, 239, 0.12);
+            border-color: #9E8CEF;
+        }
+
+        .restart-button {
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            border: 2px solid rgba(245, 198, 207, 0.4);
+            color: #F5C6CF;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .restart-button:hover {
+            background: rgba(245, 198, 207, 0.1);
+            border-color: #F5C6CF;
+        }
+
+        /* ===== RIGHT PANEL — TABLET ===== */
+        .right-col {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(15, 26, 42, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid rgba(158, 140, 239, 0.06);
+            overflow: hidden;
+        }
+
+        .tablet-frame {
+            width: 100%;
+            max-width: 780px;
+            height: calc(100vh - 120px);
+            background: #222;
+            border-radius: 22px;
+            padding: 10px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+
+        .tablet-screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 14px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Camera dot */
+        .tablet-cam {
+            position: absolute;
+            top: 50%;
+            right: 2px;
+            transform: translateY(-50%);
+            width: 6px;
+            height: 6px;
+            background: #444;
+            border-radius: 50%;
+            z-index: 10;
+        }
+
+        /* ===== CLINIC APP STYLES (inside tablet) ===== */
+        /* Matching the warm beige / dark navy design from the reference */
+
+        .app-header {
+            background: #091220;
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .app-header .logo-side {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .app-header .logo-side img {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .app-header .logo-side .brand {
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: #F8F5F2;
+        }
+
+        .app-header .clinic-center {
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            color: #F8F5F2;
+            letter-spacing: 0.3px;
+        }
+
+        .app-header .user-side {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .app-header .user-name {
+            font-size: 13px;
+            color: rgba(248, 245, 242, 0.7);
+        }
+
+        .app-header .user-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(248, 245, 242, 0.1);
+            border: 1px solid rgba(248, 245, 242, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .app-header .user-icon svg {
+            width: 16px;
+            height: 16px;
+            fill: rgba(248, 245, 242, 0.6);
+        }
+
+        .app-body {
+            flex: 1;
+            background: #F5F2ED;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            padding: 30px 20px;
+        }
+
+        .app-body::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .app-body::-webkit-scrollbar-thumb {
+            background: #D5D0C8;
+            border-radius: 4px;
+        }
+
+        /* VIEWS inside app */
+        .app-view {
+            display: none;
+            width: 100%;
+            max-width: 560px;
+            animation: viewFade 0.4s ease;
+        }
+
+        .app-view.active {
+            display: block;
+        }
+
+        @keyframes viewFade {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* FORM CARD */
+        .form-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .form-card h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #091220;
+            margin-bottom: 4px;
+        }
+
+        .form-card .form-sub {
+            font-size: 13px;
+            color: #6B7280;
+            margin-bottom: 24px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-row.single {
+            grid-template-columns: 1fr;
+        }
+
+        .field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid #D1D5DB;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            color: #091220;
+            background: #fff;
+            outline: none;
+            transition: border 0.2s, box-shadow 0.2s;
+        }
+
+        .field input:focus,
+        .field select:focus {
+            border-color: #9E8CEF;
+            box-shadow: 0 0 0 3px rgba(158, 140, 239, 0.12);
+        }
+
+        .field .helper {
+            font-size: 10px;
+            color: #9CA3AF;
+            margin-top: 4px;
+        }
+
+        /* Toggle */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
+            padding: 14px 0;
+            border-top: 1px solid #F0EDE8;
+        }
+
+        .toggle {
+            width: 42px;
+            height: 24px;
+            background: #9E8CEF;
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+
+        .toggle.off {
+            background: #D1D5DB;
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform 0.2s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+        }
+
+        .toggle.on::after {
+            transform: translateX(18px);
+        }
+
+        .toggle-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        /* Section heading inside form */
+        .form-section {
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: #091220;
+            margin-top: 8px;
+            margin-bottom: 14px;
+        }
+
+        /* Buttons */
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 28px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #091220;
+            color: #F8F5F2;
+        }
+
+        .btn-primary:hover {
+            background: #1A2840;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(15, 26, 42, 0.3);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid #D1D5DB;
+            color: #6B7280;
+        }
+
+        .btn-ghost:hover {
+            background: #F9FAFB;
+        }
+
+        /* ===== DASHBOARD VIEW ===== */
+        .dash-view {
+            max-width: 100%;
+            padding: 0 10px;
+        }
+
+        .dash-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .dash-stat {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            border-left: 4px solid;
+        }
+
+        .dash-stat.green {
+            border-left-color: #059669;
+        }
+
+        .dash-stat.amber {
+            border-left-color: #D97706;
+        }
+
+        .dash-stat.red {
+            border-left-color: #DC2626;
+        }
+
+        .dash-stat .ds-num {
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #091220;
+        }
+
+        .dash-stat .ds-label {
+            font-size: 12px;
+            color: #6B7280;
+        }
+
+        .dash-stat .ds-sub {
+            font-size: 10px;
+            color: #9CA3AF;
+            margin-top: 2px;
+        }
+
+        .dash-section-head {
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: #091220;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dash-section-head .dot-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .dot-red {
+            background: #DC2626;
+        }
+
+        .dot-amber {
+            background: #D97706;
+        }
+
+        .dot-green {
+            background: #059669;
+        }
+
+        .alert-item {
+            background: #fff;
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #F0EDE8;
+        }
+
+        .alert-item .ai-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #091220;
+        }
+
+        .alert-item .ai-detail {
+            font-size: 11px;
+            color: #6B7280;
+            margin-top: 2px;
+        }
+
+        .alert-item .ai-time {
+            font-size: 10px;
+            color: #9CA3AF;
+            white-space: nowrap;
+        }
+
+        /* Patient table */
+        .ptable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+
+        .ptable th {
+            text-align: left;
+            font-size: 10px;
+            font-weight: 600;
+            color: #9CA3AF;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 8px 10px;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .ptable td {
+            padding: 10px;
+            font-size: 12px;
+            color: #374151;
+            border-bottom: 1px solid #F3F4F6;
+            vertical-align: middle;
+        }
+
+        .ptable .pname {
+            font-weight: 600;
+            color: #091220;
+        }
+
+        .status-pill {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .sp-green {
+            background: #ECFDF5;
+            color: #059669;
+        }
+
+        .sp-amber {
+            background: #FFFBEB;
+            color: #D97706;
+        }
+
+        .sp-red {
+            background: #FEF2F2;
+            color: #DC2626;
+        }
+
+        /* ===== SMS + PWA VIEW ===== */
+        .wa-view {
+            max-width: 380px;
+            margin: 0 auto;
+        }
+
+        .wa-phone {
+            background: #111;
+            border-radius: 36px;
+            padding: 10px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .wa-screen {
+            background: #ECE5DD;
+            border-radius: 28px;
+            overflow: hidden;
+            height: 520px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .wa-header {
+            background: #075E54;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .wa-back {
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .wa-avatar {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wa-avatar img {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .wa-contact .wa-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .wa-contact .wa-status {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .wa-chat {
+            flex: 1;
+            padding: 12px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .wa-bubble {
+            max-width: 85%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #111;
+        }
+
+        .wa-bubble.incoming {
+            background: #fff;
+            border-top-left-radius: 0;
+            align-self: flex-start;
+        }
+
+        .wa-bubble.outgoing {
+            background: #DCF8C6;
+            border-top-right-radius: 0;
+            align-self: flex-end;
+        }
+
+        .wa-bubble .wa-time {
+            font-size: 9px;
+            color: #999;
+            text-align: right;
+            margin-top: 4px;
+        }
+
+        .wa-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-top: 6px;
+        }
+
+        .wa-btn {
+            background: transparent;
+            border: 1px solid #075E54;
+            color: #075E54;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* ===== CONFIRMATION VIEW ===== */
+        .confirm-view {
+            max-width: 420px;
+            text-align: center;
+        }
+
+        .confirm-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 36px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .confirm-icon {
+            width: 56px;
+            height: 56px;
+            background: #ECFDF5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+
+        .confirm-icon svg {
+            width: 28px;
+            height: 28px;
+            fill: #059669;
+        }
+
+        .confirm-card h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: #091220;
+            margin-bottom: 8px;
+        }
+
+        .confirm-card .conf-sub {
+            font-size: 13px;
+            color: #6B7280;
+            margin-bottom: 20px;
+        }
+
+        .conf-items {
+            text-align: left;
+            border: 1px solid #F0EDE8;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .conf-item {
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: #374151;
+            border-bottom: 1px solid #F0EDE8;
+        }
+
+        .conf-item:last-child {
+            border-bottom: none;
+        }
+
+        .conf-item svg {
+            width: 16px;
+            height: 16px;
+            fill: #059669;
+            flex-shrink: 0;
+        }
+
+        .conf-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .screen-viewer {
+                grid-template-columns: 320px 1fr;
+                gap: 24px;
+                padding: 24px;
+            }
+
+            .screen-title {
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .screen-viewer {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="screen-viewer">
+            <!-- LEFT PANEL -->
+            <div class="left-col">
+                <div class="top-section">
+                    <div class="inline-header">
+                        <h1>Ovify Clinic Journey</h1>
+                        <p class="subtitle">Sarah Ahmed — First IVF Cycle</p>
+                    </div>
+
+                    <div class="persona-card">
+                        <div class="persona-row">
+                            <div class="persona-av">AH</div>
+                            <div class="persona-text">
+                                <h4>Dr. Amira Hassan</h4>
+                                <div class="role">Clinic Director, Abu Dhabi Fertility Center</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="screen-info">
+                        <div class="labels-row">
+                            <div class="act-label" id="actLabel">CLINIC</div>
+                            <div class="screen-number" id="screenNum">SCREEN 1</div>
+                        </div>
+                        <h2 class="screen-title" id="screenTitle">Patient Registration</h2>
+                        <p class="screen-description" id="screenDesc">
+                            Dr. Hassan registers Sarah Ahmed for her first IVF cycle. The form captures patient details,
+                            treatment protocol, and optional support involvement — all in under 90 seconds.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bottom-section">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 16.6%"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">Screen 1 of 6</div>
+
+                    <div class="navigation">
+                        <button class="nav-button secondary" id="prevBtn" onclick="goPrev()" disabled>Previous</button>
+                        <button class="nav-button" id="nextBtn" onclick="goNext()">Next</button>
+                    </div>
+
+                    <button class="restart-button" onclick="goTo(0)">Restart Demo</button>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL — TABLET -->
+            <div class="right-col">
+                <div class="tablet-frame">
+                    <div class="tablet-cam"></div>
+                    <div class="tablet-screen">
+                        <!-- APP HEADER -->
+                        <div class="app-header">
+                            <div class="logo-side">
+                                <img src="../../ovify-logo.jpg" alt="Ovify">
+                                <span class="brand">Ovify</span>
+                            </div>
+                            <div class="clinic-center">Abu Dhabi Fertility Center</div>
+                            <div class="user-side">
+                                <span class="user-name">Dr. Amira Hassan</span>
+                                <div class="user-icon">
+                                    <svg viewBox="0 0 24 24">
+                                        <path
+                                            d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- APP BODY -->
+                        <div class="app-body">
+
+                            <!-- VIEW 1: REGISTRATION -->
+                            <div class="app-view active" id="view-1">
+                                <div class="form-card">
+                                    <h2>Register New Patient</h2>
+                                    <p class="form-sub">This will create the patient's Ovify account and enable
+                                        protocol sync</p>
+
+                                    <div class="form-row">
+                                        <div class="field">
+                                            <label>Full Name</label>
+                                            <input type="text" value="Sarah Ahmed">
+                                        </div>
+                                        <div class="field">
+                                            <label>Mobile Number</label>
+                                            <input type="text" value="+971 50 123 4567">
+                                            <div class="helper">Patient will receive SMS to download app</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="field">
+                                            <label>Email Address</label>
+                                            <input type="text" value="sarah.ahmed@email.com">
+                                        </div>
+                                        <div class="field">
+                                            <label>Date of Birth</label>
+                                            <input type="text" value="15/03/1994">
+                                        </div>
+                                    </div>
+
+                                    <div class="toggle-row">
+                                        <div class="toggle on"
+                                            onclick="this.classList.toggle('on');this.classList.toggle('off')"></div>
+                                        <span class="toggle-label">Include Support in Ovify</span>
+                                    </div>
+
+                                    <div class="form-section">Support Details</div>
+
+                                    <div class="form-row">
+                                        <div class="field">
+                                            <label>Support Name</label>
+                                            <input type="text" value="Ahmed K.">
+                                        </div>
+                                        <div class="field">
+                                            <label>Support Mobile</label>
+                                            <input type="text" value="+971 55 987 6543">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-section">Treatment</div>
+
+                                    <div class="form-row single">
+                                        <div class="field">
+                                            <label>IVF Protocol</label>
+                                            <select>
+                                                <option selected>Antagonist Protocol</option>
+                                                <option>Long Protocol</option>
+                                                <option>FET Natural</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="field">
+                                            <label>Current Cycle Day</label>
+                                            <input type="text" value="Day 1">
+                                        </div>
+                                        <div class="field">
+                                            <label>Stimulation Start Date</label>
+                                            <input type="text" value="28 Feb 2026">
+                                        </div>
+                                    </div>
+
+                                    <div class="btn-row">
+                                        <button class="btn btn-ghost">Cancel</button>
+                                        <button class="btn btn-primary" onclick="goNext()">Register Patient &amp; Send
+                                            App Link</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- VIEW 2: CONFIRMATION -->
+                            <div class="app-view" id="view-2">
+                                <div class="confirm-view">
+                                    <div class="confirm-card">
+                                        <div class="confirm-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+                                            </svg>
+                                        </div>
+                                        <h2>Sarah Ahmed registered</h2>
+                                        <p class="conf-sub">Account created and app invitation sent</p>
+
+                                        <div class="conf-items">
+                                            <div class="conf-item">
+                                                <svg viewBox="0 0 24 24">
+                                                    <path
+                                                        d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+                                                </svg>
+                                                SMS invite sent to +971 50 123 4567
+                                            </div>
+                                            <div class="conf-item">
+                                                <svg viewBox="0 0 24 24">
+                                                    <path
+                                                        d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+                                                </svg>
+                                                Support invite sent to Ahmed K.
+                                            </div>
+                                            <div class="conf-item">
+                                                <svg viewBox="0 0 24 24">
+                                                    <path
+                                                        d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+                                                </svg>
+                                                First reminder scheduled: 28 Feb at 19:00
+                                            </div>
+                                        </div>
+
+                                        <div class="conf-actions">
+                                            <button class="btn btn-ghost" onclick="goNext()">View Dashboard</button>
+                                            <button class="btn btn-primary">Register Another</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- VIEW 3: WHATSAPP ONBOARDING -->
+                            <div class="app-view" id="view-3">
+                                <div class="wa-view">
+                                    <div class="wa-phone">
+                                        <div class="wa-screen">
+                                            <div class="wa-header">
+                                                <span class="wa-back">&lt;</span>
+                                                <div class="wa-avatar"><img src="../../ovify-logo.jpg" alt=""></div>
+                                                <div class="wa-contact">
+                                                    <div class="wa-name">Abu Dhabi Fertility Center</div>
+                                                    <div class="wa-status">online</div>
+                                                </div>
+                                            </div>
+                                            <div class="wa-chat">
+                                                <div class="wa-bubble incoming">
+                                                    Hi Sarah,
+                                                    <br><br>
+                                                    Your clinic has set up Ovify to support you during your IVF
+                                                    treatment.
+                                                    <br><br>
+                                                    You'll receive:<br>
+                                                    • Medication reminders<br>
+                                                    • Answers to common questions<br>
+                                                    • Emotional support when you need it
+                                                    <br><br>
+                                                    Always check with your clinic for medical decisions.
+                                                    <div class="wa-buttons">
+                                                        <div class="wa-btn">Yes, let's get started</div>
+                                                        <div class="wa-btn">Tell me more</div>
+                                                        <div class="wa-btn">Not right now</div>
+                                                    </div>
+                                                    <div class="wa-time">2:35 PM</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- VIEW 4: INJECTION REMINDER -->
+                            <div class="app-view" id="view-4">
+                                <div class="wa-view">
+                                    <div class="wa-phone">
+                                        <div class="wa-screen">
+                                            <div class="wa-header">
+                                                <span class="wa-back">&lt;</span>
+                                                <div class="wa-avatar"><img src="../../ovify-logo.jpg" alt=""></div>
+                                                <div class="wa-contact">
+                                                    <div class="wa-name">Abu Dhabi Fertility Center</div>
+                                                    <div class="wa-status">online</div>
+                                                </div>
+                                            </div>
+                                            <div class="wa-chat">
+                                                <div class="wa-bubble incoming">
+                                                    Sarah, your evening medication is in 30 minutes.
+                                                    <br><br>
+                                                    <strong>Gonal-F 150 IU</strong> at 7:00 PM
+                                                    <br><br>
+                                                    Would you like the injection guide?
+                                                    <div class="wa-buttons">
+                                                        <div class="wa-btn">Yes, show me the steps</div>
+                                                        <div class="wa-btn">I'm ready</div>
+                                                    </div>
+                                                    <div class="wa-time">6:30 PM</div>
+                                                </div>
+                                                <div class="wa-bubble incoming" style="margin-top: 10px">
+                                                    It's time for your injection.
+                                                    <br><br>
+                                                    <strong>Gonal-F 150 IU</strong>
+                                                    <br><br>
+                                                    Tap below when you're done.
+                                                    <div class="wa-buttons">
+                                                        <div class="wa-btn"
+                                                            style="border-color: #059669; color: #059669; font-weight: 600;">
+                                                            Done</div>
+                                                        <div class="wa-btn">I need 15 more minutes</div>
+                                                        <div class="wa-btn">I need help</div>
+                                                    </div>
+                                                    <div class="wa-time">7:00 PM</div>
+                                                </div>
+                                                <div class="wa-bubble outgoing" style="margin-top: 6px">
+                                                    Done
+                                                    <div class="wa-time">7:03 PM</div>
+                                                </div>
+                                                <div class="wa-bubble incoming">
+                                                    Confirmed at 7:03 PM. Logged for your clinic.
+                                                    <br><br>
+                                                    How are you feeling?
+                                                    <div class="wa-buttons">
+                                                        <div class="wa-btn">Good</div>
+                                                        <div class="wa-btn">Okay</div>
+                                                        <div class="wa-btn">Not great</div>
+                                                    </div>
+                                                    <div class="wa-time">7:03 PM</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- VIEW 5: DASHBOARD UPDATED -->
+                            <div class="app-view dash-view" id="view-5">
+                                <div class="dash-stats">
+                                    <div class="dash-stat green">
+                                        <div class="ds-num">13</div>
+                                        <div class="ds-label">On Track</div>
+                                        <div class="ds-sub">Stable protocols</div>
+                                    </div>
+                                    <div class="dash-stat amber">
+                                        <div class="ds-num">3</div>
+                                        <div class="ds-label">Needs Review</div>
+                                        <div class="ds-sub">Behavioral changes</div>
+                                    </div>
+                                    <div class="dash-stat red">
+                                        <div class="ds-num">0</div>
+                                        <div class="ds-label">Urgent</div>
+                                        <div class="ds-sub">No action needed</div>
+                                    </div>
+                                </div>
+
+                                <div class="dash-section-head">Patient Monitoring List</div>
+
+                                <table class="ptable">
+                                    <thead>
+                                        <tr>
+                                            <th>Patient</th>
+                                            <th>Day</th>
+                                            <th>Adherence</th>
+                                            <th>Last Event</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr style="background: #F0FDF4;">
+                                            <td><span class="pname">Sarah Ahmed</span><br><span
+                                                    style="font-size:10px;color:#9CA3AF">Antagonist Protocol</span></td>
+                                            <td>Day 1</td>
+                                            <td>100%</td>
+                                            <td style="font-size:11px">Confirmed 19:03</td>
+                                            <td><span class="status-pill sp-green">On Track</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="pname">Maria S.</span><br><span
+                                                    style="font-size:10px;color:#9CA3AF">Antagonist Protocol</span></td>
+                                            <td>Day 8</td>
+                                            <td>94%</td>
+                                            <td style="font-size:11px">Confirmed 19:01</td>
+                                            <td><span class="status-pill sp-green">On Track</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="pname">Noor H.</span><br><span
+                                                    style="font-size:10px;color:#9CA3AF">Long Protocol</span></td>
+                                            <td>Day 11</td>
+                                            <td>100%</td>
+                                            <td style="font-size:11px">Confirmed 18:45</td>
+                                            <td><span class="status-pill sp-amber">Monitor</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="pname">Layla A.</span><br><span
+                                                    style="font-size:10px;color:#9CA3AF">Antagonist Protocol</span></td>
+                                            <td>Day 6</td>
+                                            <td>88%</td>
+                                            <td style="font-size:11px">Late (23 min)</td>
+                                            <td><span class="status-pill sp-amber">Late</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- VIEW 6: MISSED DOSE ESCALATION -->
+                            <div class="app-view dash-view" id="view-6">
+                                <div class="dash-stats">
+                                    <div class="dash-stat green">
+                                        <div class="ds-num">12</div>
+                                        <div class="ds-label">On Track</div>
+                                    </div>
+                                    <div class="dash-stat amber">
+                                        <div class="ds-num">3</div>
+                                        <div class="ds-label">Needs Review</div>
+                                    </div>
+                                    <div class="dash-stat red">
+                                        <div class="ds-num">1</div>
+                                        <div class="ds-label">Urgent</div>
+                                        <div class="ds-sub">Immediate action</div>
+                                    </div>
+                                </div>
+
+                                <div class="dash-section-head">
+                                    <div class="dot-indicator dot-red"></div> Urgent Alert
+                                </div>
+
+                                <div
+                                    style="background:#fff;border-radius:12px;padding:18px;border-left:4px solid #DC2626;margin-bottom:16px;">
+                                    <div
+                                        style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px">
+                                        <div>
+                                            <div style="font-size:15px;font-weight:600;color:#091220">Sarah Ahmed</div>
+                                            <div style="font-size:11px;color:#6B7280">Day 6 | Antagonist Protocol</div>
+                                        </div>
+                                        <span class="status-pill sp-red">MISSED</span>
+                                    </div>
+                                    <div style="font-size:13px;color:#374151;line-height:1.5;margin-bottom:12px">
+                                        <strong>Gonal-F 150 IU</strong> — scheduled 19:00 — not confirmed
+                                    </div>
+                                    <div
+                                        style="font-size:11px;color:#6B7280;line-height:1.6;margin-bottom:14px;padding:10px;background:#F9FAFB;border-radius:8px;">
+                                        <strong>Escalation Timeline</strong><br>
+                                        19:00 &nbsp; Reminder sent
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; No
+                                        response<br>
+                                        19:15 &nbsp; Second reminder &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; No
+                                        response<br>
+                                        20:00 &nbsp; Support Ahmed notified &nbsp; No response<br>
+                                        21:00 &nbsp; Clinic notification
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; This alert
+                                    </div>
+                                    <div style="display:flex;gap:8px">
+                                        <button class="btn btn-primary" style="flex:1;padding:10px;font-size:12px">Call
+                                            Patient</button>
+                                        <button class="btn btn-ghost" style="flex:1;padding:10px;font-size:12px">Mark
+                                            Resolved</button>
+                                        <button class="btn btn-ghost" style="flex:1;padding:10px;font-size:12px">View
+                                            Profile</button>
+                                    </div>
+                                </div>
+
+                                <div class="dash-section-head" style="margin-top:16px">
+                                    <div class="dot-indicator dot-green"></div> On Track
+                                </div>
+                                <table class="ptable">
+                                    <thead>
+                                        <tr>
+                                            <th>Patient</th>
+                                            <th>Day</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="pname">Maria S.</td>
+                                            <td>Day 8</td>
+                                            <td><span class="status-pill sp-green">On Track</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="pname">Hana T.</td>
+                                            <td>Day 14</td>
+                                            <td><span class="status-pill sp-green">On Track</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="pname">Dana M.</td>
+                                            <td>Day 10</td>
+                                            <td><span class="status-pill sp-green">On Track</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const screens = [
+            {
+                act: "CLINIC", num: 1,
+                title: "Patient Registration",
+                desc: "Dr. Hassan registers Sarah Ahmed for her first IVF cycle. The form captures patient details, treatment protocol, and optional support involvement — all in under 90 seconds."
+            },
+            {
+                act: "CLINIC", num: 2,
+                title: "Registration Confirmed",
+                desc: "Sarah is registered. Ovify instantly sends a SMS + PWA invite to Sarah and a separate support invite to her support Ahmed. The first injection reminder is scheduled for tomorrow at 7 PM."
+            },
+            {
+                act: "PATIENT", num: 3,
+                title: "SMS + PWA Onboarding",
+                desc: "Within 30 seconds, Sarah receives an SMS from her clinic — not from Ovify. She can start immediately, learn more, or delay. No app store needed."
+            },
+            {
+                act: "PATIENT", num: 4,
+                title: "Injection Reminder & Confirmation",
+                desc: "Day 1: Sarah receives a 30-minute heads-up, then the injection prompt at 7:00 PM. She confirms at 7:03 PM. The clinic dashboard updates instantly. She's asked one simple mood question."
+            },
+            {
+                act: "CLINIC", num: 5,
+                title: "Dashboard — All Patients Tracked",
+                desc: "Back at the clinic, Dr. Hassan sees Sarah's confirmation in real time. The monitoring list shows every patient's cycle day, adherence percentage, and status — no manual message scrolling needed."
+            },
+            {
+                act: "ESCALATION", num: 6,
+                title: "Day 6 — Missed Injection Alert",
+                desc: "Sarah doesn't respond on Day 6. Ovify escalates automatically: reminder at 19:00, second at 19:15, support notified at 20:00, clinic alerted at 21:00. The nurse sees the full timeline and can act."
+            }
+        ];
+
+        let current = 0;
+
+        function update() {
+            const s = screens[current];
+            document.getElementById('actLabel').textContent = s.act;
+            document.getElementById('screenNum').textContent = 'SCREEN ' + s.num;
+            document.getElementById('screenTitle').textContent = s.title;
+            document.getElementById('screenDesc').textContent = s.desc;
+            document.getElementById('progressFill').style.width = ((current + 1) / screens.length * 100) + '%';
+            document.getElementById('progressText').textContent = 'Screen ' + (current + 1) + ' of ' + screens.length;
+            document.getElementById('prevBtn').disabled = current === 0;
+            document.getElementById('nextBtn').textContent = current === screens.length - 1 ? 'Demo Complete' : 'Next';
+            document.getElementById('nextBtn').disabled = current === screens.length - 1;
+
+            // Switch views
+            document.querySelectorAll('.app-view').forEach((v, i) => {
+                v.classList.toggle('active', i === current);
+            });
+        }
+
+        function goNext() { if (current < screens.length - 1) { current++; update(); } }
+        function goPrev() { if (current > 0) { current--; update(); } }
+        function goTo(i) { current = i; update(); }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight') goNext();
+            if (e.key === 'ArrowLeft') goPrev();
+        });
+
+        update();
+    </script>
+</body>
+
+</html>

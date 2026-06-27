@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ovify AI Features | Intelligent IVF Adherence & Triage</title>
+  <meta name="description" content="Explore Ovify's non-diagnostic AI features: smart protocol planning, patient check-ins, automated WhatsApp alerts, and nurse dashboard triage." />
+  <meta name="keywords" content="AI health tech, IVF triage software, patient check-in AI, health alerts" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://www.ovify.com/ai-features.html" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.ovify.com/ai-features.html" />
+  <meta property="og:title" content="Ovify AI Features | Intelligent IVF Adherence & Triage" />
+  <meta property="og:description" content="Explore Ovify's non-diagnostic AI features: smart protocol planning, patient check-ins, automated WhatsApp alerts, and nurse dashboard triage." />
+  <meta property="og:image" content="https://www.ovify.com/assets/Logo-OvaSync.jpg" />
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://www.ovify.com/ai-features.html" />
+  <meta property="twitter:title" content="Ovify AI Features | Intelligent IVF Adherence & Triage" />
+  <meta property="twitter:description" content="Explore Ovify's non-diagnostic AI features: smart protocol planning, patient check-ins, automated WhatsApp alerts, and nurse dashboard triage." />
+  <meta property="twitter:image" content="https://www.ovify.com/assets/Logo-OvaSync.jpg" />
+  <!-- Security Headers -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self';" />
+  
+  
+  
+  
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;600;700&family=Manrope:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    /* AI Features specific styles */
+    .ai-hero {
+      padding: 100px 0 80px;
+      text-align: center;
+      background: radial-gradient(600px 400px at 50% 100%, rgba(19, 35, 60, 0.08), transparent 70%);
+    }
+
+    .ai-hero h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+      margin-bottom: 20px;
+    }
+
+    .ai-hero .sub {
+      font-size: 1.15rem;
+      color: var(--text-dim-dark);
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    /* Feature Section layouts */
+    .feature-item {
+      padding: 50px 0;
+      border-bottom: 1px solid var(--line-dark);
+    }
+
+    .feature-item:last-child {
+      border-bottom: none;
+    }
+
+    .feature-item.alt {
+      background-color: var(--navy-light);
+    }
+
+    .feature-item h2 {
+      font-size: 2rem;
+      margin-bottom: 16px;
+      color: var(--navy-deep);
+    }
+
+    .feature-item .tagline {
+      font-family: var(--data);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--navy);
+      margin-bottom: 24px;
+      display: inline-block;
+    }
+
+    .feature-desc {
+      font-size: 1.05rem;
+      color: var(--text-dim-dark);
+      margin-bottom: 24px;
+      line-height: 1.7;
+    }
+
+    .feature-bullets {
+      list-style: none;
+      padding: 0;
+    }
+
+    .feature-bullets li {
+      margin-bottom: 12px;
+      padding-left: 24px;
+      position: relative;
+    }
+
+    .feature-bullets li::before {
+      content: "✦";
+      color: var(--navy);
+      position: absolute;
+      left: 0;
+      font-weight: bold;
+    }
+
+    /* Interactive Simulator widgets */
+    .widget-box {
+      background: var(--white);
+      border: 1px solid var(--line-dark);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: 0 16px 40px -12px rgba(19, 35, 60, 0.08);
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .widget-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line-dark);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      font-family: var(--data);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-dim-dark);
+    }
+
+    .widget-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 99px;
+      background: var(--navy-light);
+      color: var(--navy);
+      font-size: 0.72rem;
+    }
+
+    /* 1. Protocol Planner simulation */
+    .planner-view {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex-grow: 1;
+    }
+
+    .planner-card-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--ivory);
+      border: 1px solid var(--line-dark);
+      border-radius: 10px;
+      padding: 10px 14px;
+    }
+
+    .planner-card-item .time {
+      font-size: 0.76rem;
+      font-family: var(--data);
+      font-weight: bold;
+      color: var(--navy);
+    }
+
+    .planner-card-item .med {
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    .planner-card-item .status {
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 99px;
+      font-weight: bold;
+    }
+
+    /* 2. CalmSeed waveform simulation */
+    .calmseed-view {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      padding: 20px 0;
+    }
+
+    .waveform {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      height: 48px;
+    }
+
+    .waveform span {
+      width: 4px;
+      border-radius: 99px;
+      background: var(--lavender);
+      height: 10px;
+      animation: wave 1.2s infinite ease-in-out;
+    }
+
+    .waveform span:nth-child(2) { animation-delay: 0.15s; }
+    .waveform span:nth-child(3) { animation-delay: 0.3s; }
+    .waveform span:nth-child(4) { animation-delay: 0.45s; }
+    .waveform span:nth-child(5) { animation-delay: 0.6s; }
+    .waveform span:nth-child(6) { animation-delay: 0.3s; }
+    .waveform span:nth-child(7) { animation-delay: 0.15s; }
+
+    @keyframes wave {
+      0%, 100% { height: 10px; }
+      50% { height: 44px; }
+    }
+
+    .calmseed-stats {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      text-align: center;
+    }
+
+    .calmseed-stat-box {
+      background: var(--ivory);
+      border-radius: 8px;
+      padding: 8px;
+      font-family: var(--data);
+      font-size: 0.74rem;
+    }
+
+    .calmseed-stat-box span {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: bold;
+      color: var(--lavender-deep);
+    }
+
+    /* 3. AMA chatbot simulation */
+    .ama-view {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .ama-bubble {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 0.84rem;
+    }
+
+    .ama-bubble.user {
+      align-self: flex-end;
+      background: var(--navy-light);
+      color: var(--text-dark);
+      border-bottom-right-radius: 2px;
+    }
+
+    .ama-bubble.ai {
+      align-self: flex-start;
+      background: var(--ivory);
+      border: 1px solid var(--line-dark);
+      border-bottom-left-radius: 2px;
+    }
+
+    /* 4. Lifestyle & Wellness daily recommendations */
+    .wellness-view {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .wellness-tip {
+      background: var(--ivory);
+      border: 1px solid var(--line-dark);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.86rem;
+    }
+
+    .wellness-tip .emoji {
+      font-size: 1.2rem;
+    }
+
+    /* 5. Message popup simulation */
+    .message-view {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      justify-content: center;
+    }
+
+    .message-bubble {
+      border: 1px solid rgba(158, 140, 239, 0.2);
+      background: var(--lavender-light);
+      border-radius: 14px;
+      padding: 16px;
+      position: relative;
+    }
+
+    .message-bubble .from {
+      font-family: var(--data);
+      font-size: 0.72rem;
+      font-weight: bold;
+      color: var(--lavender-deep);
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    .message-bubble p {
+      font-size: 0.86rem;
+      line-height: 1.4;
+      color: var(--text-dark);
+    }
+
+    @media (max-width: 992px) {
+      .feature-item .grid-2 {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+      .feature-item .grid-2 > div:nth-child(2) {
+        order: 2;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header id="header">
+    <div class="wrap nav">
+      <a href="index.html" class="brand">
+        <img src="assets/Logo-OvaSync.jpg" alt="Ovify logo" />
+        OVIFY
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="how-it-works.html">How It Works</a>
+        <a href="ai-features.html" class="active">AI Features</a>
+        <a href="for-clinics.html">For Clinics</a>
+        <a href="pricing.html">Pricing</a>
+      </nav>
+      <a href="contact.html" class="btn btn-primary">Request a Demo</a>
+      <button class="burger" id="burger">☰</button>
+    </div>
+  </header>
+  <div class="mmenu" id="mmenu">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="how-it-works.html">How It Works</a>
+    <a href="ai-features.html" class="active">AI Features</a>
+    <a href="for-clinics.html">For Clinics</a>
+    <a href="pricing.html">Pricing</a>
+    <a href="contact.html">Request a Demo</a>
+  </div>
+
+  <!-- ===== HERO SECTION ===== -->
+  <section class="ai-hero">
+    <div class="wrap reveal">
+      <span class="eyebrow">Smart Wellness Technology</span>
+      <h1>Our Integrated AI Features</h1>
+      <p class="sub">Equip your clinic with Ovify's integrated AI engines to automate patient care, predict dropout risk, and ensure perfect compliance between visits.</p>
+    </div>
+  </section>
+
+  <!-- ===== FEATURE 1: CLINICAL TRIAGE DASHBOARD ===== -->
+  <section class="feature-item alt" style="border-top: 1px solid var(--line-dark);">
+    <div class="wrap grid-2">
+      <div class="reveal">
+        <span class="tagline">Clinical Operations Engine</span>
+        <h2>1. Clinical Triage Dashboard — Real Time AI Monitoring</h2>
+        <p class="feature-desc">The Clinical Triage Dashboard is the central command center for nursing teams, moving clinics from reactive patient communication to proactive, automated compliance oversight.</p>
+        
+        <p class="feature-desc" style="font-size: 0.95rem; font-style: italic;">By consolidating patient app logs, voice stress analytics, and dose confirmations, the dashboard highlights compliance anomalies and dropout risks before they affect cycles.</p>
+
+        <ul class="feature-bullets">
+          <li><b>Adherence Anomaly Detection:</b> AI automatically flags missed doses, incorrect dosage amounts, and timing offsets.</li>
+          <li><b>Predictive Dropout Triage:</b> Uses CalmSeed voice stress trends to highlight patients at risk of abandoning their treatment.</li>
+          <li><b>Auto-Triage Priority Queue:</b> Ranks patient messages by urgency, letting nurses focus on clinical risks rather than repetitive admin.</li>
+          <li><b>Seamless EMR Integration:</b> Synchronizes compliance history, stress data, and notes directly into patient records.</li>
+        </ul>
+      </div>
+
+      <!-- Widget 1 Simulation (Clinical Triage Dashboard) -->
+      <div class="widget-box reveal" style="min-height: 350px;">
+        <div class="widget-header" style="margin-bottom: 12px;">
+          <span>CLINICAL TRIAGE DASHBOARD</span>
+          <span class="widget-indicator" style="background: rgba(229, 87, 103, 0.12); color: #ff6b7a; display: inline-flex; align-items: center; gap: 4px; border: 1px solid rgba(229, 87, 103, 0.2);">
+            <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: #ff6b7a;"></span>
+            Active Triage Alerts
+          </span>
+        </div>
+        <div class="triage-dashboard-view" style="font-family: var(--data); font-size: 0.82rem; text-align: left; display: flex; flex-direction: column; gap: 12px;">
+          
+          <!-- Clinic Stats Row -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div style="background: var(--navy-light); border: 1px solid var(--line-dark); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; justify-content: center;">
+              <span style="font-size: 0.65rem; font-weight: 600; color: var(--text-dim-dark); text-transform: uppercase;">Adherence Rate</span>
+              <div style="display: flex; align-items: baseline; gap: 4px; margin-top: 2px;">
+                <strong style="font-size: 1.1rem; color: var(--navy-deep);">96.4%</strong>
+                <span style="font-size: 0.65rem; color: var(--success); font-weight: 700;">+1.2%</span>
+              </div>
+            </div>
+            <div style="background: var(--navy-light); border: 1px solid var(--line-dark); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; justify-content: center;">
+              <span style="font-size: 0.65rem; font-weight: 600; color: var(--text-dim-dark); text-transform: uppercase;">Risk Forecast</span>
+              <div style="display: flex; align-items: baseline; gap: 4px; margin-top: 2px;">
+                <strong style="font-size: 1.1rem; color: var(--warning);">Medium</strong>
+                <span style="font-size: 0.65rem; color: var(--warning); font-weight: 700;">2 Alerts</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trend Chart SVG -->
+          <div style="background: var(--white); border: 1px solid var(--line-dark); border-radius: 8px; padding: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-size: 0.65rem; font-weight: 700; color: var(--text-dim-dark); letter-spacing: 0.05em; text-transform: uppercase;">Clinic Compliance Trend</span>
+              <span style="font-size: 0.65rem; font-weight: 600; color: var(--text-dim-dark);">7-Day Average</span>
+            </div>
+            <div style="height: 50px; position: relative;">
+              <svg viewBox="0 0 100 25" style="width: 100%; height: 100%; overflow: visible;">
+                <defs>
+                  <linearGradient id="chart-grad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="var(--navy)" stop-opacity="0.2"/>
+                    <stop offset="100%" stop-color="var(--navy)" stop-opacity="0.0"/>
+                  </linearGradient>
+                </defs>
+                <!-- Grid Lines -->
+                <line x1="0" y1="5" x2="100" y2="5" stroke="var(--line-dark)" stroke-width="0.5" stroke-dasharray="2,2" />
+                <line x1="0" y1="15" x2="100" y2="15" stroke="var(--line-dark)" stroke-width="0.5" stroke-dasharray="2,2" />
+                
+                <!-- Area path -->
+                <path d="M 0 25 L 0 18 C 15 15, 25 22, 40 12 C 55 2, 70 8, 85 5 L 100 8 L 100 25 Z" fill="url(#chart-grad)" />
+                
+                <!-- Line path -->
+                <path d="M 0 18 C 15 15, 25 22, 40 12 C 55 2, 70 8, 85 5 L 100 8" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round" />
+                
+                <!-- Active Point -->
+                <circle cx="85" cy="5" r="3" fill="var(--navy-deep)" />
+                <circle cx="85" cy="5" r="5" fill="var(--navy-deep)" opacity="0.3" style="animation: pulse 2s infinite;" />
+              </svg>
+              <!-- Sparkline hover tooltip simulation -->
+              <div style="position: absolute; left: 85%; top: -8px; transform: translateX(-50%); background: var(--navy-deep); color: var(--white); font-size: 0.58rem; padding: 2px 4px; border-radius: 4px; pointer-events: none; font-weight: bold; white-space: nowrap; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                96.4% Compliance
+              </div>
+            </div>
+          </div>
+
+          <!-- Alert Queue -->
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <span style="font-size: 0.65rem; font-weight: 700; color: var(--text-dim-dark); letter-spacing: 0.05em; text-transform: uppercase;">Urgent Triage Queue</span>
+            
+            <div style="background: rgba(229, 87, 103, 0.04); border: 1px solid rgba(229, 87, 103, 0.12); border-radius: 6px; padding: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+              <div>
+                <strong style="color: var(--navy); font-size: 0.76rem;">Sarah Connor</strong>
+                <div style="font-size: 0.68rem; color: var(--text-dim-dark); margin-top: 1px;">Missed Morning Dose (Gonal-F)</div>
+              </div>
+              <span style="background: #ff6b7a; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em;">Call Patient</span>
+            </div>
+
+            <div style="background: rgba(226, 160, 63, 0.04); border: 1px solid rgba(226, 160, 63, 0.12); border-radius: 6px; padding: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+              <div>
+                <strong style="color: var(--navy); font-size: 0.76rem;">Emma Watson</strong>
+                <div style="font-size: 0.68rem; color: var(--text-dim-dark); margin-top: 1px;">CalmSeed: Dropout Risk Alert</div>
+              </div>
+              <span style="background: #e2a03f; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em;">Send CalmCue</span>
+            </div>
+          </div>
+        </div>
+        <p style="font-size: 0.7rem; color: var(--text-dim-dark); text-align: center; margin-top: 8px;">Live clinical telemetry forecasting and predictive patient dropout prevention.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FEATURE 2: AI PROTOCOL PLANNER ===== -->
+  <section class="feature-item">
+    <div class="wrap grid-2">
+      <!-- Widget 2 Simulation (Placed left on desktop for alternating layout) -->
+      <div class="widget-box reveal">
+        <div class="widget-header">
+          <span>AI PROTOCOL PLANNER</span>
+          <span class="widget-indicator"><span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: var(--success); margin-right: 6px; vertical-align: middle;"></span>Active Timeline</span>
+        </div>
+        <div class="planner-view">
+          <p style="font-size: 0.8rem; font-style: italic; color: var(--text-dim-dark); margin-bottom: 8px;">Stimulation Phase — Day 6 Roadmap:</p>
+          <div class="planner-card-item">
+            <span class="time">08:00 AM</span>
+            <span class="med">Gonal-F (225 IU)</span>
+            <span class="status" style="background: rgba(158, 140, 239, 0.1); color: var(--success);">Verified</span>
+          </div>
+          <div class="planner-card-item">
+            <span class="time">08:00 AM</span>
+            <span class="med">Cetrotide (0.25 mg)</span>
+            <span class="status" style="background: rgba(158, 140, 239, 0.1); color: var(--success);">Verified</span>
+          </div>
+          <div class="planner-card-item">
+            <span class="time">08:00 PM</span>
+            <span class="med">Menopur (150 IU)</span>
+            <span class="status" style="background: rgba(226, 160, 63, 0.15); color: var(--warning);">Due in 2h</span>
+          </div>
+        </div>
+        <p style="font-size: 0.72rem; color: var(--text-dim-dark); text-align: center; margin-top: 10px;">If 8:00 PM dose is not logged by 8:30 PM, escalating support reminder is sent.</p>
+      </div>
+
+      <div class="reveal">
+        <span class="tagline">Core Intelligence Engine</span>
+        <h2>2. AI Protocol Planner — Automating Patient Compliance</h2>
+        <p class="feature-desc">Ovify's core intelligence engine solves the patient compliance bottleneck by translating dictated protocols or copy-pasted text into a precise, interactive patient roadmap.</p>
+
+        <ul class="feature-bullets">
+          <li>Structured morning/evening dosing timelines</li>
+          <li>Step-by-step guides for complex drugs (Gonal-F, Menopur, etc.)</li>
+          <li>Countdown timers for strict-timing injections</li>
+          <li>Storage temperature and safety alerts</li>
+          <li>Escalating safety net alerts to verify adherence</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FEATURE 3: CALMSEED NERVOUS SYSTEM AI ===== -->
+  <section class="feature-item alt">
+    <div class="wrap grid-2">
+      <div class="reveal">
+        <span class="tagline">Emotional Stability Engine</span>
+        <h2>3. CalmSeed Nervous System AI — Predicting Patient Dropout</h2>
+        <p class="feature-desc">Ovify's signature engine addresses patient dropout by tracking stress physiology—directly protecting emotional resilience and cycle compliance.</p>
+
+        <ul class="feature-bullets">
+          <li><b>Vocal Biomarker Analysis:</b> Evaluates breath ratios, tremors, pace, and vocal strain.</li>
+          <li><b>Stress-Pattern Recognition:</b> Identifies fight-or-flight, cortisol spikes, and pre-injection anxiety.</li>
+          <li><b>Paced Regulation:</b> Delivers targeted pre-injection vagal and stabilization breathing.</li>
+        </ul>
+      </div>
+
+      <!-- Widget 3 Simulation (Placed right on desktop for alternating layout) -->
+      <div class="widget-box reveal">
+        <div class="widget-header">
+          <span>CALMSEED AI BIO-SIGNAL</span>
+          <span class="widget-indicator" style="background: rgba(158, 140, 239, 0.1); color: var(--lavender-deep); display: inline-flex; align-items: center; gap: 4px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+            Voice Active
+          </span>
+        </div>
+        <div class="calmseed-view">
+          <p style="font-size: 0.8rem; font-style: italic; color: var(--text-dim-dark); text-align: center;">Vocal Biometric Check-in (15-Second Recording):</p>
+          <div class="waveform">
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <div class="calmseed-stats">
+            <div class="calmseed-stat-box">
+              Breath Ratio
+              <span>4.2s Exhale</span>
+            </div>
+            <div class="calmseed-stat-box">
+              Stress Score
+              <span>Moderate</span>
+            </div>
+          </div>
+          <p style="font-size: 0.78rem; text-align: center; color: var(--text-dark); background: var(--lavender-light); padding: 8px; border-radius: 8px;">Recommended: <b>2-Minute Vagal Paced Breathing</b> prior to evening Gonal-F injection.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FEATURE 4: ASK-ME-ANYTHING ===== -->
+  <section class="feature-item">
+    <div class="wrap grid-2">
+      <!-- Widget 4 Simulation (Placed left on desktop for alternating layout) -->
+      <div class="widget-box reveal">
+        <div class="widget-header">
+          <span>IVF EXPLAINER CHAT</span>
+          <span class="widget-indicator" style="display: inline-flex; align-items: center; gap: 4px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            Instant Translation
+          </span>
+        </div>
+        <div class="ama-view">
+          <div class="ama-bubble user">
+            Why do I need Cetrotide?
+          </div>
+          <div class="ama-bubble ai">
+            Cetrotide acts as a temporary brake. It prevents your body from releasing your eggs too early (ovulating prematurely) so they can grow together and be safely retrieved during your egg collection.
+          </div>
+        </div>
+        <p style="font-size: 0.72rem; color: var(--text-dim-dark); text-align: center; margin-top: 10px;">Translation layer: Jargon-free, context-appropriate explanations.</p>
+      </div>
+
+      <div class="reveal">
+        <span class="tagline">IVF in Human Language</span>
+        <h2>4. Ask-Me-Anything — Reducing Nurse Call Volume</h2>
+        <p class="feature-desc">Translate medical complexity into jargon-free human explanations, deflecting repetitive patient questions about AMH, follicles, and antagonist cycles.</p>
+
+        <ul class="feature-bullets">
+          <li><b>Jargon-Free Translation:</b> Translates AMH, follicles, and antagonist cycles into plain language.</li>
+          <li><b>Protocol Contextualization:</b> Explains the "why" behind specific timing and drug selections.</li>
+          <li><b>Empathetic Explanations:</b> Delivers reassuring, clear, and non-alarmist responses.</li>
+          <li><b>Support-Network Alignment:</b> Shares simplified summaries for partners and support circles.</li>
+        </ul>
+
+        <div class="quote-box" style="margin-top: 24px;">
+          "Immediate clarity reduces patient anxiety."
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FEATURE 5: EMOTIONAL & RELATIONSHIP SUPPORT AI ===== -->
+  <section class="feature-item alt">
+    <div class="wrap grid-2">
+      <div class="reveal">
+        <span class="tagline">The Missing Human Layer</span>
+        <h2>5. Emotional &amp; Relationship Support AI — Care Alignment</h2>
+        <p class="feature-desc">Ovify automates patient-support care alignment during high-stress cycles. This engine provides emotional stabilization for the patient and coordination prompts for their support network.</p>
+
+        <ul class="feature-bullets">
+          <li><b>Daily micro-messages:</b> Context-aware emotional stabilizers responding to her protocol stage and CalmSeed stress score. ("You're doing something incredibly brave. Let's take today gently.")</li>
+          <li><b>Two-Week Wait Support Mode:</b> A protective cocoon offering sleep support, grounding rituals, and pacing reminders to avoid obsessive symptom-checking.</li>
+          <li><b>Reflective Journaling (LittleLight AI):</b> Transcribes voice or text journaling into a private emotional timeline, illustrated memory excerpts, and connection rituals.</li>
+          <li><b>Support AI:</b> With consent, alerts the support regarding her feelings, how to avoid triggering language, and suggest one-minute support actions.</li>
+        </ul>
+      </div>
+
+      <!-- Widget 5 Simulation (Placed right on desktop for alternating layout) -->
+      <div class="widget-box reveal">
+        <div class="widget-header">
+          <span>SUPPORT EMPATHY TRIGGER</span>
+          <span class="widget-indicator" style="background: rgba(158, 140, 239, 0.1); color: var(--lavender-deep); display: inline-flex; align-items: center; gap: 4px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+            Support App
+          </span>
+        </div>
+        <div class="message-view">
+          <div class="message-bubble">
+            <span class="from">Ovify Empathy Alert:</span>
+            <p>"Today is Stimulation Day 8, often a day of physical bloating and emotional fatigue. Action: Make dinner tonight, verify she took her medication, and suggest a 10-minute warm foot massage to calm her nervous system."</p>
+          </div>
+        </div>
+        <p style="font-size: 0.72rem; color: var(--text-dim-dark); text-align: center;">Strengthening relationship alignment during high-stress medical journeys.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FEATURE 6: LIFESTYLE & WELLNESS AI ===== -->
+  <section class="feature-item">
+    <div class="wrap grid-2">
+      <!-- Widget 6 Simulation (Placed left on desktop for alternating layout) -->
+      <div class="widget-box reveal">
+        <div class="widget-header">
+          <span>DAILY CARE GUIDANCE</span>
+          <span class="widget-indicator" style="background: rgba(158, 140, 239, 0.15); color: var(--lavender); display: inline-flex; align-items: center; gap: 4px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            Phase: Stimulation
+          </span>
+        </div>
+        <div class="wellness-view">
+          <div class="wellness-tip">
+            <span class="icon-wrap" style="width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: rgba(158, 140, 239, 0.15); color: var(--lavender); margin-right: 12px; flex-shrink: 0;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+            </span>
+            <div>
+              <strong>Hydration Prompt</strong>
+              "Add one bottle of coconut water today to support electrolyte balance during stimulation."
+            </div>
+          </div>
+          <div class="wellness-tip">
+            <span class="icon-wrap" style="width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: rgba(158, 140, 239, 0.15); color: var(--lavender); margin-right: 12px; flex-shrink: 0;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s-8-3-8-10 8-10 8-10 8 3 8 10-8 10-8 10z"></path><path d="M12 22s-4-3-4-10 4-6 4-6 4 3 4 6-4 10-4 10z"></path></svg>
+            </span>
+            <div>
+              <strong>Restorative Movement</strong>
+              "Stimulation Day 6: Choose gentle walking or restorative Yin yoga. Avoid high-impact or twisting exercises."
+            </div>
+          </div>
+          <div class="wellness-tip">
+            <span class="icon-wrap" style="width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: rgba(158, 140, 239, 0.15); color: var(--lavender); margin-right: 12px; flex-shrink: 0;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4.5" y1="19.5" x2="19.5" y2="4.5"></line><path d="M15 2.5a3.5 3.5 0 0 1 5 5l-11.25 11.25a6.36 6.36 0 0 1-9-9L15 2.5z"></path></svg>
+            </span>
+            <div>
+              <strong>Supplement Tip</strong>
+              "Take CoQ10 in the morning with food to maximize absorption."
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <span class="tagline">Non-Medical Daily Care</span>
+        <h2>6. Lifestyle &amp; Wellness AI — Automated Daily Guidance</h2>
+        <p class="feature-desc">Automates phase-aligned lifestyle guidance to eliminate repetitive clinic emails about daily micro-decisions.</p>
+
+        <ul class="feature-bullets">
+          <li><b>Nutrition &amp; Hydration:</b> Phase-specific dietary reminders and hydration tracking.</li>
+          <li><b>Activity &amp; Movement:</b> Safe exercise boundaries tailored to stimulation and transfer phases.</li>
+          <li><b>Supplement Structuring:</b> Spacing guidelines, timing schedules, and absorption tips.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="wrap">
+      <div class="foot-grid">
+        <div>
+          <a href="index.html" class="brand">
+            <img src="assets/Logo-BlueBackground.jpg" alt="Ovify logo" />
+            OVIFY
+          </a>
+          <p class="foot-about">Intelligent, AI-enabled, structured, and calm companion during IVF Journey.</p>
+        </div>
+        <div class="foot-col">
+          <h4>Ecosystem</h4>
+          <a href="index.html">Home</a>
+          <a href="about.html">About Us</a>
+          <a href="how-it-works.html">How It Works</a>
+        </div>
+        <div class="foot-col">
+          <h4>Platform</h4>
+          <a href="ai-features.html">AI Features</a>
+          <a href="for-clinics.html">For Clinics</a>
+          <a href="pricing.html">Pricing & Licensing</a>
+          <a href="contact.html">Request Demo</a>
+        </div>
+        <div class="foot-col">
+          <h4>Contact</h4>
+          <a href="mailto:hello@ovify.com">hello@ovify.com</a>
+          <p style="font-size: 0.9rem; color: var(--text-dim-light); margin-top: 10px;">Abu Dhabi, UAE</p>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <span>© 2026 Ovify. AI Infrastructure for Reproductive Medicine. All rights reserved.</span>
+        <span>Ethical AI · Support, Not Surveillance.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Header shadow on scroll
+    const header = document.getElementById('header');
+    window.addEventListener('scroll', () => {
+      header.classList.toggle('scrolled', window.scrollY > 10);
+    });
+
+    // Mobile menu toggle
+    const burger = document.getElementById('burger');
+    const mmenu = document.getElementById('mmenu');
+    burger.onclick = () => mmenu.classList.toggle('open');
+    mmenu.querySelectorAll('a').forEach(link => {
+      link.onclick = () => mmenu.classList.remove('open');
+    });
+
+    // Scroll Reveal Intersection Observer
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  </script>
+</body>
+</html>

@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ovify for IVF Clinics | Reduce Workload & Prevent Cancellations</title>
+  <meta name="description" content="Automate patient adherence monitoring, reduce coordinator administrative load by 40%, and protect clinic revenue by preventing cancelled IVF cycles." />
+  <meta name="keywords" content="EMR clinic software, IVF nurse coordination, clinic workflow automation" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://www.ovify.com/for-clinics.html" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.ovify.com/for-clinics.html" />
+  <meta property="og:title" content="Ovify for IVF Clinics | Reduce Workload & Prevent Cancellations" />
+  <meta property="og:description" content="Automate patient adherence monitoring, reduce coordinator administrative load by 40%, and protect clinic revenue by preventing cancelled IVF cycles." />
+  <meta property="og:image" content="https://www.ovify.com/assets/Logo-OvaSync.jpg" />
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://www.ovify.com/for-clinics.html" />
+  <meta property="twitter:title" content="Ovify for IVF Clinics | Reduce Workload & Prevent Cancellations" />
+  <meta property="twitter:description" content="Automate patient adherence monitoring, reduce coordinator administrative load by 40%, and protect clinic revenue by preventing cancelled IVF cycles." />
+  <meta property="twitter:image" content="https://www.ovify.com/assets/Logo-OvaSync.jpg" />
+  <!-- Security Headers -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self';" />
+  
+  
+  
+  
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;600;700&family=Manrope:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    /* For Clinics specific styles */
+    .clinic-hero {
+      padding: 100px 0 80px;
+      text-align: center;
+      background: radial-gradient(600px 400px at 50% 100%, rgba(19, 35, 60, 0.08), transparent 70%);
+    }
+
+    .clinic-hero h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+      margin-bottom: 20px;
+    }
+
+    .clinic-hero .sub {
+      font-size: 1.15rem;
+      color: var(--text-dim-dark);
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    /* Stats banner */
+    .clinic-stats-banner {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 24px;
+    }
+
+    .clinic-stat-card {
+      border: 1px solid var(--line-dark);
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 30px;
+      text-align: center;
+    }
+
+    .clinic-stat-card .num {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+
+    .clinic-stat-card .lbl {
+      font-family: var(--data);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-dim-dark);
+    }
+
+    /* Workflow Steps */
+    .workflow-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .workflow-step {
+      background: var(--white);
+      border: 1px solid var(--line-dark);
+      border-radius: 16px;
+      padding: 24px;
+      position: relative;
+    }
+
+    .workflow-step::before {
+      content: attr(data-step);
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-family: var(--data);
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: rgba(19, 35, 60, 0.12);
+      line-height: 1;
+    }
+
+    .workflow-step h4 {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+      color: var(--navy-deep);
+      padding-right: 24px;
+    }
+
+    .workflow-step p {
+      font-size: 0.88rem;
+      color: var(--text-dim-dark);
+      line-height: 1.4;
+    }
+
+    @media (max-width: 992px) {
+      .clinic-stats-banner {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .workflow-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+    }
+
+    /* Dual Burden Section */
+    .dual-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin-top: 20px;
+    }
+
+    .burden-card {
+      padding: 32px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line-dark);
+    }
+
+    .burden-card.patient {
+      background: var(--lavender-light);
+      border-color: rgba(158, 140, 239, 0.2);
+    }
+
+    .burden-card.clinic {
+      background: var(--navy-light);
+      border-color: rgba(19, 35, 60, 0.2);
+    }
+
+    .burden-card h3 {
+      font-size: 1.4rem;
+      margin-bottom: 18px;
+    }
+
+    .burden-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .burden-list li {
+      margin-bottom: 16px;
+      font-size: 0.95rem;
+    }
+
+    .burden-list li strong {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--text-dark);
+    }
+
+    /* Nurse Time Drain Visualizer Card */
+    .drain-visual-card {
+      background: linear-gradient(165deg, var(--navy-deep), var(--dark-slate));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-light);
+      border-radius: var(--radius);
+      padding: 32px;
+      box-shadow: 0 16px 36px -12px rgba(19, 32, 53, 0.15);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s ease;
+      text-align: left;
+    }
+
+    .drain-visual-card:hover {
+      border-color: var(--lavender);
+      box-shadow: 0 16px 36px -12px rgba(158, 140, 239, 0.2);
+    }
+
+    .drain-header {
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .drain-stat-badge {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 4px;
+      background: rgba(229, 87, 103, 0.12);
+      border: 1px solid rgba(229, 87, 103, 0.25);
+      color: #ff6b7a;
+      padding: 6px 12px;
+      border-radius: 30px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .drain-stat-badge span {
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+
+    .drain-bar-item {
+      margin-bottom: 16px;
+    }
+
+    .drain-bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      color: var(--text-dim-light);
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .drain-bar-outer {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .drain-bar-inner {
+      height: 100%;
+      background: linear-gradient(90deg, #ff6b7a, #ffa4ac);
+      border-radius: 4px;
+    }
+
+    .drain-bar-inner.item-1 { width: 85%; }
+    .drain-bar-inner.item-2 { width: 70%; }
+    .drain-bar-inner.item-3 { width: 60%; }
+
+    .dividend-banner {
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .dividend-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(158, 140, 239, 0.15);
+      border: 1px solid rgba(158, 140, 239, 0.3);
+      color: var(--lavender);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .dividend-text {
+      font-size: 0.85rem;
+      color: var(--text-dim-light);
+      line-height: 1.4;
+      text-align: left;
+    }
+    
+    .dividend-text strong {
+      color: #FFFFFF;
+    }
+
+    @media (max-width: 768px) {
+      .dual-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header id="header">
+    <div class="wrap nav">
+      <a href="index.html" class="brand">
+        <img src="assets/Logo-OvaSync.jpg" alt="Ovify logo" />
+        OVIFY
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="how-it-works.html">How It Works</a>
+        <a href="ai-features.html">AI Features</a>
+        <a href="for-clinics.html" class="active">For Clinics</a>
+        <a href="pricing.html">Pricing</a>
+      </nav>
+      <a href="contact.html" class="btn btn-primary">Request a Demo</a>
+      <button class="burger" id="burger">☰</button>
+    </div>
+  </header>
+  <div class="mmenu" id="mmenu">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="how-it-works.html">How It Works</a>
+    <a href="ai-features.html">AI Features</a>
+    <a href="for-clinics.html" class="active">For Clinics</a>
+    <a href="pricing.html">Pricing</a>
+    <a href="contact.html">Request a Demo</a>
+  </div>
+
+  <!-- ===== HERO SECTION ===== -->
+  <section class="clinic-hero">
+    <div class="wrap reveal">
+      <span class="eyebrow">B2B Clinic Solutions</span>
+      <h1>Enhance Patient Experience,<br /><span class="grad-text">Improve Compliance, &amp; Reduce Workload.</span></h1>
+      <p class="sub">Reduce clinical administrative burdens, decrease WhatsApp query overload, and gain visibility into patient adherence and wellness with Ovify's clinic app and dashboard.</p>
+
+      <div class="clinic-stats-banner">
+        <div class="clinic-stat-card">
+          <div class="num">40-60%</div>
+          <div class="lbl">Fewer WhatsApp Queries</div>
+        </div>
+        <div class="clinic-stat-card">
+          <div class="num">40%</div>
+          <div class="lbl">Less Patient Dropout</div>
+        </div>
+        <div class="clinic-stat-card">
+          <div class="num">94%</div>
+          <div class="lbl">Medication Adherence</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== WHY CLINICS NEED OVIFY ===== -->
+  <section class="alt" style="border-top: 1px solid var(--line-dark); border-bottom: 1px solid var(--line-dark);">
+    <div class="wrap reveal">
+      <div class="grid-2" style="align-items: center;">
+        <div>
+          <span class="eyebrow">Operational Pressure</span>
+          <h2>Stabilize Clinic Workflow</h2>
+          <p class="feature-desc" style="margin-top: 16px; font-size: 1.05rem; line-height: 1.6; color: var(--text-dark);">
+            Repetitive patient queries overwhelm nursing teams, driving staff burnout, patient anxiety, and medication error rates.
+          </p>
+          <p class="feature-desc" style="color: var(--lavender-deep); font-weight: 600; margin-top: 12px;">
+            The Ovify Solution: Automate patient triage and communication to stabilize cycles and restore clinic capacity.
+          </p>
+        </div>
+        <div class="drain-visual-card">
+          <div class="drain-header">
+            <h3 style="margin: 0; font-size: 1.25rem; color: var(--white);">The Nurse Time Drain</h3>
+            <div class="drain-stat-badge">
+              <span>15+</span> Hours Lost Per Nurse / Week
+            </div>
+          </div>
+          
+          <div class="drain-bar-item">
+            <div class="drain-bar-label">
+              <span>WhatsApp Missed Dose Chasing</span>
+              <span style="font-weight: 700; color: #ff6b7a;">High Effort</span>
+            </div>
+            <div class="drain-bar-outer">
+              <div class="drain-bar-inner item-1"></div>
+            </div>
+          </div>
+
+          <div class="drain-bar-item">
+            <div class="drain-bar-label">
+              <span>Answering Redundant Medication Mixing Qs</span>
+              <span style="font-weight: 700; color: #ffa4ac;">Moderate Effort</span>
+            </div>
+            <div class="drain-bar-outer">
+              <div class="drain-bar-inner item-2"></div>
+            </div>
+          </div>
+
+          <div class="drain-bar-item">
+            <div class="drain-bar-label">
+              <span>Panicked Wait-Window Calls</span>
+              <span style="font-weight: 700; color: #ffa4ac;">Constant Overhead</span>
+            </div>
+            <div class="drain-bar-outer">
+              <div class="drain-bar-inner item-3"></div>
+            </div>
+          </div>
+
+          <div class="dividend-banner">
+            <div class="dividend-icon">✓</div>
+            <div class="dividend-text">
+              <strong>The Automation Dividend:</strong> Ovify handles these steps automatically, letting nurses practice at the top of their license.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== KEY BENEFITS ===== -->
+  <section>
+    <div class="wrap reveal">
+      <div class="sec-head">
+        <span class="eyebrow">Value Proposition</span>
+        <h2>Key Benefits</h2>
+        <p>A double-sided benefit structure that empowers the clinic operations and elevates the patient experience.</p>
+      </div>
+
+      <div class="grid-2" style="align-items: stretch; gap: 32px;">
+        <!-- For the Practice -->
+        <div class="card">
+          <div class="icon-wrap" style="display: flex; align-items: center; justify-content: center; background: var(--navy-light); color: var(--navy);">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+          </div>
+          <h3>For the Practice</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li style="margin: 12px 0; display: flex; gap: 10px;"><b style="color: var(--navy);">✓</b> <div><b>Reduced Administrative Load:</b> Experience 40–60% fewer WhatsApp queries from confused patients.</div></li>
+            <li style="margin: 12px 0; display: flex; gap: 10px;"><b style="color: var(--navy);">✓</b> <div><b>Enhanced Compliance &amp; Structure:</b> Ensure higher compliance and maintain structured communications.</div></li>
+            <li style="margin: 12px 0; display: flex; gap: 10px;"><b style="color: var(--navy);">✓</b> <div><b>Market Differentiation:</b> Stand out in competitive markets by offering state-of-the-art care technology.</div></li>
+            <li style="margin: 12px 0; display: flex; gap: 10px;"><b style="color: var(--navy);">✓</b> <div><b>Improved Reputation:</b> Cultivate better online reviews and increased patient referrals.</div></li>
+            <li style="margin: 12px 0; display: flex; gap: 10px;"><b style="color: var(--navy);">✓</b> <div><b>Efficient Operations:</b> Utilize automated reminders, reducing clinic hours spent chasing checkmarks.</div></li>
+          </ul>
+        </div>
+
+        <!-- For the Patient Experience -->
+        <div class="card">
+          <div class="icon-wrap" style="display: flex; align-items: center; justify-content: center; background: var(--lavender-light); color: var(--lavender);">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+          </div>
+          <h3>For the Patient Experience</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li style="margin: 12px 0; display: flex; gap: 10px;"><b style="color: var(--navy);">✓</b> <div><b>Increased Satisfaction:</b> Cultivate happier, calmer, and more aligned patients.</div></li>
+            <li style="margin: 12px 0; display: flex; gap: 10px;"><b style="color: var(--navy);">✓</b> <div><b>Dedicated Support:</b> Patients benefit from a white-labeled companion app that guides them 24/7.</div></li>
+            <li style="margin: 12px 0; display: flex; gap: 10px;"><b style="color: var(--navy);">✓</b> <div><b>Personalized Care:</b> Monitor patient well-being with stress indicators and step-in alerts.</div></li>
+            <li style="margin: 12px 0; display: flex; gap: 10px;"><b style="color: var(--navy);">✓</b> <div><b>Fewer Treatment Delays:</b> Reducing error-driven delays, keeping cycles moving on schedule.</div></li>
+            <li style="margin: 12px 0; display: flex; gap: 10px;"><b style="color: var(--navy);">✓</b> <div><b>Continuous Connection:</b> Support patients in the "silent weeks" between clinical visits.</div></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== HOW IT WORKS (CLINIC WORKFLOW) ===== -->
+  <section class="alt" style="border-top: 1px solid var(--line-dark);">
+    <div class="wrap reveal">
+      <div class="sec-head">
+        <span class="eyebrow">The Workflow</span>
+        <h2>How It Works</h2>
+        <p>A simple 5-step workflow integrating cleanly into your clinic's existing patient onboarding.</p>
+      </div>
+
+      <div class="workflow-grid">
+        <div class="workflow-step" data-step="1">
+          <h4>Clinic Registration</h4>
+          <p>The clinic registers the patient in the central dashboard during onboarding.</p>
+        </div>
+        <div class="workflow-step" data-step="2">
+          <h4>Protocol Entry</h4>
+          <p>The nurse inputs the medication treatment protocol via the dashboard or tablet.</p>
+        </div>
+        <div class="workflow-step" data-step="3">
+          <h4>Instant Update</h4>
+          <p>The patient's mobile app updates immediately with the structured roadmap.</p>
+        </div>
+        <div class="workflow-step" data-step="4">
+          <h4>Stress Monitoring</h4>
+          <p>CalmSeed AI continuously monitors the patient's stress levels via voice logs.</p>
+        </div>
+        <div class="workflow-step" data-step="5">
+          <h4>Clinic Warnings</h4>
+          <p>The clinic receives instant dashboard alerts if the patient misses a dose or experiences stress spikes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== DUAL BURDEN SECTION ===== -->
+  <section class="alt" style="border-top: 1px solid var(--line-dark);">
+    <div class="wrap reveal">
+      <div class="sec-head">
+        <span class="eyebrow">The IVF Challenge</span>
+        <h2>A Dual Burden</h2>
+        <p>IVF is complex both medically and emotionally, creating critical pain points for patients and providers alike.</p>
+      </div>
+
+      <div class="dual-grid">
+        <div class="burden-card patient">
+          <span class="eyebrow" style="color: var(--lavender-deep);">For Patients</span>
+          <h3>Struggles &amp; Overwhelm</h3>
+          <ul class="burden-list">
+            <li>
+              <strong>Injection Anxiety</strong>
+              Managing complex, high-stakes drug protocols alone at home.
+            </li>
+            <li>
+              <strong>Silent Weeks Isolation</strong>
+              Lack of emotional guidance between sparse clinic visits.
+            </li>
+            <li>
+              <strong>Decision Fatigue</strong>
+              Relentless administrative and dosage-tracking overhead.
+            </li>
+            <li>
+              <strong>Nervous-System Stress</strong>
+              Neglect of mental well-being, directly impacting cycle outcomes.
+            </li>
+          </ul>
+        </div>
+
+        <div class="burden-card clinic">
+          <span class="eyebrow" style="color: var(--navy-deep);">For Clinics</span>
+          <h3>Operational Pressure</h3>
+          <ul class="burden-list">
+            <li>
+              <strong>Administrative Overload</strong>
+              Heavy nurse burnout from constant WhatsApp and phone inquiries.
+            </li>
+            <li>
+              <strong>Compliance Risks</strong>
+              Missed dose cycles leading to cancelled treatments and lost revenue.
+            </li>
+            <li>
+              <strong>Zero Visibility</strong>
+              No operational insight into patient adherence between visits.
+            </li>
+            <li>
+              <strong>Panic Management</strong>
+              Inefficient, reactive handling of patient anxiety and confusion.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA DEMO ===== -->
+  <section class="dark" style="text-align: center;">
+    <div class="wrap reveal" style="max-width: 700px;">
+      <span class="eyebrow light">Request a Demo</span>
+      <h2 style="font-size: 2.2rem; margin-bottom: 16px;">Ready to Optimize Your Clinic's Workflow?</h2>
+      <p style="color: var(--text-dim-light); margin-bottom: 32px; font-size: 1.1rem;">Schedule a 30-minute demonstration. We will show you how Ovify integrates with your existing workflows and EMR systems.</p>
+      <a href="contact.html" class="btn btn-accent">Schedule Clinic Demo</a>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="wrap">
+      <div class="foot-grid">
+        <div>
+          <a href="index.html" class="brand">
+            <img src="assets/Logo-BlueBackground.jpg" alt="Ovify logo" />
+            OVIFY
+          </a>
+          <p class="foot-about">Intelligent, AI-enabled, structured, and calm companion during IVF Journey.</p>
+        </div>
+        <div class="foot-col">
+          <h4>Ecosystem</h4>
+          <a href="index.html">Home</a>
+          <a href="about.html">About Us</a>
+          <a href="how-it-works.html">How It Works</a>
+        </div>
+        <div class="foot-col">
+          <h4>Platform</h4>
+          <a href="ai-features.html">AI Features</a>
+          <a href="for-clinics.html">For Clinics</a>
+          <a href="pricing.html">Pricing & Licensing</a>
+          <a href="contact.html">Request Demo</a>
+        </div>
+        <div class="foot-col">
+          <h4>Contact</h4>
+          <a href="mailto:hello@ovify.com">hello@ovify.com</a>
+          <p style="font-size: 0.9rem; color: var(--text-dim-light); margin-top: 10px;">Abu Dhabi, UAE</p>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <span>© 2026 Ovify. AI Infrastructure for Reproductive Medicine. All rights reserved.</span>
+        <span>Ethical AI · Support, Not Surveillance.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Header shadow on scroll
+    const header = document.getElementById('header');
+    window.addEventListener('scroll', () => {
+      header.classList.toggle('scrolled', window.scrollY > 10);
+    });
+
+    // Mobile menu toggle
+    const burger = document.getElementById('burger');
+    const mmenu = document.getElementById('mmenu');
+    burger.onclick = () => mmenu.classList.toggle('open');
+    mmenu.querySelectorAll('a').forEach(link => {
+      link.onclick = () => mmenu.classList.remove('open');
+    });
+
+    // Scroll Reveal Intersection Observer
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  </script>
+</body>
+</html>

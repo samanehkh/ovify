@@ -1,0 +1,38 @@
+# macOS System Files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Python virtual environments & caching
+venv/
+.venv/
+env/
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node.js dependencies & builds
+node_modules/
+dist/
+build/
+.npm
+.yarn
+
+# Terraform state & variables
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+*.tfvars.json
+
+# Local IDE configuration & temp files
+.vscode/
+.idea/
+*.log
+tmp/
+scratch/
