@@ -85,8 +85,8 @@ graph TD
     ArchAgent -->|9. Submits Prompt| PII_Scrub
     DevAgent & QAAgent & SecOpsAgent -->|9. Submits Prompt| PII_Scrub
     
-    PII_Scrub -->|10. Calls Pro (Planning)| GeminiPro
-    PII_Scrub -->|11. Calls Flash (Execution)| GeminiFlash
+    PII_Scrub -->|10. Calls Pro for Planning| GeminiPro
+    PII_Scrub -->|11. Calls Flash for Execution| GeminiFlash
     
     GeminiPro & GeminiFlash -->|12. Validates JSON Shape| PydanticGuard
     PydanticGuard -->|13. Returns Structured Output| OrchNode
