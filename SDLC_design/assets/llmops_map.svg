@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1680" height="1180" viewBox="0 0 1680 1180">
+<defs><marker id="a" markerWidth="11" markerHeight="11" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker></defs>
+<rect x="0" y="0" width="1680" height="1180" rx="0" fill="#FDFDFB" stroke="#FDFDFB" stroke-width="0"/>
+<text x="50" y="52" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="30" font-weight="800" fill="#13233C" text-anchor="start">LLMOps and Agentic AI — The Map</text>
+<text x="50" y="80" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#64748B" text-anchor="start">The model is the easy part. Value + safety live in Context, Constraints, Measurement, and Visibility.</text>
+<text x="50" y="128" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" font-weight="800" fill="#13233C" text-anchor="start">THE THREE PILLARS OF LLMOps</text>
+<rect x="50" y="145" width="510" height="110" rx="14" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+<text x="64" y="169" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1E3A8A" text-anchor="start">1 · EVALUATION</text>
+<text x="64" y="190" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#1E3A8A" text-anchor="start">How you replace 'assert ==' for non-deterministic output.</text>
+<text x="64" y="225" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#1E3A8A" text-anchor="start">eval sets · LLM-as-judge · Ragas · promptfoo</text>
+<rect x="585" y="145" width="510" height="110" rx="14" fill="#FEE2E2" stroke="#DC2626" stroke-width="2"/>
+<text x="599" y="169" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#7F1D1D" text-anchor="start">2 · GUARDRAILS</text>
+<text x="599" y="190" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#7F1D1D" text-anchor="start">Deterministic checks wrapped around a stochastic core.</text>
+<text x="599" y="225" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#7F1D1D" text-anchor="start">input · output · action layers (defense in depth)</text>
+<rect x="1120" y="145" width="510" height="110" rx="14" fill="#F3E8FF" stroke="#9333EA" stroke-width="2"/>
+<text x="1134" y="169" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#581C87" text-anchor="start">3 · OBSERVABILITY</text>
+<text x="1134" y="190" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#581C87" text-anchor="start">See every call, token, cost, and error.</text>
+<text x="1134" y="225" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#581C87" text-anchor="start">traces · spans · Langfuse · OpenTelemetry</text>
+<text x="50" y="300" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" font-weight="800" fill="#13233C" text-anchor="start">THE AGENTIC LADDER  (climb only as high as the task needs)</text>
+<rect x="50" y="320" width="300" height="86" rx="14" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
+<text x="64" y="344" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#78350F" text-anchor="start">L0 · Prompt</text>
+<text x="64" y="365" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#78350F" text-anchor="start">one call</text>
+<line x1="350" y1="363" x2="366" y2="363" stroke="#475569" stroke-width="2.5" marker-end="url(#a)"/>
+<rect x="366" y="320" width="300" height="86" rx="14" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
+<text x="380" y="344" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#78350F" text-anchor="start">L1 · Chain</text>
+<text x="380" y="365" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#78350F" text-anchor="start">fixed steps</text>
+<line x1="666" y1="363" x2="682" y2="363" stroke="#475569" stroke-width="2.5" marker-end="url(#a)"/>
+<rect x="682" y="320" width="300" height="86" rx="14" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
+<text x="696" y="344" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#78350F" text-anchor="start">L2 · Router</text>
+<text x="696" y="365" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#78350F" text-anchor="start">model branches</text>
+<line x1="982" y1="363" x2="998" y2="363" stroke="#475569" stroke-width="2.5" marker-end="url(#a)"/>
+<rect x="998" y="320" width="300" height="86" rx="14" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
+<text x="1012" y="344" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#78350F" text-anchor="start">L3 · Agent</text>
+<text x="1012" y="365" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#78350F" text-anchor="start">tool loop + reflect</text>
+<line x1="1298" y1="363" x2="1314" y2="363" stroke="#475569" stroke-width="2.5" marker-end="url(#a)"/>
+<rect x="1314" y="320" width="300" height="86" rx="14" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
+<text x="1328" y="344" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#78350F" text-anchor="start">L4 · Swarm</text>
+<text x="1328" y="365" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#78350F" text-anchor="start">expert roles collaborate</text>
+<text x="50" y="430" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#64748B" text-anchor="start">↑ higher = more capable, more cost, less predictable.  Ovify SDLC = L4 swarm; each node kept as low as possible.</text>
+<text x="50" y="478" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" font-weight="800" fill="#13233C" text-anchor="start">GUARDRAILS — DEFENSE IN DEPTH</text>
+<rect x="50" y="498" width="300" height="86" rx="14" fill="#FECACA" stroke="#B91C1C" stroke-width="2"/>
+<text x="64" y="522" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#7F1D1D" text-anchor="start">App</text>
+<text x="64" y="543" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#7F1D1D" text-anchor="start">auth · rate limit</text>
+<line x1="350" y1="541" x2="366" y2="541" stroke="#475569" stroke-width="2.5" marker-end="url(#a)"/>
+<rect x="366" y="498" width="300" height="86" rx="14" fill="#FECACA" stroke="#B91C1C" stroke-width="2"/>
+<text x="380" y="522" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#7F1D1D" text-anchor="start">Input</text>
+<text x="380" y="543" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#7F1D1D" text-anchor="start">PII scrub · injection filter</text>
+<line x1="666" y1="541" x2="682" y2="541" stroke="#475569" stroke-width="2.5" marker-end="url(#a)"/>
+<rect x="682" y="498" width="300" height="86" rx="14" fill="#FECACA" stroke="#B91C1C" stroke-width="2"/>
+<text x="696" y="522" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#7F1D1D" text-anchor="start">Model</text>
+<text x="696" y="543" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#7F1D1D" text-anchor="start">system prompt · low temp</text>
+<line x1="982" y1="541" x2="998" y2="541" stroke="#475569" stroke-width="2.5" marker-end="url(#a)"/>
+<rect x="998" y="498" width="300" height="86" rx="14" fill="#FECACA" stroke="#B91C1C" stroke-width="2"/>
+<text x="1012" y="522" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#7F1D1D" text-anchor="start">Output</text>
+<text x="1012" y="543" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#7F1D1D" text-anchor="start">schema · grounding · toxicity</text>
+<line x1="1298" y1="541" x2="1314" y2="541" stroke="#475569" stroke-width="2.5" marker-end="url(#a)"/>
+<rect x="1314" y="498" width="300" height="86" rx="14" fill="#FECACA" stroke="#B91C1C" stroke-width="2"/>
+<text x="1328" y="522" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#7F1D1D" text-anchor="start">Action</text>
+<text x="1328" y="543" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#7F1D1D" text-anchor="start">tool scope · human gate</text>
+<text x="50" y="628" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" font-weight="800" fill="#13233C" text-anchor="start">RAG — GROUNDING (the anti-hallucination + private-knowledge pattern)</text>
+<rect x="50" y="648" width="300" height="86" rx="14" fill="#DCFCE7" stroke="#16A34A" stroke-width="2"/>
+<text x="64" y="672" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#14532D" text-anchor="start">Docs</text>
+<text x="64" y="693" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#14532D" text-anchor="start">guidelines / code</text>
+<line x1="350" y1="691" x2="366" y2="691" stroke="#475569" stroke-width="2.5" marker-end="url(#a)"/>
+<rect x="366" y="648" width="300" height="86" rx="14" fill="#DCFCE7" stroke="#16A34A" stroke-width="2"/>
+<text x="380" y="672" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#14532D" text-anchor="start">Chunk+Embed</text>
+<text x="380" y="693" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#14532D" text-anchor="start">→ vectors</text>
+<line x1="666" y1="691" x2="682" y2="691" stroke="#475569" stroke-width="2.5" marker-end="url(#a)"/>
+<rect x="682" y="648" width="300" height="86" rx="14" fill="#DCFCE7" stroke="#16A34A" stroke-width="2"/>
+<text x="696" y="672" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#14532D" text-anchor="start">Vector DB</text>
+<text x="696" y="693" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#14532D" text-anchor="start">store</text>
+<line x1="982" y1="691" x2="998" y2="691" stroke="#475569" stroke-width="2.5" marker-end="url(#a)"/>
+<rect x="998" y="648" width="300" height="86" rx="14" fill="#DCFCE7" stroke="#16A34A" stroke-width="2"/>
+<text x="1012" y="672" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#14532D" text-anchor="start">Retrieve+Rerank</text>
+<text x="1012" y="693" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#14532D" text-anchor="start">top-k</text>
+<line x1="1298" y1="691" x2="1314" y2="691" stroke="#475569" stroke-width="2.5" marker-end="url(#a)"/>
+<rect x="1314" y="648" width="300" height="86" rx="14" fill="#DCFCE7" stroke="#16A34A" stroke-width="2"/>
+<text x="1328" y="672" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#14532D" text-anchor="start">LLM</text>
+<text x="1328" y="693" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#14532D" text-anchor="start">grounded + cited answer</text>
+<text x="50" y="778" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" font-weight="800" fill="#13233C" text-anchor="start">COST LEVERS (in order of impact)</text>
+<rect x="50" y="790" width="760" height="180" rx="14" fill="#F0FDF4" stroke="#16A34A" stroke-width="2"/>
+<text x="64" y="820" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13.5" font-weight="400" fill="#14532D" text-anchor="start">• 1 · Model routing (cheap-first, escalate rarely)</text>
+<text x="64" y="845" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13.5" font-weight="400" fill="#14532D" text-anchor="start">• 2 · Minimise context (input = most of the bill)</text>
+<text x="64" y="870" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13.5" font-weight="400" fill="#14532D" text-anchor="start">• 3 · Prompt caching (stable prefixes)</text>
+<text x="64" y="895" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13.5" font-weight="400" fill="#14532D" text-anchor="start">• 4 · Cap loops + per-run budget abort</text>
+<text x="64" y="920" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13.5" font-weight="400" fill="#14532D" text-anchor="start">• 5 · Batch / fewer calls</text>
+<text x="64" y="945" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13.5" font-weight="400" fill="#14532D" text-anchor="start">• 6 · Self-host open-weight at volume</text>
+<text x="850" y="778" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" font-weight="800" fill="#13233C" text-anchor="start">BUILD DECISION  (prompt → RAG → fine-tune)</text>
+<rect x="850" y="790" width="780" height="180" rx="14" fill="#FFFBEB" stroke="#D97706" stroke-width="2"/>
+<text x="864" y="820" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#78350F" text-anchor="start">Need private/fresh facts?  →  RAG</text>
+<text x="864" y="850" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#78350F" text-anchor="start">Need a new skill/style instructions can't give?  →  Fine-tune (last resort)</text>
+<text x="864" y="880" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#78350F" text-anchor="start">Otherwise  →  Prompt engineering (start here: free, instant)</text>
+<text x="864" y="918" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#92400E" text-anchor="start">For knowledge: RAG beats fine-tuning — cheaper, updatable, citable.</text>
+<text x="864" y="940" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#92400E" text-anchor="start">Don't use an agent where a chain will do.</text>
+<text x="50" y="1010" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#7F1D1D" text-anchor="start">TOP 2 AGENTIC RISKS (OWASP LLM):</text>
+<text x="360" y="1010" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13.5" font-weight="400" fill="#7F1D1D" text-anchor="start">LLM01 Prompt Injection  ·  LLM08 Excessive Agency  →  contained by least-privilege tools + human gates + no auto-merge/deploy.</text>
+<text x="50" y="1050" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#475569" text-anchor="start">Pillars + ladder + guardrails + RAG + cost discipline = LLMOps. See llmops_deep_dive.md for the full guide.</text>
+</svg>
