@@ -1,6 +1,14 @@
 import os
+import sys
 import json
+import re
+import subprocess
 from typing import List, Dict, TypedDict
+from pydantic import BaseModel, Field
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.tools import tool
+from langchain_core.messages import ToolMessage, AIMessage, HumanMessage, SystemMessage
 from langgraph.graph import StateGraph, END
 
 # ==========================================
@@ -20,43 +28,250 @@ class SDLCState(TypedDict):
     max_iterations: int
 
 # ==========================================
-# 2. Node Function Stubs (Agent Actions)
+# 2. PII Scrubber (DLP Guardrail)
+# ==========================================
+
+def redact_pii(text: str) -> str:
+    """Redacts UAE Emirates IDs, emails, and phone numbers to ensure DHA/MOHAP data compliance."""
+    emirates_id_pattern = r"\b784-?[0-9]{4}-?[0-9]{7}-?[0-9]{1}\b"
+    email_pattern = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
+    phone_pattern = r"\b(?:\+?971|0)?5[024568]-?[0-9]{7}\b"
+    
+    text = re.sub(emirates_id_pattern, "[REDACTED_EMIRATES_ID]", text)
+    text = re.sub(email_pattern, "[REDACTED_EMAIL]", text)
+    text = re.sub(phone_pattern, "[REDACTED_PHONE_NUMBER]", text)
+    return text
+
+# ==========================================
+# 3. Model Gating & Instantiation
+# ==========================================
+
+API_KEY = os.environ.get("GEMINI_API_KEY")
+if not API_KEY:
+    print("WARNING: GEMINI_API_KEY environment variable is not set. Execution will fail during API calls.")
+    API_KEY = "MOCK_KEY_FOR_BUILD"
+
+# Senior Architect Node (Gemini Pro for reasoning)
+pro_model = ChatGoogleGenerativeAI(model="gemini-1.5-pro", google_api_key=API_KEY, temperature=0.1)
+# Execution Nodes (Gemini Flash for speed/cost)
+flash_model = ChatGoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=API_KEY, temperature=0.2)
+
+# ==========================================
+# 4. Workspace Tools for Developer Agent
+# ==========================================
+
+@tool
+def read_workspace_file(path: str) -> str:
+    """Reads the contents of a file in the workspace repo. Use this to inspect source code."""
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return f.read()
+    except FileNotFoundError:
+        return f"File {path} not found."
+    except Exception as e:
+        return f"Error reading file {path}: {e}"
+
+@tool
+def write_workspace_file(path: str, content: str) -> str:
+    """Writes the complete contents to a file. Overwrites existing files. Do not use placeholders."""
+    try:
+        abs_path = os.path.abspath(path)
+        workspace_root = os.path.abspath(os.getcwd())
+        if not abs_path.startswith(workspace_root):
+            return f"Security Error: Path {path} is outside workspace!"
+            
+        os.makedirs(os.path.dirname(abs_path), exist_ok=True)
+        with open(abs_path, "w", encoding="utf-8") as f:
+            f.write(content)
+        return f"Successfully wrote to {path}"
+    except Exception as e:
+        return f"Error writing file {path}: {e}"
+
+@tool
+def list_workspace_dir(path: str = ".") -> str:
+    """Lists the files and folders inside the specified directory path."""
+    try:
+        abs_path = os.path.abspath(path)
+        workspace_root = os.path.abspath(os.getcwd())
+        if not abs_path.startswith(workspace_root):
+            return f"Security Error: Path {path} is outside workspace!"
+            
+        items = os.listdir(abs_path)
+        return json.dumps(items, indent=2)
+    except Exception as e:
+        return f"Error listing directory {path}: {e}"
+
+@tool
+def execute_test_command(command: str) -> str:
+    """Executes a testing command in the shell. Limited to 'pytest' or 'flake8' commands."""
+    allowed_prefixes = ["pytest", "pytest ", "flake8", "flake8 ", "python -m pytest"]
+    if not any(command.startswith(prefix) for prefix in allowed_prefixes):
+        return f"Security Error: Command '{command}' is not permitted! You can only execute pytest or flake8."
+        
+    try:
+        result = subprocess.run(command, shell=True, capture_output=True, text=True, timeout=60)
+        return f"STDOUT:\n{result.stdout}\nSTDERR:\n{result.stderr}\nExit Code: {result.returncode}"
+    except subprocess.TimeoutExpired:
+        return "Error: Command timed out after 60 seconds."
+    except Exception as e:
+        return f"Error executing command: {e}"
+
+# ==========================================
+# 5. Pydantic Validation Schemas
+# ==========================================
+
+class TaskItem(BaseModel):
+    id: int = Field(description="Unique incremental integer ID starting at 1")
+    description: str = Field(description="Granular developer task outlining what code to change/create")
+    done: bool = Field(default=False, description="Must be False initially")
+
+class ArchitectPlan(BaseModel):
+    plan: str = Field(description="Detailed technical architecture design, specifications, and file mappings")
+    tasks: List[TaskItem] = Field(description="Checklist of checkable development tasks")
+
+class QAEvaluation(BaseModel):
+    passed: bool = Field(description="True if the test suite succeeded and lints passed; False otherwise")
+    critic_feedback: List[str] = Field(description="Detailed error feedback, test failure traces, and instructions if failed")
+
+class SecOpsEvaluation(BaseModel):
+    passed: bool = Field(description="True if scan checks pass with zero high/critical vulnerabilities; False otherwise")
+    security_report: str = Field(description="Vulnerability scan summary and details of findings")
+
+# ==========================================
+# 6. Node Implementations
 # ==========================================
 
 def architecture_agent(state: SDLCState) -> Dict:
-    """Reads spec.md and generates plan.md + tasks.md"""
+    """Reads spec.md and generates plan.md and tasks.md"""
     print("--- [Architecture Agent Node] Designing technical plan ---")
-    # In implementation, this will query Gemini Pro with system prompt + constitution.md
+    
+    spec_content = read_workspace_file.invoke({"path": ".spec-kit/spec.md"})
+    constitution = read_workspace_file.invoke({"path": ".spec-kit/constitution.md"})
+    
+    system_prompt = f"""You are the Senior Digital Health & IVF Systems Architect for Ovify.
+Your job is to read the user feature specification (spec.md) and the system constitution (constitution.md), and design a high-fidelity technical implementation plan and a list of developer tasks.
+
+Constitution:
+{constitution}
+
+You must strictly conform your output to the required schema structure.
+"""
+    
+    clean_prompt = redact_pii(system_prompt)
+    structured_architect = pro_model.with_structured_output(ArchitectPlan)
+    
+    result = structured_architect.invoke([
+        SystemMessage(content=clean_prompt),
+        HumanMessage(content=f"Here is the specification file:\n{spec_content}")
+    ])
+    
+    # Save plan and tasks to spec-kit directory
+    plan_path = ".spec-kit/plan.md"
+    tasks_path = ".spec-kit/tasks.md"
+    
+    write_workspace_file.invoke({"path": plan_path, "content": result.plan})
+    
+    tasks_markdown = "\n".join([f"- [ ] {t.description}" for t in result.tasks])
+    write_workspace_file.invoke({"path": tasks_path, "content": tasks_markdown})
+    
+    serialized_tasks = [{"id": t.id, "description": t.description, "done": t.done} for t in result.tasks]
+    
     return {
-        "plan": "Mock Technical Plan: provision burtsable PostgreSQL, create schemas",
-        "tasks": [{"id": 1, "description": "Create Postgres models", "done": False}],
+        "plan": result.plan,
+        "tasks": serialized_tasks,
         "status": "planning",
         "iteration": state.get("iteration", 0)
     }
 
 def developer_agent(state: SDLCState) -> Dict:
     """Reads tasks/plan and generates code files"""
-    print(f"--- [Developer Agent Node] Implementing tasks (Iteration: {state['iteration']}) ---")
-    # In implementation, this will query Gemini Flash to write source code
+    print(f"--- [Developer Agent Node] Implementing tasks (Attempt {state['iteration']}/{state['max_iterations']}) ---")
+    
+    plan_text = state.get("plan", "")
+    tasks_json = json.dumps(state.get("tasks", []), indent=2)
+    constitution = read_workspace_file.invoke({"path": ".spec-kit/constitution.md"})
+    feedback_text = "\n".join(state.get("critic_feedback", []))
+    
+    system_prompt = f"""You are the Developer Agent. Your job is to implement the changes specified in the Technical Plan and Task List below.
+You must strictly follow the rules in the Constitution. If previous test runs failed, review the critic feedback and correct your implementation.
+
+Constitution:
+{constitution}
+
+Technical Plan:
+{plan_text}
+
+Task List:
+{tasks_json}
+
+Previous QA Critic Feedback (if any):
+{feedback_text}
+
+INSTRUCTIONS:
+1. Use the provided tools (read_workspace_file, write_workspace_file, list_workspace_dir) to inspect the workspace and write your code changes.
+2. Implement robust, clean code. Do not write mock implementations or placeholders.
+3. Once all tasks are complete, output a final message summarizing your changes.
+"""
+    
+    messages = [
+        SystemMessage(content=redact_pii(system_prompt)),
+        HumanMessage(content="Start implementing the tasks. Call the necessary tools to read/write files.")
+    ]
+    
+    # Tool execution loop
+    model_with_tools = flash_model.bind_tools([read_workspace_file, write_workspace_file, list_workspace_dir])
+    
+    for i in range(10):  # Capped at 10 turns per run
+        response = model_with_tools.invoke(messages)
+        messages.append(response)
+        
+        if not response.tool_calls:
+            break
+            
+        for tool_call in response.tool_calls:
+            tool_name = tool_call["name"]
+            tool_args = tool_call["args"]
+            tool_id = tool_call["id"]
+            
+            if tool_name == "read_workspace_file":
+                output = read_workspace_file.invoke(tool_args)
+            elif tool_name == "write_workspace_file":
+                output = write_workspace_file.invoke(tool_args)
+            elif tool_name == "list_workspace_dir":
+                output = list_workspace_dir.invoke(tool_args)
+            else:
+                output = f"Error: Tool {tool_name} not found."
+                
+            messages.append(ToolMessage(content=output, tool_call_id=tool_id))
+            
+    print("--- [Developer Agent Node] Implementation completed ---")
     return {
-        "code_diffs": {"src/models.py": "class User(BaseModel): ..."},
         "status": "implementing"
     }
 
 def qa_agent(state: SDLCState) -> Dict:
     """Runs tests and decides pass/fail (loops back on fail)"""
     print("--- [QA / Critic Agent Node] Executing test suite ---")
-    # In implementation, this will execute pytest locally and parse output logs
-    mock_passed = state["iteration"] >= 1  # Mock pass on iteration 1
     
-    test_results = {"passed": mock_passed, "log": "Tests passed" if mock_passed else "SyntaxError on models.py line 4"}
-    critic_feedback = [] if mock_passed else ["Fix import syntax error in models.py"]
+    test_output = execute_test_command.invoke({"command": "pytest"})
+    print(f"Test Execution Output:\n{test_output}")
     
-    # Increment iteration counter on failure
-    next_iteration = state["iteration"] if mock_passed else state["iteration"] + 1
+    system_prompt = """You are the QA / Critic Agent for Ovify. Your job is to analyze the test execution log and decide if the implementation passes verification.
+If the tests passed (exit code 0), set passed=True. If the tests failed, set passed=False and provide constructive feedback for the Developer Agent to fix.
+"""
+    
+    structured_qa = flash_model.with_structured_output(QAEvaluation)
+    eval_result = structured_qa.invoke([
+        SystemMessage(content=system_prompt),
+        HumanMessage(content=f"Here is the pytest execution log:\n{test_output}")
+    ])
+    
+    passed = eval_result.passed
+    critic_feedback = eval_result.critic_feedback
+    next_iteration = state["iteration"] if passed else state["iteration"] + 1
     
     return {
-        "test_results": test_results,
+        "test_results": {"passed": passed, "log": test_output},
         "critic_feedback": critic_feedback,
         "iteration": next_iteration,
         "status": "verifying"
@@ -65,14 +280,30 @@ def qa_agent(state: SDLCState) -> Dict:
 def secops_agent(state: SDLCState) -> Dict:
     """Scans IaC files with Checkov/Trivy and outputs report"""
     print("--- [SecOps Agent Node] Auditing Infrastructure as Code ---")
-    # In implementation, this runs Checkov/Trivy in the shell
+    
+    try:
+        checkov_result = subprocess.run("checkov -d . --quiet", shell=True, capture_output=True, text=True, timeout=60)
+        scan_log = checkov_result.stdout if checkov_result.stdout else "Checkov run completed with no stdout."
+    except Exception as e:
+        scan_log = f"Checkov scan failed to execute: {e}"
+        
+    system_prompt = """You are the SecOps Agent for Ovify. Your job is to analyze the security scan log and decide if the repository is secure.
+If no critical vulnerabilities are found, set passed=True. Otherwise set passed=False.
+"""
+    
+    structured_secops = flash_model.with_structured_output(SecOpsEvaluation)
+    eval_result = structured_secops.invoke([
+        SystemMessage(content=system_prompt),
+        HumanMessage(content=f"Here is the security scan log:\n{scan_log}")
+    ])
+    
     return {
-        "security_report": {"vulnerabilities_found": 0, "status": "secure"},
-        "status": "approved"
+        "security_report": {"passed": eval_result.passed, "report": eval_result.security_report},
+        "status": "approved" if eval_result.passed else "secops_failed"
     }
 
 # ==========================================
-# 3. Conditional Edge Logic
+# 7. Conditional Edge Logic
 # ==========================================
 
 def should_retry(state: SDLCState) -> str:
@@ -89,7 +320,7 @@ def should_retry(state: SDLCState) -> str:
     return "retry"
 
 # ==========================================
-# 4. Graph Construction
+# 8. Graph Construction
 # ==========================================
 
 workflow = StateGraph(SDLCState)
@@ -125,7 +356,7 @@ workflow.add_edge("secops", END)
 app = workflow.compile()
 
 # ==========================================
-# 5. Pipeline Entry Point
+# 9. Pipeline Entry Point
 # ==========================================
 
 if __name__ == "__main__":
