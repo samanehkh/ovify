@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ovify — Cycle & Ovulation Tracker</title>
+  
+  <!-- Web App Manifest for PWA -->
+  <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIk92aWZ5IEN5Y2xlIFRyYWNrZXIiLAogICJzaG9ydF9uYW1lIjogIk92aWZ5IiwKICAic3RhcnRfdXJsIjogIi8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwOTEyMjAiLAogICJ0aGVtZV9jb2xvciI6ICIjOUU4Q0VGIiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiaHR0cHM6Ly9wbGFjZWhvbGQuY28vMTkyeDE5Mi9wbmc/dGV4dD1PdmloeSIsCiAgICAgICJzaXplcyI6ICIxOTJ4MTkyIiwKICAgICAgInR5cGUiOiAiaW1hZ2UvcG5nIgogICAgfQogIF0KfQ==">
+  <meta name="theme-color" content="#091220">
+  
+  <!-- Modern Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #091220;
+      --bg-card: rgba(19, 35, 60, 0.6);
+      --border-color: rgba(158, 140, 239, 0.2);
+      
+      --color-primary: #9E8CEF; /* Lavender */
+      --color-accent: #FFA8A8;  /* Blush Pink */
+      --color-text-main: #FDFDFB; /* Ivory */
+      --color-text-muted: #8E9BAE;
+      
+      --gradient-flow: linear-gradient(135deg, #9E8CEF 0%, #FFA8A8 100%);
+      --glow-shadow: 0 8px 32px 0 rgba(158, 140, 239, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: radial-gradient(circle at 10% 20%, rgba(158, 140, 239, 0.08) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 80%, rgba(255, 168, 168, 0.08) 0%, transparent 40%);
+      color: var(--color-text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px; /* Mobile first layout container */
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+    }
+
+    header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      background: var(--gradient-flow);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .badge-uae {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--color-accent);
+      border: 1px solid var(--color-accent);
+      padding: 4px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: rgba(255, 168, 168, 0.1);
+    }
+
+    /* Glassmorphism Card Style */
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--glow-shadow);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card:hover {
+      border-color: rgba(158, 140, 239, 0.4);
+      transform: translateY(-2px);
+    }
+
+    /* Hero cycle progress ring */
+    .cycle-hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 16px;
+    }
+
+    .progress-container {
+      position: relative;
+      width: 180px;
+      height: 180px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .progress-svg {
+      transform: rotate(-90deg);
+      width: 180px;
+      height: 180px;
+    }
+
+    .progress-bg {
+      fill: none;
+      stroke: rgba(19, 35, 60, 0.8);
+      stroke-width: 12;
+    }
+
+    .progress-bar {
+      fill: none;
+      stroke: var(--color-primary);
+      stroke-width: 12;
+      stroke-linecap: round;
+      stroke-dasharray: 502;
+      stroke-dashoffset: 502;
+      transition: stroke-dashoffset 1s ease-in-out;
+    }
+
+    .progress-text {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .progress-text .day-num {
+      font-size: 38px;
+      font-weight: 700;
+      color: var(--color-text-main);
+    }
+
+    .progress-text .day-label {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .status-alert {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--color-accent);
+    }
+
+    /* Info Grid */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .summary-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 16px;
+      background: rgba(9, 18, 32, 0.4);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .summary-item .label {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .summary-item .value {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-text-main);
+    }
+
+    /* Logging Forms */
+    .form-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--color-text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text-muted);
+    }
+
+    input, select {
+      background: rgba(9, 18, 32, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: var(--color-text-main);
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px rgba(158, 140, 239, 0.2);
+    }
+
+    button {
+      background: var(--gradient-flow);
+      color: #091220;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 16px rgba(158, 140, 239, 0.3);
+    }
+
+    button:hover {
+      transform: scale(0.98);
+      opacity: 0.95;
+    }
+
+    /* Tabs for Logs */
+    .tabs {
+      display: flex;
+      background: rgba(9, 18, 32, 0.4);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 16px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .tab.active {
+      background: var(--bg-card);
+      color: var(--color-primary);
+      box-shadow: var(--glow-shadow);
+    }
+
+    .form-panel {
+      display: none;
+    }
+
+    .form-panel.active {
+      display: block;
+    }
+
+    /* History Logs */
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: rgba(9, 18, 32, 0.3);
+      border-radius: 12px;
+      border-left: 4px solid var(--color-primary);
+      font-size: 14px;
+    }
+
+    .history-item.symptom {
+      border-left-color: var(--color-accent);
+    }
+
+    .history-item .date-val {
+      font-weight: 500;
+    }
+
+    .history-item .desc-val {
+      color: var(--color-text-muted);
+    }
+
+    /* Custom Toast Alert */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--gradient-flow);
+      color: #091220;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: var(--glow-shadow);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 1000;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- Top Header -->
+    <header>
+      <h1>Ovify</h1>
+      <span class="badge-uae">UAE Cloud (North)</span>
+    </header>
+
+    <!-- Hero Tracker Card -->
+    <div class="card cycle-hero">
+      <div class="progress-container">
+        <svg class="progress-svg">
+          <circle class="progress-bg" cx="90" cy="90" r="80"></circle>
+          <circle class="progress-bar" id="progressBar" cx="90" cy="90" r="80"></circle>
+        </svg>
+        <div class="progress-text">
+          <span class="day-num" id="currentDay">1</span>
+          <span class="day-label">Cycle Day</span>
+        </div>
+      </div>
+      <div class="status-alert" id="cycleStatus">Typical Low Conception Window</div>
+    </div>
+
+    <!-- Predictions Summary Grid -->
+    <div class="summary-grid">
+      <div class="card summary-item">
+        <span class="label">Next Period</span>
+        <span class="value" id="nextPeriodDate">Calculating...</span>
+      </div>
+      <div class="card summary-item">
+        <span class="label">Fertile Window</span>
+        <span class="value" id="fertileWindowDates">Calculating...</span>
+      </div>
+    </div>
+
+    <!-- Interactive Logging Forms -->
+    <div class="card">
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('period-panel', this)">Log Period</div>
+        <div class="tab" onclick="switchTab('symptom-panel', this)">Log Symptoms</div>
+      </div>
+
+      <!-- Log Period Panel -->
+      <div class="form-panel active" id="period-panel">
+        <div class="form-title">
+          <span>🌸</span> Log Menstrual Dates
+        </div>
+        <form id="periodForm">
+          <div class="form-group">
+            <label for="startDate">Period Start Date</label>
+            <input type="date" id="startDate" required>
+          </div>
+          <div class="form-group">
+            <label for="endDate">Period End Date</label>
+            <input type="date" id="endDate" required>
+          </div>
+          <button type="submit" style="width:100%">Save Period Dates</button>
+        </form>
+      </div>
+
+      <!-- Log Symptoms Panel -->
+      <div class="form-panel" id="symptom-panel">
+        <div class="form-title">
+          <span>🌡️</span> Record Daily Symptoms
+        </div>
+        <form id="symptomForm">
+          <div class="form-group">
+            <label for="symptomDate">Date</label>
+            <input type="date" id="symptomDate" required>
+          </div>
+          <div class="form-group">
+            <label for="symptomType">Symptom Category</label>
+            <select id="symptomType">
+              <option value="mood">Mood</option>
+              <option value="discharge">Cervical Mucus</option>
+              <option value="basal_body_temperature">Basal Body Temperature (°C)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="symptomValue">Value / Measurement</label>
+            <input type="text" id="symptomValue" placeholder="e.g. happy, watery, 36.6" required>
+          </div>
+          <button type="submit" style="width:100%">Save Symptom Logs</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Timeline History logs -->
+    <div class="card">
+      <div class="form-title">
+        <span>📜</span> History Timeline
+      </div>
+      <div class="history-list" id="historyTimeline">
+        <div class="history-item">
+          <span class="date-val">No records yet</span>
+          <span class="desc-val">Log your first period to begin tracking.</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Global Toast Alert -->
+  <div class="toast" id="toastAlert">Record Saved Successfully</div>
+
+  <!-- JavaScript Frontend Logic -->
+  <script>
+    // Local state
+    let currentUser = null;
+
+    // Default dates on load
+    const todayStr = new Date().toISOString().split('T')[0];
+    document.getElementById('startDate').value = todayStr;
+    document.getElementById('endDate').value = todayStr;
+    document.getElementById('symptomDate').value = todayStr;
+
+    // Toast utility
+    function showToast(message) {
+      const toast = document.getElementById('toastAlert');
+      toast.innerText = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Switch tabs
+    function switchTab(panelId, tabEl) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+      
+      tabEl.classList.add('active');
+      document.getElementById(panelId).classList.add('active');
+    }
+
+    // Initialize/Create user
+    async function initUser() {
+      try {
+        const res = await fetch('/users/', { method: 'POST' });
+        const data = await res.json();
+        currentUser = data.id;
+        console.log("Initialized User ID:", currentUser);
+        loadDashboardData();
+      } catch (err) {
+        console.error("Failed to initialize user. Running with fallback user ID.", err);
+        currentUser = "00000000-0000-0000-0000-000000000000";
+        loadDashboardData();
+      }
+    }
+
+    // Fetch and render dashboard
+    async function loadDashboardData() {
+      if (!currentUser) return;
+      
+      try {
+        // 1. Get cycle summaries
+        const sumRes = await fetch(`/cycles/summary?user_id=${currentUser}`);
+        if (sumRes.ok) {
+          const sumData = await sumRes.json();
+          if (sumData.predicted_next_period_start) {
+            document.getElementById('nextPeriodDate').innerText = sumData.predicted_next_period_start;
+            
+            // Calculate cycle progress days
+            const nextPeriod = new Date(sumData.predicted_next_period_start);
+            const cycleLen = sumData.average_cycle_length || 28;
+            const cycleStart = new Date(nextPeriod.getTime() - (cycleLen * 24 * 60 * 60 * 1000));
+            const diffTime = Math.abs(new Date() - cycleStart);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) % cycleLen;
+            
+            document.getElementById('currentDay').innerText = diffDays || 1;
+            
+            // Render circle progress bar
+            const pct = (diffDays || 1) / cycleLen;
+            const strokeOffset = 502 * (1 - pct);
+            document.getElementById('progressBar').style.strokeDashoffset = strokeOffset;
+          }
+        }
+
+        // 2. Get fertile window
+        const fertileRes = await fetch(`/cycles/fertile-window?user_id=${currentUser}`);
+        if (fertileRes.ok) {
+          const fertileData = await fertileRes.json();
+          if (fertileData.start_date && fertileData.end_date) {
+            document.getElementById('fertileWindowDates').innerText = `${fertileData.start_date} to ${fertileData.end_date}`;
+            
+            // Check if today is fertile
+            const todayStr = new Date().toISOString().split('T')[0];
+            if (todayStr >= fertileData.start_date && todayStr <= fertileData.end_date) {
+              document.getElementById('cycleStatus').innerText = "Predicted Fertile Window Active 💖";
+              document.getElementById('cycleStatus').style.color = "var(--color-accent)";
+            } else {
+              document.getElementById('cycleStatus').innerText = "Typical Low Conception Window";
+              document.getElementById('cycleStatus').style.color = "var(--color-text-muted)";
+            }
+          }
+        }
+
+        // 3. Get history timeline list
+        const historyRes = await fetch(`/cycles?user_id=${currentUser}`);
+        const timeline = document.getElementById('historyTimeline');
+        if (historyRes.ok) {
+          const cycles = await historyRes.json();
+          if (cycles.length > 0) {
+            timeline.innerHTML = '';
+            cycles.forEach(c => {
+              const item = document.createElement('div');
+              item.className = 'history-item';
+              item.innerHTML = `
+                <span class="date-val">🌸 Period Logged</span>
+                <span class="desc-val">${c.start_date} to ${c.end_date}</span>
+              `;
+              timeline.appendChild(item);
+            });
+          }
+        }
+        
+      } catch (err) {
+        console.error("Error refreshing dashboard data:", err);
+      }
+    }
+
+    // Submit log period
+    document.getElementById('periodForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const start = document.getElementById('startDate').value;
+      const end = document.getElementById('endDate').value;
+
+      try {
+        const res = await fetch(`/cycles?user_id=${currentUser}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ start_date: start, end_date: end })
+        });
+        
+        if (res.ok) {
+          showToast("Period Logged Successfully!");
+          loadDashboardData();
+        } else {
+          showToast("Error saving period dates.");
+        }
+      } catch (err) {
+        showToast("Network error saving period.");
+      }
+    });
+
+    // Submit log symptom
+    document.getElementById('symptomForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const dateVal = document.getElementById('symptomDate').value;
+      const typeVal = document.getElementById('symptomType').value;
+      const valueVal = document.getElementById('symptomValue').value;
+
+      try {
+        const res = await fetch(`/symptoms?user_id=${currentUser}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ log_date: dateVal, symptom_type: typeVal, symptom_value: valueVal })
+        });
+        
+        if (res.ok) {
+          showToast("Symptom Logged Successfully!");
+          loadDashboardData();
+          
+          // Append to history list
+          const timeline = document.getElementById('historyTimeline');
+          const item = document.createElement('div');
+          item.className = 'history-item symptom';
+          item.innerHTML = `
+            <span class="date-val">🌡️ Logged ${typeVal.replace(/_/g, ' ')}</span>
+            <span class="desc-val">${dateVal}: ${valueVal}</span>
+          `;
+          timeline.insertBefore(item, timeline.firstChild);
+        } else {
+          showToast("Error saving symptom log.");
+        }
+      } catch (err) {
+        showToast("Network error saving symptom.");
+      }
+    });
+
+    // Boot up
+    initUser();
+  </script>
+</body>
+</html>

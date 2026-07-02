@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
 from api import cycles, symptoms, users
 from db.session import Base, engine
 
@@ -6,6 +7,11 @@ from db.session import Base, engine
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+@app.get("/", response_class=HTMLResponse)
+def read_root():
+    with open("index.html", "r", encoding="utf-8") as f:
+        return f.read()
 
 app.include_router(cycles.router, prefix="/cycles", tags=["cycles"])
 app.include_router(symptoms.router, prefix="/symptoms", tags=["symptoms"])
