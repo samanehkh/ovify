@@ -51,9 +51,9 @@ if not API_KEY:
     print("WARNING: GEMINI_API_KEY environment variable is not set. Execution will fail during API calls.")
     API_KEY = "MOCK_KEY_FOR_BUILD"
 
-# Senior Architect Node (Gemini Pro for reasoning)
-pro_model = ChatGoogleGenerativeAI(model="gemini-2.5-pro", google_api_key=API_KEY, temperature=0.1)
-# Execution Nodes (Gemini Flash for speed/cost)
+# Senior Architect Base Model (Gemini Pro for reasoning)
+pro_base = ChatGoogleGenerativeAI(model="gemini-2.5-pro", google_api_key=API_KEY, temperature=0.1)
+# Execution Model (Gemini Flash for speed/cost/fallback)
 flash_model = ChatGoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=API_KEY, temperature=0.2)
 
 # ==========================================
@@ -158,7 +158,9 @@ You must strictly conform your output to the required schema structure.
 """
     
     clean_prompt = redact_pii(system_prompt)
-    structured_architect = pro_model.with_structured_output(ArchitectPlan)
+    structured_pro = pro_base.with_structured_output(ArchitectPlan)
+    structured_flash = flash_model.with_structured_output(ArchitectPlan)
+    structured_architect = structured_pro.with_fallbacks([structured_flash])
     
     result = structured_architect.invoke([
         SystemMessage(content=clean_prompt),
