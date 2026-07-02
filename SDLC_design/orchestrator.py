@@ -52,9 +52,9 @@ if not API_KEY:
     API_KEY = "MOCK_KEY_FOR_BUILD"
 
 # Senior Architect Node (Gemini Pro for reasoning)
-pro_model = ChatGoogleGenerativeAI(model="gemini-1.5-pro", google_api_key=API_KEY, temperature=0.1)
+pro_model = ChatGoogleGenerativeAI(model="gemini-2.5-pro", google_api_key=API_KEY, temperature=0.1)
 # Execution Nodes (Gemini Flash for speed/cost)
-flash_model = ChatGoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=API_KEY, temperature=0.2)
+flash_model = ChatGoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=API_KEY, temperature=0.2)
 
 # ==========================================
 # 4. Workspace Tools for Developer Agent

@@ -16,7 +16,9 @@
       "Bash(git push *)",
       "Bash(git fetch *)",
       "Bash(git credential *)",
-      "Bash(git pull *)"
+      "Bash(git pull *)",
+      "Skill(claude-api)",
+      "Skill(claude-api:*)"
     ]
   }
 }
