@@ -255,7 +255,7 @@ def qa_agent(state: SDLCState) -> Dict:
     """Runs tests and decides pass/fail (loops back on fail)"""
     print("--- [QA / Critic Agent Node] Executing test suite ---")
     
-    test_output = execute_test_command.invoke({"command": "pytest"})
+    test_output = execute_test_command.invoke({"command": "python -m pytest"})
     print(f"Test Execution Output:\n{test_output}")
     
     system_prompt = """You are the QA / Critic Agent for Ovify. Your job is to analyze the test execution log and decide if the implementation passes verification.
