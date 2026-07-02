@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from db.session import get_db, Base, engine
 from db import models
@@ -8,7 +8,7 @@ from uuid import UUID
 # Create tables
 Base.metadata.create_all(bind=engine)
 
-router = FastAPI.APIRouter()
+router = APIRouter()
 
 @router.post("/users/", response_model=UserResponse)
 def create_user(db: Session = Depends(get_db)):
