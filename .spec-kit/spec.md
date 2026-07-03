@@ -9,11 +9,11 @@
 ## Acceptance Criteria
 
 *   The homepage loads within 2 seconds on mobile with no additional navigation required.
-*   The patient sees their **first name and a warm greeting** based on time of day (e.g., "Good morning, Sara 🌸").
+*   The patient sees their **first name and a warm greeting** based on time of day (e.g., "Good morning, Sara").
 *   The **Today's Task card** is prominently visible and shows today's injection name, dosage, and time.
 *   A large, single **"Mark as Done"** button allows one-tap injection confirmation.
 *   A **Treatment Progress Bar** shows which stimulation day the patient is currently on (e.g., "Day 5 of 12").
-*   The **CalmSeed Emotional Check-in strip** appears below the task card with a soft prompt (e.g., "How are you feeling today?") and 5 emoji-based mood options.
+*   The **CalmSeed Emotional Check-in strip** appears below the task card with a soft prompt (e.g., "How are you feeling today?") and 5 selectable mood options.
 *   A **"Ask Ovify AI"** shortcut button is visible at the bottom for quick questions.
 *   The layout is mobile-first, single-column, and requires **zero horizontal scrolling**.
 *   All text must render in **English** (Arabic bilingual support is Phase 2).
@@ -56,12 +56,12 @@
     *   Lavender filled progress bar, blush animated pulse on the progress indicator dot.
 
 *   **CalmSeed Check-in Strip:**
-    *   Soft blush-tinted card with 5 emoji buttons: 😔 😟 😐 🙂 😊
-    *   Tapping an emoji selects it (lavender outline highlight) and shows a brief warm message.
+    *   Soft blush-tinted card with 5 mood buttons labelled: Sad, Low, Okay, Good, Great.
+    *   Tapping a mood option selects it (lavender outline highlight) and shows a brief warm message.
 
 *   **Ask Ovify AI Button:**
     *   Fixed or sticky bottom-center.
-    *   Pill-shaped, lavender background, white icon + text: "Ask Ovify AI 💬".
+    *   Pill-shaped, lavender background, white text: "Ask Ovify AI".
 
 ---
 
