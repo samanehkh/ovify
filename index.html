@@ -23,17 +23,17 @@
       --lav-dark:    #6F5AD1;
       --lav-mid:     #7E6BD3;
       --lav-soft:    rgba(158,140,239,0.13);
-      --lav-glow:    rgba(158,140,239,0.22);
+      --lav-glow:    rgba(158,140,239,0.18); /* Updated for spec */
       --blush:       #F4A0A0;
       --blush-soft:  rgba(244,160,160,0.16);
       --due:         #C24C57;
       --due-soft:    rgba(194,76,87,0.12);
       --sage:        #3E8E6E;
       --sage-soft:   rgba(62,142,110,0.13);
-      --border:      rgba(19,35,60,0.09);
+      --border:      rgba(255,255,255,0.65); /* Updated for glassmorphism */
       --r-xl:        24px;  --r-lg: 18px;  --r-md: 12px;  --r-pill: 999px;
       --ease:        cubic-bezier(0.16,1,0.3,1);
-      --t:           0.25s var(--ease);
+      --t:           0.3s var(--ease); /* Updated for spec */
     }
 
     /* ─────────────────────────────────────────  RESET  ───────────────────────────────────────── */
@@ -41,7 +41,12 @@
     html { -webkit-text-size-adjust:100%; }
     html { overflow-x:hidden; }
     body {
-      background:#E9E4DE; display:flex; justify-content:center; min-height:100dvh;
+      background: var(--bg);
+      background-image:
+        radial-gradient(circle at 10% 10%, rgba(158,140,239,0.06) 0%, transparent 50%),
+        radial-gradient(circle at 90% 90%, rgba(244,160,160,0.08) 0%, transparent 50%),
+        radial-gradient(circle at 30% 80%, rgba(158,140,239,0.04) 0%, transparent 50%);
+      display:flex; justify-content:center; min-height:100dvh;
       width:100%; max-width:100vw; overflow-x:hidden;
       font-family:'Manrope',sans-serif; color:var(--navy); -webkit-font-smoothing:antialiased;
     }
@@ -51,7 +56,8 @@
 
     /* ─────────────────────────────────────────  PHONE SHELL  ───────────────────────────────────────── */
     .phone {
-      background:var(--bg); width:100%; max-width:390px; min-height:100dvh;
+      background:transparent; /* Changed to transparent to show body background */
+      width:100%; max-width:390px; min-height:100dvh;
       display:flex; flex-direction:column; position:relative; overflow:hidden;
       box-shadow:0 32px 80px rgba(0,0,0,0.18);
     }
@@ -69,10 +75,10 @@
     .nav__wordmark { font-family:'DM Sans',sans-serif; font-size:21px; font-weight:700; letter-spacing:-0.5px; }
     .nav__right { display:flex; align-items:center; gap:10px; flex:none; }
     .icon-btn {
-      width:38px; height:38px; border-radius:50%; background:var(--surface); border:1px solid var(--border);
+      width:38px; height:38px; border-radius:50%; background:var(--surface); border:1px solid rgba(19,35,60,0.09); /* Adjusted border */
       display:flex; align-items:center; justify-content:center; position:relative; transition:var(--t);
     }
-    .icon-btn:hover { background:var(--lav-soft); }
+    .icon-btn:hover { background:var(--lav-soft); transform:translateY(-3px); box-shadow:0 8px 32px var(--lav-glow); } /* Added glow and transform */
     .icon-btn svg { width:18px; height:18px; stroke:var(--navy); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
     .nav__dot { position:absolute; top:8px; right:8px; width:8px; height:8px; border-radius:50%; background:var(--blush); border:1.5px solid var(--surface); }
     .nav__avatar {
@@ -82,6 +88,7 @@
       font-family:'Inter',sans-serif; font-size:15px; font-weight:700; color:#fff;
       transition:var(--t); box-shadow:0 2px 10px var(--lav-glow); flex:none;
     }
+    .nav__avatar:hover { transform:translateY(-3px); box-shadow:0 8px 32px var(--lav-glow); } /* Added glow and transform */
 
     /* ─────────────────────────────────────────  SCROLL  ───────────────────────────────────────── */
     .scroll { flex:1; overflow-y:auto; overflow-x:hidden; padding:0 16px 108px; -webkit-overflow-scrolling:touch; }
@@ -136,9 +143,18 @@
 
     /* ─────────────────────────────────────────  MED CARDS  ───────────────────────────────────────── */
     .med-stack { display:flex; flex-direction:column; gap:12px; }
-    .med { background:var(--surface); border-radius:var(--r-xl); padding:16px 16px 14px;
-      box-shadow:0 1px 3px rgba(0,0,0,0.04), 0 6px 20px rgba(0,0,0,0.04); border:1.5px solid transparent; transition:var(--t); }
-    .med.is-done { border-color:var(--sage-soft); background:linear-gradient(180deg,var(--surface),rgba(62,142,110,0.04)); }
+    .med {
+      background:rgba(255,255,255,0.65);
+      backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+      border:1px solid var(--border);
+      border-radius:20px; /* Updated for spec */
+      padding:16px 16px 14px;
+      box-shadow:0 1px 3px rgba(0,0,0,0.04); /* Base shadow, glow added on hover */
+      transition:var(--t);
+      position:relative; /* For potential absolute positioning of elements */
+    }
+    .med:hover { transform:translateY(-3px); box-shadow:0 8px 32px var(--lav-glow); } /* Added glow and transform */
+    .med.is-done { border-color:var(--sage-soft); background:linear-gradient(180deg,rgba(255,255,255,0.65),rgba(62,142,110,0.04)); } /* Adjusted background for glassmorphism */
 
     .med__row { display:flex; align-items:center; gap:13px; }
     .med__icon { width:46px; height:46px; flex:none; border-radius:14px; display:flex; align-items:center; justify-content:center; }
@@ -155,26 +171,34 @@
     .med__status--done { background:var(--sage-soft); color:var(--sage); }
     .med__status-dot { width:6px; height:6px; border-radius:50%; background:currentColor; }
 
-    .med__footer { display:flex; align-items:center; gap:8px; margin-top:14px; padding-top:13px; border-top:1px solid var(--border); }
+    .med__footer { display:flex; align-items:center; gap:8px; margin-top:14px; padding-top:13px; border-top:1px solid rgba(19,35,60,0.09); /* Adjusted border color */ }
     .med__cta { flex:1; padding:11px 14px; background:var(--navy); color:#fff; font-family:'DM Sans',sans-serif;
       font-size:14px; font-weight:700; border-radius:var(--r-pill); transition:var(--t); display:inline-flex; align-items:center; justify-content:center; gap:7px; }
     .med__cta svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; }
-    .med__cta:hover { background:var(--lav-dark); }
-    .med__cta.is-done { background:var(--sage-soft); color:var(--sage); cursor:default; }
+    .med__cta:hover { background:var(--lav-dark); transform:translateY(-2px); box-shadow:0 4px 16px var(--lav-glow); } /* Added glow and transform */
+    .med__cta.is-done { background:var(--sage-soft); color:var(--sage); cursor:default; transform:none; box-shadow:none; } /* Reset hover effects for done state */
     .med__iconbtn {
-      width:42px; height:42px; flex:none; border:1.5px solid var(--border); border-radius:14px;
+      width:42px; height:42px; flex:none; border:1.5px solid rgba(19,35,60,0.09); /* Adjusted border color */
+      border-radius:14px;
       display:flex; align-items:center; justify-content:center; color:var(--navy-70); transition:var(--t);
     }
     .med__iconbtn svg { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
-    .med__iconbtn:hover { border-color:var(--lavender); color:var(--lav-dark); background:var(--lav-soft); }
+    .med__iconbtn:hover { border-color:var(--lavender); color:var(--lav-dark); background:var(--lav-soft); transform:translateY(-2px); box-shadow:0 4px 16px var(--lav-glow); } /* Added glow and transform */
     .med__iconbtn[aria-pressed="true"] { border-color:var(--lavender); color:var(--lav-dark); background:var(--lav-soft); }
 
     /* ─────────────────────────────────────────  QUICK ACTIONS  ───────────────────────────────────────── */
     .qa-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    .qa { text-align:left; background:var(--surface); border-radius:var(--r-xl); padding:16px 15px;
+    .qa {
+      text-align:left;
+      background:rgba(255,255,255,0.65);
+      backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+      border:1px solid var(--border);
+      border-radius:20px; /* Updated for spec */
+      padding:16px 15px;
       display:flex; flex-direction:column; align-items:flex-start; gap:11px; transition:var(--t);
-      border:1.5px solid transparent; box-shadow:0 1px 3px rgba(0,0,0,0.04), 0 6px 20px rgba(0,0,0,0.04); }
-    .qa:hover { border-color:rgba(158,140,239,0.3); box-shadow:0 6px 24px var(--lav-glow); transform:translateY(-2px); }
+      box-shadow:0 1px 3px rgba(0,0,0,0.04); /* Base shadow, glow added on hover */
+    }
+    .qa:hover { border-color:rgba(158,140,239,0.3); box-shadow:0 8px 32px var(--lav-glow); transform:translateY(-3px); } /* Added glow and transform */
     .qa__icon { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; }
     .qa__icon--lav   { background:var(--lav-soft); }
     .qa__icon--blush { background:var(--blush-soft); }
@@ -183,9 +207,14 @@
     .qa__sub { display:block; font-family:'Manrope',sans-serif; font-size:12px; color:var(--navy-70); margin-top:1px; }
 
     /* ─────────────────────────────────────────  CALMSEED  ───────────────────────────────────────── */
-    .calm { background:linear-gradient(135deg,#ECE8F7 0%,#FCEFEF 100%);
-      border-radius:var(--r-xl); padding:18px; border:1.5px solid rgba(158,140,239,0.18); transition:var(--t); }
-    .calm:hover { box-shadow:0 6px 22px var(--lav-glow); }
+    .calm {
+      background:linear-gradient(135deg,rgba(236,232,247,0.65) 0%,rgba(252,239,239,0.65) 100%); /* Adjusted for glassmorphism */
+      backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+      border-radius:20px; /* Updated for spec */
+      padding:18px; border:1px solid rgba(158,140,239,0.18); transition:var(--t);
+      box-shadow:0 1px 3px rgba(0,0,0,0.04); /* Base shadow, glow added on hover */
+    }
+    .calm:hover { box-shadow:0 8px 32px var(--lav-glow); transform:translateY(-3px); } /* Added glow and transform */
     .calm__head { display:block; width:100%; text-align:left; background:none; border:none; padding:0; cursor:pointer; }
     .calm__row { display:flex; align-items:center; gap:13px; }
     .calm__orb { width:46px; height:46px; flex:none; }
@@ -201,7 +230,7 @@
     .calm__moods { display:flex; gap:7px; margin-top:16px; padding-top:16px; border-top:1px solid rgba(158,140,239,0.18); }
     .calm__mood { flex:1; padding:9px 0; border:1.5px solid rgba(158,140,239,0.25); border-radius:12px;
       background:rgba(255,255,255,0.7); font-family:'Manrope',sans-serif; font-size:12px; font-weight:600; color:var(--navy-70); transition:var(--t); }
-    .calm__mood:hover, .calm__mood.active { border-color:var(--lavender); color:var(--lav-dark); background:#fff; }
+    .calm__mood:hover, .calm__mood.active { border-color:var(--lavender); color:var(--lav-dark); background:#fff; transform:translateY(-2px); box-shadow:0 4px 16px var(--lav-glow); } /* Added glow and transform */
     .calm__resp { display:block; margin-top:12px; font-family:'Manrope',sans-serif; font-size:13px; line-height:1.6; color:var(--navy);
       padding:12px 14px; background:rgba(255,255,255,0.85); border-radius:12px; border-left:3px solid var(--lavender);
       opacity:0; transform:translateY(4px); transition:opacity 0.3s ease, transform 0.3s var(--ease); }
@@ -210,7 +239,7 @@
     /* ─────────────────────────────────────────  BOTTOM NAV  ───────────────────────────────────────── */
     .tabbar { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:390px;
       background:rgba(255,255,255,0.92); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
-      border-top:1px solid var(--border); display:flex; padding:9px 6px env(safe-area-inset-bottom,16px); z-index:99; }
+      border-top:1px solid rgba(19,35,60,0.09); display:flex; padding:9px 6px env(safe-area-inset-bottom,16px); z-index:99; }
     .tab { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; padding:4px 0; border-radius:12px; transition:var(--t); }
     .tab svg { width:22px; height:22px; stroke:var(--navy-55); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; transition:var(--t); }
     .tab span { font-family:'Inter',sans-serif; font-size:10px; font-weight:600; color:var(--navy-55); transition:var(--t); }
@@ -221,13 +250,239 @@
     .tab:not(.active):hover span { color:var(--lav-dark); }
 
     /* ─────────────────────────────────────────  TOAST  ───────────────────────────────────────── */
-    .toast { position:fixed; bottom:92px; left:50%; transform:translateX(-50%) translateY(6px);
-      background:var(--navy); color:#fff; font-family:'Manrope',sans-serif; font-size:13.5px; font-weight:600;
-      padding:11px 20px; border-radius:var(--r-pill); max-width:340px; text-align:center;
-      opacity:0; pointer-events:none; transition:opacity 0.25s ease, transform 0.25s var(--ease); z-index:200;
-      box-shadow:0 10px 30px rgba(0,0,0,0.24); display:flex; align-items:center; gap:8px; }
-    .toast svg { width:16px; height:16px; stroke:#9BE3C4; fill:none; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; flex:none; }
-    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast { position:fixed; bottom:92px; left:50%; transform:translateX(-50%) translateY(6px);\
+      background:var(--navy); color:#fff; font-family:'Manrope',sans-serif; font-size:13.5px; font-weight:600;\
+      padding:11px 20px; border-radius:var(--r-pill); max-width:340px; text-align:center;\
+      opacity:0; pointer-events:none; transition:opacity 0.25s ease, transform 0.25s var(--ease); z-index:200;\
+      box-shadow:0 10px 30px rgba(0,0,0,0.24); display:flex; align-items:center; gap:8px; }\
+    .toast svg { width:16px; height:16px; stroke:#9BE3C4; fill:none; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; flex:none; }\
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }\
+
+    /* ─────────────────────────────────────────  INJECTION GUIDE MODAL  ───────────────────────────────────────── */
+    .guide-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(19, 35, 60, 0.45);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 200;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s var(--ease);
+    }
+    .guide-modal.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .guide-modal__sheet {
+      background: var(--bg);
+      width: 100%;
+      max-width: 390px;
+      border-radius: 28px 28px 0 0;
+      padding: 24px 20px 40px;
+      transform: translateY(100%);
+      transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.12);
+      position: relative;
+    }
+    .guide-modal.open .guide-modal__sheet {
+      transform: translateY(0);
+    }
+    .guide-modal__close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(19, 35, 60, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--navy);
+      cursor: pointer;
+      transition: var(--t);
+    }
+    .guide-modal__close:hover {
+      background: rgba(19, 35, 60, 0.1);
+      transform: rotate(90deg);
+    }
+    .guide-modal__close svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.2;
+    }
+    .guide-modal__header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+      padding-right: 40px;
+    }
+    .guide-modal__med-img {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      object-fit: cover;
+    }
+    .guide-modal__title {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: -0.4px;
+    }
+    .guide-modal__video-container {
+      position: relative;
+      width: 100%;
+      border-radius: 18px;
+      overflow: hidden;
+      margin-bottom: 22px;
+      aspect-ratio: 16/9;
+      background: #000;
+    }
+    .guide-modal__video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .guide-modal__video-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(19, 35, 60, 0.6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: #fff;
+      cursor: pointer;
+      font-family: 'Manrope', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      transition: opacity 0.3s;
+    }
+    .guide-modal__video-overlay.playing {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .guide-modal__play-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #fff;
+      color: var(--navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+      transition: transform 0.25s var(--ease);
+    }
+    .guide-modal__video-overlay:hover .guide-modal__play-btn {
+      transform: scale(1.1);
+    }
+    .guide-modal__play-btn svg {
+      width: 20px;
+      height: 20px;
+      margin-left: 3px;
+    }
+    .guide-modal__section {
+      margin-bottom: 24px;
+    }
+    .guide-modal__section-title {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--navy-55);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+    .guide-modal__checklist {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .guide-modal__check-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--surface);
+      padding: 14px 16px;
+      border-radius: var(--r-md);
+      cursor: pointer;
+      border: 1px solid var(--border);
+      transition: var(--t);
+    }
+    .guide-modal__check-item:hover {
+      border-color: rgba(158, 140, 239, 0.3);
+    }
+    .guide-modal__check-item input {
+      display: none;
+    }
+    .guide-modal__checkbox {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2.2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--t);
+      flex-shrink: 0;
+    }
+    .guide-modal__check-item input:checked + .guide-modal__checkbox {
+      background: var(--lavender);
+      border-color: var(--lavender);
+    }
+    .guide-modal__checkbox::after {
+      content: '';
+      width: 5px;
+      height: 9px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg) translate(-1px, -1px);
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .guide-modal__check-item input:checked + .guide-modal__checkbox::after {
+      opacity: 1;
+    }
+    .guide-modal__check-text {
+      font-family: 'Manrope', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--navy);
+    }
+    .guide-modal__btn {
+      width: 100%;
+      padding: 15px;
+      border-radius: var(--r-pill);
+      background: linear-gradient(135deg, var(--lavender) 0%, var(--blush) 100%);
+      color: var(--navy);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--t);
+      box-shadow: 0 6px 20px rgba(158, 140, 239, 0.22);
+      text-align: center;
+    }
+    .guide-modal__btn:disabled {
+      background: var(--border);
+      color: var(--navy-55);
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+    .guide-modal__btn:not(:disabled):hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(158, 140, 239, 0.32);
+    }
 
     /* ─────────────────────────────────────────  REDUCED MOTION  ───────────────────────────────────────── */
     @media (prefers-reduced-motion: reduce) {
@@ -313,35 +568,8 @@
       <span class="sec__title">Today's medications</span>
       <button class="sec__link" onclick="toast('Full schedule — coming soon')">View all</button>
     </div>
-    <div class="med-stack">
-
-      <!-- Med 1 -->
-      <article class="med" id="med1">
-        <div class="med__row">
-          <span class="med__icon" aria-hidden="true" style="background:transparent;padding:0;overflow:hidden;border-radius:14px;">
-            <img src="/static/gonal_f.jpg" alt="Gonal-F" style="width:46px;height:46px;object-fit:cover;border-radius:14px;display:block;">
-          </span>
-          <div class="med__info">
-            <h3 class="med__name">Gonal-F 150 IU</h3>
-            <p class="med__meta">Tonight · 8:00 PM · Subcutaneous</p>
-          </div>
-          <span class="med__status med__status--due" id="med1Status"><span class="med__status-dot"></span>Due</span>
-        </div>
-      </article>
-
-      <!-- Med 2 -->
-      <article class="med" id="med2">
-        <div class="med__row">
-          <span class="med__icon" aria-hidden="true" style="background:transparent;padding:0;overflow:hidden;border-radius:14px;">
-            <img src="/static/menopur.jpg" alt="Menopur" style="width:46px;height:46px;object-fit:cover;border-radius:14px;display:block;">
-          </span>
-          <div class="med__info">
-            <h3 class="med__name">Menopur 75 IU</h3>
-            <p class="med__meta">Tonight · 8:00 PM · Subcutaneous</p>
-          </div>
-          <span class="med__status med__status--due" id="med2Status"><span class="med__status-dot"></span>Due</span>
-        </div>
-      </article>
+    <div class="med-stack" id="medicationStack">
+      <!-- Medications will be dynamically loaded here -->
     </div>
 
     <!-- QUICK ACTIONS -->
@@ -358,7 +586,7 @@
       </button>
       <button class="qa" onclick="toast('Injection guides — coming soon')">
         <span class="qa__icon qa__icon--blush" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2 0 0 1 4 19.5v-15A2.5 2 0 0 1 6.5 2z"/></svg>
         </span>
         <span>
           <span class="qa__label">Injection guides</span>
@@ -424,6 +652,51 @@
     </button>
   </nav>
 
+  <!-- INJECTION GUIDE MODAL -->
+  <div class="guide-modal" id="guideModal" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+    <div class="guide-modal__sheet">
+      <button class="guide-modal__close" onclick="closeGuide()" aria-label="Close guide">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div class="guide-modal__header">
+        <img id="guideMedImg" src="" alt="" class="guide-modal__med-img">
+        <h2 class="guide-modal__title" id="guideTitle">Gonal-F 150 IU</h2>
+      </div>
+      <div class="guide-modal__video-container">
+        <video id="guideVideo" class="guide-modal__video" preload="metadata">
+          <source src="" type="video/mp4">
+        </video>
+        <div class="guide-modal__video-overlay" id="videoOverlay" onclick="playVideo()">
+          <div class="guide-modal__play-btn">
+            <svg viewBox="0 0 24 24"><polygon points="10 8.5 16 12 10 15.5" fill="currentColor" stroke="none"/></svg>
+          </div>
+          <span>Watch preparation tutorial</span>
+        </div>
+      </div>
+      <div class="guide-modal__section">
+        <h3 class="guide-modal__section-title">Preparation Checklist</h3>
+        <div class="guide-modal__checklist">
+          <label class="guide-modal__check-item">
+            <input type="checkbox" id="checkWash" onchange="checkAllSteps()">
+            <span class="guide-modal__checkbox"></span>
+            <span class="guide-modal__check-text">Wash your hands with warm water and soap</span>
+          </label>
+          <label class="guide-modal__check-item">
+            <input type="checkbox" id="checkClean" onchange="checkAllSteps()">
+            <span class="guide-modal__checkbox"></span>
+            <span class="guide-modal__check-text">Clean the injection site on your abdomen</span>
+          </label>
+          <label class="guide-modal__check-item">
+            <input type="checkbox" id="checkFridge" onchange="checkAllSteps()">
+            <span class="guide-modal__checkbox"></span>
+            <span class="guide-modal__check-text">Store the medication pen back in the fridge</span>
+          </label>
+        </div>
+      </div>
+      <button class="guide-modal__btn" id="guideSubmitBtn" onclick="submitDoseFromGuide()" disabled>Injection Completed</button>
+    </div>
+  </div>
+
 </div><!-- /phone -->
 
 <div class="toast" id="toastEl" role="status" aria-live="polite"></div>
@@ -432,12 +705,20 @@
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Live status-bar time
-  (function(){ var n=new Date(),h=n.getHours(),m=n.getMinutes(),ap=h>=12?'PM':'AM';
-    document.getElementById('sbTime').textContent = (h%12||12)+':'+String(m).padStart(2,'0')+' '+ap; })();
+  (function(){
+    function updateTime() {
+      var n=new Date(),h=n.getHours(),m=n.getMinutes(),ap=h>=12?'PM':'AM';
+      document.getElementById('sbTime').textContent = (h%12||12)+':'+String(m).padStart(2,'0')+' '+ap;
+    }
+    updateTime();
+    setInterval(updateTime, 60000); // Update every minute
+  })();
 
   // Time-based greeting
-  (function(){ var h=new Date().getHours();
-    document.getElementById('heroGreeting').textContent = h<12?'Good morning':h<17?'Good afternoon':'Good evening'; })();
+  (function(){
+    var h=new Date().getHours();
+    document.getElementById('heroGreeting').textContent = h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  })();
 
   // Animate progress arc + bar (set final immediately for reduced motion)
   (function(){
@@ -446,33 +727,206 @@
     if (reduce) { set(); } else { window.addEventListener('load', function(){ setTimeout(set, 350); }); }
   })();
 
-  // Dose confirmation — the primary daily action
-  var pending = 2;
-  function confirmDose(id, name){
-    var cta = document.getElementById(id+'Cta');
-    if (cta.classList.contains('is-done')) return;
-    var card = document.getElementById(id), status = document.getElementById(id+'Status');
-    card.classList.add('is-done');
-    status.className = 'med__status med__status--done';
-    status.innerHTML = '<span class="med__status-dot"></span>Taken';
-    cta.classList.add('is-done');
-    cta.innerHTML = '<svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 6 9 17 4 12"/></svg>Taken · logged';
-    cta.setAttribute('aria-disabled','true');
-    pending = Math.max(0, pending-1);
-    var hp = document.getElementById('heroPending');
-    if (pending === 0){ hp.textContent = 'All done ✓'; hp.style.color = '#9BE3C4'; }
-    else { hp.textContent = pending+' pending'; }
-    toastOk(name + ' logged — your clinic can see this');
+  // Dynamic Medication Loading and Confirmation
+  const userId = 1; // Hardcoded user ID for now
+
+  async function fetchMedications() {
+    try {
+      const response = await fetch(`/api/medications?user_id=${userId}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const medications = await response.json();
+      renderMedications(medications);
+    } catch (error) {
+      console.error("Error fetching medications:", error);
+      toast('Failed to load medications.');
+    }
   }
 
-  // Reminder toggle
+  function renderMedications(medications) {
+    const medicationStack = document.getElementById('medicationStack');
+    medicationStack.innerHTML = ''; // Clear existing static cards
+
+    let pendingCount = 0;
+
+    if (medications.length === 0) {
+      medicationStack.innerHTML = '<p style="text-align:center; color:var(--navy-70); font-family:Manrope,sans-serif; padding:20px;">No medications scheduled for today.</p>';
+    }
+
+    medications.forEach(med => {
+      const isDue = med.status === 'Due';
+      if (isDue) {
+        pendingCount++;
+      }
+
+      const medCard = document.createElement('article');
+      medCard.id = `med-${med.id}`;
+      medCard.className = `med ${isDue ? '' : 'is-done'}`;
+      medCard.setAttribute('aria-labelledby', `med-name-${med.id}`);
+
+      // Determine image source based on medication name (simple heuristic for demo)
+      const imgSrc = med.name.toLowerCase().includes('gonal') ? '/static/gonal_f.jpg' :
+                     med.name.toLowerCase().includes('menopur') ? '/static/menopur.jpg' :
+                     '/static/default_med.jpg'; // Fallback image
+
+      medCard.innerHTML = `
+        <div class="med__row">
+          <span class="med__icon" aria-hidden="true" style="background:transparent;padding:0;overflow:hidden;border-radius:14px;">
+            <img src="${imgSrc}" alt="${med.name}" class="med__med-img" style="width:46px;height:46px;object-fit:cover;border-radius:14px;display:block;">
+          </span>
+          <div class="med__info">
+            <h3 class="med__name" id="med-name-${med.id}">${med.name} ${med.dosage}</h3>
+            <p class="med__meta">Tonight · ${med.scheduled_time.substring(0, 5)} · ${med.route}</p>
+          </div>
+          <span class="med__status med__status--${isDue ? 'due' : 'done'}" id="med-status-${med.id}">
+            <span class="med__status-dot"></span>${isDue ? 'Due' : 'Taken'}
+          </span>
+        </div>
+        <div class="med__footer" id="med-footer-${med.id}">
+          ${isDue ? `
+            <button class="med__cta" id="med-cta-${med.id}" onclick="logDose(${med.id}, '${med.name} ${med.dosage}')" aria-label="Confirm ${med.name} ${med.dosage} dose">
+              <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Confirm Dose
+            </button>
+            <button class="med__iconbtn" aria-label="Open injection guide for ${med.name}" onclick="openGuide(${med.id}, '${med.name}', '${med.dosage}', '${imgSrc}')">
+              <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2 0 0 1 4 19.5v-15A2.5 2 0 0 1 6.5 2z"/></svg>
+            </button>
+          ` : `
+            <button class="med__cta is-done" aria-disabled="true">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Taken · logged
+            </button>
+            <button class="med__iconbtn" aria-label="Open injection guide for ${med.name}" onclick="openGuide(${med.id}, '${med.name}', '${med.dosage}', '${imgSrc}')">
+              <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2 0 0 1 4 19.5v-15A2.5 2 0 0 1 6.5 2z"/></svg>
+            </button>
+          `}
+        </div>
+      `;
+      medicationStack.appendChild(medCard);
+    });
+    updateHeroPending(pendingCount);
+  }
+
+  async function logDose(prescriptionId, medicationName) {
+    const cta = document.getElementById(`med-cta-${prescriptionId}`);
+    if (cta && cta.classList.contains('is-done')) return; // Prevent double logging
+
+    try {
+      const response = await fetch(`/api/medications/${prescriptionId}/confirm?user_id=${userId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // body: JSON.stringify({}) // No body needed for this API
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Update UI on success
+      const card = document.getElementById(`med-${prescriptionId}`);
+      const status = document.getElementById(`med-status-${prescriptionId}`);
+      const footer = document.getElementById(`med-footer-${prescriptionId}`);
+
+      if (card) card.classList.add('is-done');
+      if (status) {
+        status.className = 'med__status med__status--done';
+        status.innerHTML = '<span class="med__status-dot"></span>Taken';
+      }
+      if (footer) {
+        footer.innerHTML = `
+          <button class="med__cta is-done" aria-disabled="true">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Taken · logged
+          </button>
+          <button class="med__iconbtn" aria-label="Open injection guide for ${medicationName}" onclick="openGuide(${prescriptionId}, '${medicationName.split(' ')[0]}', '${medicationName.split(' ').slice(1).join(' ')}', '${card.querySelector('.med__med-img')?.src || ''}')">
+            <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2 0 0 1 4 19.5v-15A2.5 2 0 0 1 6.5 2z"/></svg>
+          </button>
+        `;
+      }
+
+      toastOk(`${medicationName} logged — your clinic can see this`);
+      // Re-fetch medications to update the pending count accurately, or decrement locally
+      // For simplicity and accuracy, re-fetching is better for a real app, but for this demo, local decrement is fine.
+      // Let's re-fetch to ensure consistency with the backend state.
+      fetchMedications();
+
+    } catch (error) {
+      console.error("Error logging dose:", error);
+      toast(`Failed to log ${medicationName}. Please try again.`);
+    }
+  }
+
+  function updateHeroPending(count) {
+    var hp = document.getElementById('heroPending');
+    if (hp) {
+      if (count === 0){ hp.textContent = 'All done ✓'; hp.style.color = '#9BE3C4'; }
+      else { hp.textContent = count + ' pending'; hp.style.color = ''; } // Reset color if not all done
+    }
+  }
+
+  // Initial load of medications
+  window.addEventListener('load', fetchMedications);
+
+  // Reminder toggle (kept for future use, not directly used in current spec)
   function toggleReminder(btn, name){
     var on = btn.getAttribute('aria-pressed') === 'true';
     btn.setAttribute('aria-pressed', on ? 'false' : 'true');
     toast(on ? 'Reminder removed for '+name : 'Reminder set for '+name);
   }
 
-  function openGuide(name){ toast('Opening injection guide for '+name); }
+  // Injection guide modal logic
+  let activePrescriptionId = null;
+  let activeMedicationName = "";
+
+  function openGuide(id, name, dosage, imgSrc) {
+    activePrescriptionId = id;
+    activeMedicationName = name + ' ' + dosage;
+
+    document.getElementById('guideTitle').textContent = name + ' ' + dosage;
+    document.getElementById('guideMedImg').src = imgSrc;
+    
+    // Reset video player
+    const video = document.getElementById('guideVideo');
+    const overlay = document.getElementById('videoOverlay');
+    video.pause();
+    video.currentTime = 0;
+    overlay.classList.remove('playing');
+
+    // Reset checklist
+    document.getElementById('checkWash').checked = false;
+    document.getElementById('checkClean').checked = false;
+    document.getElementById('checkFridge').checked = false;
+    document.getElementById('guideSubmitBtn').disabled = true;
+
+    // Open modal
+    document.getElementById('guideModal').classList.add('open');
+  }
+
+  function closeGuide() {
+    document.getElementById('guideModal').classList.remove('open');
+    document.getElementById('guideVideo').pause();
+  }
+
+  function playVideo() {
+    const video = document.getElementById('guideVideo');
+    const overlay = document.getElementById('videoOverlay');
+    overlay.classList.add('playing');
+    video.play();
+  }
+
+  function checkAllSteps() {
+    const wash = document.getElementById('checkWash').checked;
+    const clean = document.getElementById('checkClean').checked;
+    const fridge = document.getElementById('checkFridge').checked;
+    document.getElementById('guideSubmitBtn').disabled = !(wash && clean && fridge);
+  }
+
+  function submitDoseFromGuide() {
+    if (activePrescriptionId) {
+      logDose(activePrescriptionId, activeMedicationName);
+      closeGuide();
+    }
+  }
 
   // Emotional check-in
   var moodCopy = {
