@@ -132,11 +132,13 @@
 
     .stat .l {
       font-family: var(--data);
-      font-size: 0.7rem;
+      font-size: 0.78rem;
+      font-weight: 600;
       color: var(--text-dim-dark);
       margin-top: 6px;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.04em;
+      line-height: 1.3;
     }
 
     /* Live Clinic Dashboard Simulation Card */
@@ -873,19 +875,19 @@
         <!-- Stats Grid -->
         <div class="stats" id="stats">
           <div class="stat">
-            <div class="n" data-count="40" data-suffix="%">0%</div>
+            <div class="n" data-count="40" data-suffix="%">40%</div>
             <div class="l">Less Patient Dropout</div>
           </div>
           <div class="stat">
-            <div class="n" data-count="94" data-suffix="%">0%</div>
+            <div class="n" data-count="94" data-suffix="%">94%</div>
             <div class="l">Medication Adherence</div>
           </div>
           <div class="stat">
-            <div class="n" data-count="60" data-suffix="%">0%</div>
+            <div class="n" data-count="60" data-suffix="%">60%</div>
             <div class="l">Fewer Nurse Phone Calls</div>
           </div>
           <div class="stat">
-            <div class="n" data-count="48" data-suffix="h">0h</div>
+            <div class="n" data-count="48" data-suffix="h">48h</div>
             <div class="l">Clinic Deployment Time</div>
           </div>
         </div>
@@ -1411,11 +1413,23 @@
     }, { threshold: 0.25 });
     mockObserver.observe(document.getElementById('mock'));
 
-    // Count-up stats animation
+    // Count-up stats animation (progressive enhancement only —
+    // markup already shows the final value, so no-JS / reduced-motion / slow
+    // loads always display the correct number).
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     function countUp(el) {
       const target = +el.dataset.count;
       const pre = el.dataset.prefix || '';
       const suf = el.dataset.suffix || '';
+      const finalText = pre + target + suf;
+
+      // Respect reduced-motion: leave the final value in place, don't animate.
+      if (prefersReducedMotion) {
+        el.textContent = finalText;
+        return;
+      }
+
       let current = 0;
       const steps = 50;
       const increment = target / steps;
@@ -1423,7 +1437,7 @@
       const timer = setInterval(() => {
         current += increment;
         if (current >= target) {
-          el.textContent = pre + target + suf;
+          el.textContent = finalText;
           clearInterval(timer);
         } else {
           el.textContent = pre + Math.floor(current) + suf;

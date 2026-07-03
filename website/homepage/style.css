@@ -24,8 +24,8 @@
   /* Text and Lines */
   --text-dark: #132035;
   --text-light: #EDF2F7;
-  --text-dim-dark: rgba(19, 32, 53, 0.66);
-  --text-dim-light: rgba(237, 242, 247, 0.66);
+  --text-dim-dark: rgba(19, 32, 53, 0.78);
+  --text-dim-light: rgba(237, 242, 247, 0.72);
   --line-dark: rgba(19, 32, 53, 0.12);
   --line-light: rgba(255, 255, 255, 0.1);
 
@@ -103,7 +103,9 @@ img {
 }
 
 .grad-text {
-  background: linear-gradient(100deg, var(--navy), var(--lavender));
+  /* End on the deeper lavender so the gradient tail stays legible on white
+     (light lavender #9E8CEF fails AA-large; deep lavender #7E6BD3 passes). */
+  background: linear-gradient(100deg, var(--navy), var(--lavender-deep));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -902,5 +904,27 @@ section.alt {
   .foot-bottom {
     flex-direction: column;
     align-items: flex-start;
+  }
+}
+
+/* ==========================================
+   Reduced Motion (accessibility)
+   Neutralises count-ups, scroll-reveals, breathing/blob loops,
+   and page transitions for users who ask for less motion.
+   ========================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Ensure scroll-reveal content is shown even if it never animates in. */
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
