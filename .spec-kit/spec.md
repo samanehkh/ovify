@@ -72,6 +72,24 @@ And records the status as "Late"
 And the homepage status for Menopur updates to "Taken"
 ```
 
+#### Scenario 4: Scheduled reminder and offline dose logging
+```gherkin
+Given a Gonal-F injection scheduled for 8:00 PM (20:00)
+When the clock reaches 8:00 PM
+Then the system sends an injection reminder: "Please log your Gonal-F 150 IU dose"
+When the patient logs the dose at 9:30 PM (21:30) using the "Log Offline" option with a reported actual injection time of 8:00 PM (20:00)
+Then the system creates a dose log in the database
+And calculates adherence status ("On Time") based on the reported actual injection time rather than the entry submission timestamp
+```
+
+#### Scenario 5: Missed dose (Patient does not log at all)
+```gherkin
+Given a Menopur injection scheduled for 8:00 PM (20:00)
+When the day ends (23:59:59) and the dose remains unlogged
+Then the system automatically logs a "Missed" dose record in the database for that scheduled date
+And updates the patient's active status to alert the clinic coordinators
+```
+
 ### 2.2 Database Schema
 To support Journey 3 adherence logging, we define three relational tables. The schemas must work with SQLite (local development) and Azure Database for PostgreSQL (production).
 
@@ -122,6 +140,7 @@ To support Journey 3 adherence logging, we define three relational tables. The s
 
 ## Part 3: Verification & Technical Considerations
 
-* **Frontend:** Single HTML file (`index.html`) served by FastAPI.
-* **Backend:** FastAPI (Python) — serving static files and database endpoints.
-* **Testing:** Write unit tests in `tests/test_cycle.py` using pytest to verify that the period logging, API endpoints, and Gonal-F/Menopur schedule retrieval works.
+* **Frontend:** React (built with Vite) and styled with TailwindCSS, organized as a Progressive Web App (PWA) under the `frontend/` directory.
+* **Backend:** FastAPI (Python) serving purely as a RESTful JSON API. CORS must be enabled to permit requests from the React dev server (default: `http://localhost:5173`).
+* **Database:** SQLite (local development `test.db`) and Azure Database for PostgreSQL (production).
+* **Testing:** Write backend unit and integration tests in `tests/test_cycle.py` using pytest to verify database persistence, schema validation, API responses, and dose timing compliance rules.
