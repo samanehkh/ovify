@@ -41,3 +41,33 @@ This constitution defines the mandatory architectural rules, regulatory constrai
   * Dev-QA loop iteration limit is capped at `max_iterations = 3`.
   * LLM JSON parsing auto-fix retry is capped at `max_parse_retries = 2`.
 * **Resource Optimization:** Keep database tiers on the Burstable (B1ms) tier in non-production environments to minimize cloud spending.
+
+---
+
+## 5. UI/UX Style & Brand Consistency (Ovify Patient PWA)
+
+To prevent fragmented designs across multiple screens, all future UI/UX creations must strictly conform to these exact visual design tokens:
+* **Color Palette:**
+  * Background: Ivory `#F8F5F1`
+  * Card Surfaces: White `#FFFFFF`
+  * Text/Navy Card Bases: Navy `#13233C` (and its opacities: `--navy-70`, `--navy-55`, `--navy-10`)
+  * Accents: Lavender `#9E8CEF` (`--lav-dark: #6F5AD1`, `--lav-mid: #7E6BD3`, `--lav-soft: rgba(158,140,239,0.13)`)
+  * Secondary Accents: Blush `#F4A0A0` (`--blush-soft: rgba(244,160,160,0.16)`)
+  * Status (Taken/Green): Sage `#3E8E6E` (`--sage-soft: rgba(62,142,110,0.13)`)
+  * Alert (Due/Red): Red `#C24C57` (`--due-soft: rgba(194,76,87,0.12)`)
+* **Typography:**
+  * Headings (`h1`, `h2`, `h3`): `DM Sans` (Weights 400, 500, 600, 700)
+  * Body Text: `Manrope` (Weights 400, 500, 600)
+  * Data/Labels/Timestamps: `Inter` (Weights 400, 500, 600, 700)
+* **Visual Theme & Assets:**
+  * Logo mark: Must load the official logo from `/static/logo.png`.
+  * Cards: Border radius is set to 24px (`--r-xl`), 18px (`--r-lg`), and 12px (`--r-md`).
+  * Tabbar / sticky headers: Frosted glass theme using `backdrop-filter: blur(14px)` with high-contrast text.
+  * Accessibility: Maintain high contrast (e.g. no light lavender text directly on white/ivory surfaces), full ARIA labels on buttons, and active media queries honoring `prefers-reduced-motion` to neutralize count-ups or loops for motion-sensitive users.
+
+---
+
+## 6. Directory Isolation & Website Restriction
+
+* **Only the App (FastAPI backend and root-level PWA files) may be modified by autonomous agents.**
+* **CRITICAL RULE:** Do not make any edits, deletions, or additions to files in the `website/` folder. All marketing homepage elements are locked; any changes to the public website require prior explicit approval from the Product Owner.
