@@ -200,17 +200,21 @@ Constitution:
     }
 
 def architecture_agent(state: SDLCState) -> Dict:
-    """Reads spec.md and generates plan.md and tasks.md"""
+    """Reads spec.md, index.html and generates plan.md and tasks.md"""
     print("--- [Architecture Agent Node] Designing technical plan ---")
     
     spec_content = read_workspace_file.invoke({"path": ".spec-kit/spec.md"})
     constitution = read_workspace_file.invoke({"path": ".spec-kit/constitution.md"})
+    ui_content = read_workspace_file.invoke({"path": "index.html"})
     
     system_prompt = f"""You are the Lead Solution Architect for Ovify, with 20 years of experience in cloud architecture, AI architecture, Azure architecture, application designing, API integrations, and legacy modernization, specialized in digital health architecting.
-Your job is to read the user feature specification (spec.md) and the system constitution (constitution.md), and design a high-fidelity technical implementation plan and a list of developer tasks.
+Your job is to read the user feature specification (spec.md), the system constitution (constitution.md), and the current UI/UX design (index.html), and design a high-fidelity technical implementation plan and a list of developer tasks.
 
 Constitution:
 {constitution}
+
+Current UI/UX design (index.html):
+{ui_content}
 
 You must strictly conform your output to the required schema structure.
 """
