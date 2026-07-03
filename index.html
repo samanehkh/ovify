@@ -9,768 +9,250 @@
   <title>Ovify</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=Manrope:wght@300;400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Manrope:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* ─────────────────────────────────────────
-       TOKENS
-    ───────────────────────────────────────── */
+    /* ─────────────────────────────────────────  TOKENS  ───────────────────────────────────────── */
     :root {
-      --bg:           #F8F5F1;
-      --surface:      #FFFFFF;
-      --navy:         #13233C;
-      --navy-60:      rgba(19,35,60,0.6);
-      --navy-30:      rgba(19,35,60,0.3);
-      --navy-10:      rgba(19,35,60,0.07);
-      --lavender:     #9E8CEF;
-      --lav-dark:     #7460D4;
-      --lav-mid:      #8577DC;
-      --lav-soft:     rgba(158,140,239,0.12);
-      --lav-glow:     rgba(158,140,239,0.22);
-      --blush:        #F4A0A0;
-      --blush-soft:   rgba(244,160,160,0.15);
-      --sage:         #6BAA8E;
-      --sage-soft:    rgba(107,170,142,0.12);
-      --border:       rgba(19,35,60,0.08);
-      --r-xl:         24px;
-      --r-lg:         18px;
-      --r-md:         12px;
-      --r-pill:       999px;
-      --ease:         cubic-bezier(0.16,1,0.3,1);
-      --t:            0.25s var(--ease);
+      --bg:          #F8F5F1;
+      --surface:     #FFFFFF;
+      --navy:        #13233C;
+      --navy-70:     rgba(19,35,60,0.72);
+      --navy-55:     rgba(19,35,60,0.55);
+      --navy-10:     rgba(19,35,60,0.07);
+      --lavender:    #9E8CEF;
+      --lav-dark:    #6F5AD1;
+      --lav-mid:     #7E6BD3;
+      --lav-soft:    rgba(158,140,239,0.13);
+      --lav-glow:    rgba(158,140,239,0.22);
+      --blush:       #F4A0A0;
+      --blush-soft:  rgba(244,160,160,0.16);
+      --due:         #C24C57;
+      --due-soft:    rgba(194,76,87,0.12);
+      --sage:        #3E8E6E;
+      --sage-soft:   rgba(62,142,110,0.13);
+      --border:      rgba(19,35,60,0.09);
+      --r-xl:        24px;  --r-lg: 18px;  --r-md: 12px;  --r-pill: 999px;
+      --ease:        cubic-bezier(0.16,1,0.3,1);
+      --t:           0.25s var(--ease);
     }
 
-    /* ─────────────────────────────────────────
-       RESET
-    ───────────────────────────────────────── */
+    /* ─────────────────────────────────────────  RESET  ───────────────────────────────────────── */
     *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
     html { -webkit-text-size-adjust:100%; }
+    html { overflow-x:hidden; }
     body {
-      background:#E9E4DE;
-      display:flex;
-      justify-content:center;
-      min-height:100dvh;
-      font-family:'Manrope',sans-serif;
-      color:var(--navy);
-      -webkit-font-smoothing:antialiased;
+      background:#E9E4DE; display:flex; justify-content:center; min-height:100dvh;
+      width:100%; max-width:100vw; overflow-x:hidden;
+      font-family:'Manrope',sans-serif; color:var(--navy); -webkit-font-smoothing:antialiased;
     }
-    button { font-family:inherit; cursor:pointer; border:none; background:none; }
+    button { font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; }
     svg { display:block; }
+    :focus-visible { outline:2.5px solid var(--lav-dark); outline-offset:2px; border-radius:6px; }
 
-    /* ─────────────────────────────────────────
-       PHONE SHELL
-    ───────────────────────────────────────── */
+    /* ─────────────────────────────────────────  PHONE SHELL  ───────────────────────────────────────── */
     .phone {
-      background:var(--bg);
-      width:100%;
-      max-width:390px;
-      min-height:100dvh;
-      display:flex;
-      flex-direction:column;
-      position:relative;
-      overflow:hidden;
+      background:var(--bg); width:100%; max-width:390px; min-height:100dvh;
+      display:flex; flex-direction:column; position:relative; overflow:hidden;
       box-shadow:0 32px 80px rgba(0,0,0,0.18);
     }
 
-    /* ─────────────────────────────────────────
-       STATUS BAR
-    ───────────────────────────────────────── */
-    .statusbar {
-      padding:14px 24px 0;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-    }
-    .statusbar__time {
-      font-family:'Inter',sans-serif;
-      font-size:15px;
-      font-weight:600;
-      color:var(--navy);
-    }
-    .statusbar__icons {
-      display:flex;
-      align-items:center;
-      gap:5px;
-    }
-    .statusbar__icons svg {
-      width:15px; height:15px;
-      fill:var(--navy);
-    }
+    /* ─────────────────────────────────────────  STATUS BAR  ───────────────────────────────────────── */
+    .statusbar { padding:14px 24px 0; display:flex; justify-content:space-between; align-items:center; }
+    .statusbar__time { font-family:'Inter',sans-serif; font-size:15px; font-weight:600; }
+    .statusbar__icons { display:flex; align-items:center; gap:6px; }
+    .statusbar__icons svg { width:15px; height:15px; fill:var(--navy); }
 
-    /* ─────────────────────────────────────────
-       TOP NAV
-    ───────────────────────────────────────── */
-    .nav {
-      padding:12px 20px 16px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
+    /* ─────────────────────────────────────────  TOP NAV  ───────────────────────────────────────── */
+    .nav { padding:12px 18px 14px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .nav__logo { display:flex; align-items:center; gap:9px; min-width:0; }
+    .nav__logomark { width:34px; height:34px; border-radius:10px; flex:none; }
+    .nav__wordmark { font-family:'DM Sans',sans-serif; font-size:21px; font-weight:700; letter-spacing:-0.5px; }
+    .nav__right { display:flex; align-items:center; gap:10px; flex:none; }
+    .icon-btn {
+      width:38px; height:38px; border-radius:50%; background:var(--surface); border:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center; position:relative; transition:var(--t);
     }
-    .nav__logo {
-      display:flex;
-      align-items:center;
-      gap:8px;
-    }
-    .nav__logomark {
-      width:34px; height:34px;
-    }
-    .nav__wordmark {
-      font-family:'DM Sans',sans-serif;
-      font-size:21px;
-      font-weight:700;
-      letter-spacing:-0.5px;
-      color:var(--navy);
-    }
-    .nav__right {
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-    .nav__bell {
-      width:36px; height:36px;
-      border-radius:50%;
-      background:var(--surface);
-      border:1px solid var(--border);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      position:relative;
-      transition:var(--t);
-    }
-    .nav__bell:hover { background:var(--lav-soft); }
-    .nav__bell svg { width:17px; height:17px; stroke:var(--navy); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
-    .nav__bell-dot {
-      position:absolute;
-      top:7px; right:7px;
-      width:7px; height:7px;
-      border-radius:50%;
-      background:var(--blush);
-      border:1.5px solid var(--bg);
-    }
+    .icon-btn:hover { background:var(--lav-soft); }
+    .icon-btn svg { width:18px; height:18px; stroke:var(--navy); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+    .nav__dot { position:absolute; top:8px; right:8px; width:8px; height:8px; border-radius:50%; background:var(--blush); border:1.5px solid var(--surface); }
     .nav__avatar {
-      width:36px; height:36px;
-      border-radius:50%;
+      width:38px; height:38px; border-radius:50%;
       background:linear-gradient(135deg,var(--lavender),var(--blush));
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-family:'Inter',sans-serif;
-      font-size:14px;
-      font-weight:700;
-      color:#fff;
-      cursor:pointer;
-      transition:var(--t);
-      box-shadow:0 2px 8px var(--lav-glow);
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Inter',sans-serif; font-size:15px; font-weight:700; color:#fff;
+      transition:var(--t); box-shadow:0 2px 10px var(--lav-glow); flex:none;
     }
 
-    /* ─────────────────────────────────────────
-       SCROLLABLE BODY
-    ───────────────────────────────────────── */
-    .scroll {
-      flex:1;
-      overflow-y:auto;
-      padding:0 16px 100px;
-      -webkit-overflow-scrolling:touch;
-    }
+    /* ─────────────────────────────────────────  SCROLL  ───────────────────────────────────────── */
+    .scroll { flex:1; overflow-y:auto; overflow-x:hidden; padding:0 16px 108px; -webkit-overflow-scrolling:touch; }
 
-    /* ─────────────────────────────────────────
-       HERO — CYCLE PROGRESS
-    ───────────────────────────────────────── */
+    /* ─────────────────────────────────────────  HERO  ───────────────────────────────────────── */
     .hero {
-      background:var(--navy);
-      border-radius:var(--r-xl);
-      padding:24px 24px 22px;
-      margin-bottom:16px;
-      position:relative;
-      overflow:hidden;
+      background:var(--navy); border-radius:var(--r-xl); padding:22px 22px 20px; margin-bottom:18px;
+      position:relative; overflow:hidden;
     }
-    /* decorative radial glows */
-    .hero::before {
-      content:'';
-      position:absolute;
-      top:-40px; right:-40px;
-      width:180px; height:180px;
-      border-radius:50%;
-      background:radial-gradient(circle, rgba(158,140,239,0.22) 0%, transparent 70%);
-      pointer-events:none;
-    }
-    .hero::after {
-      content:'';
-      position:absolute;
-      bottom:-30px; left:20px;
-      width:120px; height:120px;
-      border-radius:50%;
-      background:radial-gradient(circle, rgba(244,160,160,0.18) 0%, transparent 70%);
-      pointer-events:none;
-    }
+    .hero::before { content:''; position:absolute; top:-40px; right:-40px; width:180px; height:180px; border-radius:50%;
+      background:radial-gradient(circle, rgba(158,140,239,0.28) 0%, transparent 70%); pointer-events:none; }
+    .hero::after { content:''; position:absolute; bottom:-30px; left:10px; width:130px; height:130px; border-radius:50%;
+      background:radial-gradient(circle, rgba(244,160,160,0.20) 0%, transparent 70%); pointer-events:none; }
 
-    .hero__top {
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      margin-bottom:22px;
+    .hero__top { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:20px; }
+    .hero__greeting { font-family:'DM Sans',sans-serif; font-size:13px; color:rgba(255,255,255,0.65); letter-spacing:0.03em; margin-bottom:3px; }
+    .hero__name { font-family:'DM Sans',sans-serif; font-size:23px; font-weight:700; color:#fff; letter-spacing:-0.4px; }
+    .hero__phase {
+      display:inline-flex; align-items:center; gap:6px; flex:none;
+      background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.18); border-radius:var(--r-pill);
+      padding:6px 12px; font-family:'Inter',sans-serif; font-size:12px; font-weight:500; color:rgba(255,255,255,0.9);
     }
-    .hero__greeting {
-      font-family:'DM Sans',sans-serif;
-      font-size:13px;
-      font-weight:400;
-      color:rgba(255,255,255,0.55);
-      letter-spacing:0.04em;
-      margin-bottom:4px;
-    }
-    .hero__name {
-      font-family:'DM Sans',sans-serif;
-      font-size:22px;
-      font-weight:700;
-      color:#fff;
-      letter-spacing:-0.4px;
-    }
-    .hero__phase-pill {
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      background:rgba(255,255,255,0.1);
-      border:1px solid rgba(255,255,255,0.15);
-      border-radius:var(--r-pill);
-      padding:6px 12px;
-      font-family:'Inter',sans-serif;
-      font-size:12px;
-      font-weight:500;
-      color:rgba(255,255,255,0.8);
-    }
-    .hero__phase-dot {
-      width:6px; height:6px;
-      border-radius:50%;
-      background:var(--lavender);
-      animation:breathe 2.4s ease-in-out infinite;
-    }
-    @keyframes breathe {
-      0%,100% { opacity:1; transform:scale(1); }
-      50% { opacity:0.5; transform:scale(0.75); }
-    }
+    .hero__phase-dot { width:6px; height:6px; border-radius:50%; background:var(--lavender); animation:breathe 2.6s ease-in-out infinite; }
+    @keyframes breathe { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:0.45;transform:scale(0.7);} }
 
-    /* progress arc row */
-    .hero__progress-row {
-      display:flex;
-      align-items:center;
-      gap:20px;
-    }
-    .hero__arc {
-      position:relative;
-      width:96px; height:96px;
-      min-width:96px;
-    }
-    .hero__arc-svg {
-      width:96px; height:96px;
-      transform:rotate(-90deg);
-    }
-    .arc-track { fill:none; stroke:rgba(255,255,255,0.1); stroke-width:7; stroke-linecap:round; }
-    .arc-fill  {
-      fill:none;
-      stroke:url(#arcGrad);
-      stroke-width:7;
-      stroke-linecap:round;
-      stroke-dasharray:251.2;
-      stroke-dashoffset:251.2;
-      transition:stroke-dashoffset 1.4s var(--ease);
-    }
-    .hero__arc-label {
-      position:absolute;
-      inset:0;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-    }
-    .hero__arc-day {
-      font-family:'DM Sans',sans-serif;
-      font-size:22px;
-      font-weight:700;
-      color:#fff;
-      line-height:1;
-    }
-    .hero__arc-sub {
-      font-family:'Inter',sans-serif;
-      font-size:10px;
-      font-weight:500;
-      color:rgba(255,255,255,0.5);
-      margin-top:2px;
-      letter-spacing:0.05em;
-    }
+    .hero__row { display:flex; align-items:center; gap:18px; }
+    .hero__arc { position:relative; width:94px; height:94px; flex:none; }
+    .hero__arc-svg { width:94px; height:94px; transform:rotate(-90deg); }
+    .arc-track { fill:none; stroke:rgba(255,255,255,0.12); stroke-width:7; }
+    .arc-fill  { fill:none; stroke:url(#arcGrad); stroke-width:7; stroke-linecap:round;
+      stroke-dasharray:251.2; stroke-dashoffset:251.2; transition:stroke-dashoffset 1.4s var(--ease); }
+    .hero__arc-lbl { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+    .hero__arc-day { font-family:'DM Sans',sans-serif; font-size:21px; font-weight:700; color:#fff; line-height:1; }
+    .hero__arc-sub { font-family:'Inter',sans-serif; font-size:10px; font-weight:600; color:rgba(255,255,255,0.6); margin-top:3px; letter-spacing:0.08em; }
 
-    .hero__stats {
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-    }
-    .hero__stat {
-      display:flex;
-      flex-direction:column;
-      gap:2px;
-    }
-    .hero__stat-label {
-      font-family:'Inter',sans-serif;
-      font-size:11px;
-      font-weight:500;
-      color:rgba(255,255,255,0.45);
-      letter-spacing:0.08em;
-      text-transform:uppercase;
-    }
-    .hero__stat-val {
-      font-family:'DM Sans',sans-serif;
-      font-size:15px;
-      font-weight:600;
-      color:#fff;
-    }
-    .hero__stat-val--accent { color:var(--lavender); }
+    .hero__stats { flex:1; min-width:0; display:flex; flex-direction:column; gap:12px; }
+    .hero__stat-label { font-family:'Inter',sans-serif; font-size:10.5px; font-weight:600; color:rgba(255,255,255,0.6); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:2px; }
+    .hero__stat-val { font-family:'DM Sans',sans-serif; font-size:14.5px; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .hero__stat-val--accent { color:#C4B7FA; }
 
-    .hero__bar-row {
-      margin-top:18px;
-    }
-    .hero__bar-label {
-      display:flex;
-      justify-content:space-between;
-      margin-bottom:6px;
-    }
-    .hero__bar-label span {
-      font-family:'Inter',sans-serif;
-      font-size:11px;
-      color:rgba(255,255,255,0.45);
-    }
-    .hero__bar-label strong {
-      font-family:'Inter',sans-serif;
-      font-size:11px;
-      color:rgba(255,255,255,0.7);
-      font-weight:600;
-    }
-    .hero__bar-track {
-      height:5px;
-      background:rgba(255,255,255,0.1);
-      border-radius:var(--r-pill);
-      overflow:hidden;
-    }
-    .hero__bar-fill {
-      height:100%;
-      width:0;
-      background:linear-gradient(90deg, var(--lavender), var(--blush));
-      border-radius:var(--r-pill);
-      transition:width 1.6s var(--ease);
-    }
+    .hero__bar-row { margin-top:18px; }
+    .hero__bar-top { display:flex; justify-content:space-between; margin-bottom:7px; }
+    .hero__bar-top span { font-family:'Inter',sans-serif; font-size:11px; color:rgba(255,255,255,0.6); }
+    .hero__bar-top strong { font-family:'Inter',sans-serif; font-size:11px; color:rgba(255,255,255,0.9); font-weight:700; }
+    .hero__bar-track { height:6px; background:rgba(255,255,255,0.12); border-radius:var(--r-pill); overflow:hidden; }
+    .hero__bar-fill { height:100%; width:0; background:linear-gradient(90deg,var(--lavender),var(--blush)); border-radius:var(--r-pill); transition:width 1.6s var(--ease); }
 
-    /* ─────────────────────────────────────────
-       SECTION HEADER
-    ───────────────────────────────────────── */
-    .section-head {
-      display:flex;
-      justify-content:space-between;
-      align-items:baseline;
-      margin:20px 0 12px;
-    }
-    .section-head__title {
-      font-family:'DM Sans',sans-serif;
-      font-size:17px;
-      font-weight:700;
-      color:var(--navy);
-      letter-spacing:-0.2px;
-    }
-    .section-head__link {
-      font-family:'Inter',sans-serif;
-      font-size:13px;
-      font-weight:500;
-      color:var(--lav-mid);
-      cursor:pointer;
-    }
+    /* ─────────────────────────────────────────  SECTION HEADER  ───────────────────────────────────────── */
+    .sec { display:flex; justify-content:space-between; align-items:baseline; margin:22px 0 12px; gap:12px; }
+    .sec__title { font-family:'DM Sans',sans-serif; font-size:17px; font-weight:700; letter-spacing:-0.2px; }
+    .sec__link { font-family:'Inter',sans-serif; font-size:13px; font-weight:600; color:var(--lav-dark); }
 
-    /* ─────────────────────────────────────────
-       MEDICATION CARDS
-    ───────────────────────────────────────── */
-    .med-stack {
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      margin-bottom:4px;
-    }
-    .med {
-      background:var(--surface);
-      border-radius:var(--r-xl);
-      padding:18px 18px 16px;
-      box-shadow:0 1px 4px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);
-      transition:var(--t);
-      border:1.5px solid transparent;
-    }
-    .med:hover { border-color:var(--lav-soft); box-shadow:0 4px 24px var(--lav-glow); transform:translateY(-1px); }
+    /* ─────────────────────────────────────────  MED CARDS  ───────────────────────────────────────── */
+    .med-stack { display:flex; flex-direction:column; gap:12px; }
+    .med { background:var(--surface); border-radius:var(--r-xl); padding:16px 16px 14px;
+      box-shadow:0 1px 3px rgba(0,0,0,0.04), 0 6px 20px rgba(0,0,0,0.04); border:1.5px solid transparent; transition:var(--t); }
+    .med.is-done { border-color:var(--sage-soft); background:linear-gradient(180deg,var(--surface),rgba(62,142,110,0.04)); }
 
-    .med__row {
-      display:flex;
-      align-items:center;
-      gap:14px;
-    }
-    .med__icon {
-      width:46px; height:46px; min-width:46px;
-      border-radius:15px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-    .med__icon--lav { background:var(--lav-soft); }
-    .med__icon--blush { background:var(--blush-soft); }
-    .med__icon svg { width:22px; height:22px; }
-
+    .med__row { display:flex; align-items:center; gap:13px; }
+    .med__icon { width:46px; height:46px; flex:none; border-radius:14px; display:flex; align-items:center; justify-content:center; }
+    .med__icon--lav   { background:linear-gradient(135deg,#B9AEF6,#8E7BE8); }
+    .med__icon--blush { background:linear-gradient(135deg,#F7B7B7,#EE8E8E); }
+    .med__icon svg { width:23px; height:23px; stroke:#fff; fill:none; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
     .med__info { flex:1; min-width:0; }
-    .med__name {
-      font-family:'DM Sans',sans-serif;
-      font-size:16px;
-      font-weight:700;
-      color:var(--navy);
-      letter-spacing:-0.2px;
-    }
-    .med__time {
-      font-family:'Inter',sans-serif;
-      font-size:13px;
-      color:var(--navy-60);
-      margin-top:2px;
-    }
+    .med__name { font-family:'DM Sans',sans-serif; font-size:16px; font-weight:700; letter-spacing:-0.2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .med__meta { font-family:'Inter',sans-serif; font-size:12.5px; color:var(--navy-70); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
-    .med__status {
-      display:flex;
-      align-items:center;
-      gap:5px;
-      font-family:'Inter',sans-serif;
-      font-size:12px;
-      font-weight:600;
-      padding:5px 11px;
-      border-radius:var(--r-pill);
-    }
-    .med__status--on { background:var(--sage-soft); color:var(--sage); }
-    .med__status--due { background:rgba(244,160,160,0.15); color:#C0616A; }
+    .med__status { flex:none; display:inline-flex; align-items:center; gap:5px; font-family:'Inter',sans-serif;
+      font-size:12px; font-weight:700; padding:5px 10px; border-radius:var(--r-pill); }
+    .med__status--due  { background:var(--due-soft);  color:var(--due); }
+    .med__status--done { background:var(--sage-soft); color:var(--sage); }
     .med__status-dot { width:6px; height:6px; border-radius:50%; background:currentColor; }
 
-    .med__footer {
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      margin-top:14px;
-      padding-top:12px;
-      border-top:1px solid var(--border);
-    }
-    .med__reminder {
-      display:flex;
-      align-items:center;
-      gap:6px;
-      font-family:'Inter',sans-serif;
-      font-size:13px;
-      font-weight:500;
-      color:var(--navy-60);
-      padding:7px 14px;
-      border:1.5px solid var(--border);
-      border-radius:var(--r-pill);
-      transition:var(--t);
-    }
-    .med__reminder:hover, .med__reminder.set {
-      border-color:var(--lavender);
-      color:var(--lav-dark);
-      background:var(--lav-soft);
-    }
-    .med__reminder svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
-    .med__cta {
-      padding:8px 16px;
-      background:var(--navy);
-      color:#fff;
-      font-family:'DM Sans',sans-serif;
-      font-size:13px;
-      font-weight:600;
-      border-radius:var(--r-pill);
-      transition:var(--t);
-    }
+    .med__footer { display:flex; align-items:center; gap:8px; margin-top:14px; padding-top:13px; border-top:1px solid var(--border); }
+    .med__cta { flex:1; padding:11px 14px; background:var(--navy); color:#fff; font-family:'DM Sans',sans-serif;
+      font-size:14px; font-weight:700; border-radius:var(--r-pill); transition:var(--t); display:inline-flex; align-items:center; justify-content:center; gap:7px; }
+    .med__cta svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; }
     .med__cta:hover { background:var(--lav-dark); }
-    .med__cta.done {
-      background:var(--sage-soft);
-      color:var(--sage);
-      cursor:default;
+    .med__cta.is-done { background:var(--sage-soft); color:var(--sage); cursor:default; }
+    .med__iconbtn {
+      width:42px; height:42px; flex:none; border:1.5px solid var(--border); border-radius:14px;
+      display:flex; align-items:center; justify-content:center; color:var(--navy-70); transition:var(--t);
     }
+    .med__iconbtn svg { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+    .med__iconbtn:hover { border-color:var(--lavender); color:var(--lav-dark); background:var(--lav-soft); }
+    .med__iconbtn[aria-pressed="true"] { border-color:var(--lavender); color:var(--lav-dark); background:var(--lav-soft); }
 
-    /* ─────────────────────────────────────────
-       QUICK ACTIONS
-    ───────────────────────────────────────── */
-    .qa-grid {
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-      margin-bottom:4px;
-    }
-    .qa {
-      background:var(--surface);
-      border-radius:var(--r-xl);
-      padding:18px 16px;
-      display:flex;
-      flex-direction:column;
-      align-items:flex-start;
-      gap:10px;
-      cursor:pointer;
-      transition:var(--t);
-      border:1.5px solid transparent;
-      box-shadow:0 1px 4px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);
-    }
-    .qa:hover {
-      border-color:rgba(158,140,239,0.3);
-      box-shadow:0 4px 24px var(--lav-glow);
-      transform:translateY(-2px);
-    }
-    .qa__icon {
-      width:40px; height:40px;
-      border-radius:12px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-    .qa__icon--lav { background:var(--lav-soft); }
+    /* ─────────────────────────────────────────  QUICK ACTIONS  ───────────────────────────────────────── */
+    .qa-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .qa { text-align:left; background:var(--surface); border-radius:var(--r-xl); padding:16px 15px;
+      display:flex; flex-direction:column; align-items:flex-start; gap:11px; transition:var(--t);
+      border:1.5px solid transparent; box-shadow:0 1px 3px rgba(0,0,0,0.04), 0 6px 20px rgba(0,0,0,0.04); }
+    .qa:hover { border-color:rgba(158,140,239,0.3); box-shadow:0 6px 24px var(--lav-glow); transform:translateY(-2px); }
+    .qa__icon { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; }
+    .qa__icon--lav   { background:var(--lav-soft); }
     .qa__icon--blush { background:var(--blush-soft); }
     .qa__icon svg { width:20px; height:20px; stroke:var(--navy); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
-    .qa__label {
-      font-family:'DM Sans',sans-serif;
-      font-size:14px;
-      font-weight:700;
-      color:var(--navy);
-      line-height:1.3;
-    }
-    .qa__sub {
-      font-family:'Manrope',sans-serif;
-      font-size:12px;
-      color:var(--navy-60);
-      margin-top:-4px;
-    }
+    .qa__label { display:block; font-family:'DM Sans',sans-serif; font-size:14.5px; font-weight:700; line-height:1.25; }
+    .qa__sub { display:block; font-family:'Manrope',sans-serif; font-size:12px; color:var(--navy-70); margin-top:1px; }
 
-    /* ─────────────────────────────────────────
-       NEXT APPOINTMENT
-    ───────────────────────────────────────── */
-    .appt {
-      background:var(--surface);
-      border-radius:var(--r-xl);
-      padding:18px 18px;
-      display:flex;
-      align-items:center;
-      gap:14px;
-      box-shadow:0 1px 4px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);
-      margin-bottom:4px;
-      transition:var(--t);
-      border:1.5px solid transparent;
-    }
-    .appt:hover { border-color:var(--lav-soft); transform:translateY(-1px); }
-    .appt__icon {
-      width:46px; height:46px; min-width:46px;
-      border-radius:15px;
-      background:var(--lav-soft);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-    .appt__icon svg { width:22px; height:22px; stroke:var(--lav-dark); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
-    .appt__body { flex:1; }
-    .appt__label {
-      font-family:'Inter',sans-serif;
-      font-size:11px;
-      font-weight:500;
-      letter-spacing:0.1em;
-      text-transform:uppercase;
-      color:var(--navy-60);
-      margin-bottom:4px;
-    }
-    .appt__date {
-      font-family:'DM Sans',sans-serif;
-      font-size:15px;
-      font-weight:700;
-      color:var(--navy);
-    }
-    .appt__clinic {
-      font-family:'Manrope',sans-serif;
-      font-size:12px;
-      color:var(--navy-60);
-      margin-top:2px;
-    }
-    .appt__badge {
-      font-family:'Inter',sans-serif;
-      font-size:13px;
-      font-weight:600;
-      color:var(--lav-dark);
-      background:var(--lav-soft);
-      padding:6px 14px;
-      border-radius:var(--r-pill);
-      white-space:nowrap;
-    }
+    /* ─────────────────────────────────────────  CALMSEED  ───────────────────────────────────────── */
+    .calm { background:linear-gradient(135deg,#ECE8F7 0%,#FCEFEF 100%);
+      border-radius:var(--r-xl); padding:18px; border:1.5px solid rgba(158,140,239,0.18); transition:var(--t); }
+    .calm:hover { box-shadow:0 6px 22px var(--lav-glow); }
+    .calm__head { display:block; width:100%; text-align:left; background:none; border:none; padding:0; cursor:pointer; }
+    .calm__row { display:flex; align-items:center; gap:13px; }
+    .calm__orb { width:46px; height:46px; flex:none; }
+    .calm__orb svg { width:46px; height:46px; }
+    .calm__txt { flex:1; min-width:0; }
+    .calm__title { display:block; font-family:'DM Sans',sans-serif; font-size:15.5px; font-weight:700; }
+    .calm__sub { display:block; font-family:'Manrope',sans-serif; font-size:12.5px; color:var(--navy-70); margin-top:2px; }
+    .calm__chev { flex:none; transition:transform var(--t); }
+    .calm__chev svg { width:18px; height:18px; stroke:var(--navy-55); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+    .calm.open .calm__chev { transform:rotate(180deg); }
+    .calm__panel { display:block; max-height:0; overflow:hidden; transition:max-height 0.4s var(--ease); }
+    .calm.open .calm__panel { max-height:280px; }
+    .calm__moods { display:flex; gap:7px; margin-top:16px; padding-top:16px; border-top:1px solid rgba(158,140,239,0.18); }
+    .calm__mood { flex:1; padding:9px 0; border:1.5px solid rgba(158,140,239,0.25); border-radius:12px;
+      background:rgba(255,255,255,0.7); font-family:'Manrope',sans-serif; font-size:12px; font-weight:600; color:var(--navy-70); transition:var(--t); }
+    .calm__mood:hover, .calm__mood.active { border-color:var(--lavender); color:var(--lav-dark); background:#fff; }
+    .calm__resp { display:block; margin-top:12px; font-family:'Manrope',sans-serif; font-size:13px; line-height:1.6; color:var(--navy);
+      padding:12px 14px; background:rgba(255,255,255,0.85); border-radius:12px; border-left:3px solid var(--lavender);
+      opacity:0; transform:translateY(4px); transition:opacity 0.3s ease, transform 0.3s var(--ease); }
+    .calm__resp.show { opacity:1; transform:translateY(0); }
 
-    /* ─────────────────────────────────────────
-       CALMSEED CARD
-    ───────────────────────────────────────── */
-    .calmseed {
-      background:linear-gradient(135deg, #EDE9F8 0%, #FFF0F0 100%);
-      border-radius:var(--r-xl);
-      padding:20px 20px;
-      border:1.5px solid rgba(158,140,239,0.15);
-      cursor:pointer;
-      transition:var(--t);
-    }
-    .calmseed:hover { box-shadow:0 4px 20px var(--lav-glow); }
-    .calmseed__row {
-      display:flex;
-      align-items:center;
-      gap:14px;
-    }
-    .calmseed__orb {
-      width:48px; height:48px; min-width:48px;
-    }
-    .calmseed__text { flex:1; }
-    .calmseed__title {
-      font-family:'DM Sans',sans-serif;
-      font-size:16px;
-      font-weight:700;
-      color:var(--navy);
-    }
-    .calmseed__sub {
-      font-family:'Manrope',sans-serif;
-      font-size:13px;
-      font-weight:400;
-      font-style:italic;
-      color:var(--navy-60);
-      margin-top:2px;
-    }
-    .calmseed__chevron {
-      transition:transform var(--t);
-    }
-    .calmseed__chevron svg { width:18px; height:18px; stroke:var(--navy-30); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
-    .calmseed.open .calmseed__chevron { transform:rotate(180deg); }
+    /* ─────────────────────────────────────────  BOTTOM NAV  ───────────────────────────────────────── */
+    .tabbar { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:390px;
+      background:rgba(255,255,255,0.92); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+      border-top:1px solid var(--border); display:flex; padding:9px 6px env(safe-area-inset-bottom,16px); z-index:99; }
+    .tab { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; padding:4px 0; border-radius:12px; transition:var(--t); }
+    .tab svg { width:22px; height:22px; stroke:var(--navy-55); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; transition:var(--t); }
+    .tab span { font-family:'Inter',sans-serif; font-size:10px; font-weight:600; color:var(--navy-55); transition:var(--t); }
+    .tab.active svg { stroke:var(--navy); }
+    .tab.active .icon-home { fill:var(--navy); stroke:none; }
+    .tab.active span { color:var(--navy); font-weight:700; }
+    .tab:not(.active):hover svg { stroke:var(--lavender); }
+    .tab:not(.active):hover span { color:var(--lav-dark); }
 
-    .calmseed__panel {
-      max-height:0;
-      overflow:hidden;
-      transition:max-height 0.4s var(--ease);
-    }
-    .calmseed.open .calmseed__panel { max-height:200px; }
-
-    .calmseed__mood-row {
-      display:flex;
-      gap:8px;
-      margin-top:16px;
-      padding-top:16px;
-      border-top:1px solid rgba(158,140,239,0.15);
-    }
-    .calmseed__mood-btn {
-      flex:1;
-      padding:9px 0;
-      border:1.5px solid rgba(158,140,239,0.2);
-      border-radius:12px;
-      background:rgba(255,255,255,0.7);
-      font-family:'Manrope',sans-serif;
-      font-size:12px;
-      font-weight:500;
-      color:var(--navy-60);
-      transition:var(--t);
-    }
-    .calmseed__mood-btn:hover, .calmseed__mood-btn.active {
-      border-color:var(--lavender);
-      color:var(--lav-dark);
-      background:#fff;
-    }
-    .calmseed__response {
-      margin-top:12px;
-      font-family:'Manrope',sans-serif;
-      font-size:13px;
-      line-height:1.6;
-      color:var(--navy);
-      padding:12px 14px;
-      background:rgba(255,255,255,0.8);
-      border-radius:12px;
-      border-left:3px solid var(--lavender);
-      opacity:0;
-      transform:translateY(4px);
-      transition:opacity 0.3s ease, transform 0.3s var(--ease);
-    }
-    .calmseed__response.show { opacity:1; transform:translateY(0); }
-
-    /* ─────────────────────────────────────────
-       BOTTOM NAV
-    ───────────────────────────────────────── */
-    .nav-bar {
-      position:fixed;
-      bottom:0; left:50%;
-      transform:translateX(-50%);
-      width:100%;
-      max-width:390px;
-      background:var(--surface);
-      border-top:1px solid var(--border);
-      display:flex;
-      padding:10px 6px env(safe-area-inset-bottom,18px);
-      z-index:99;
-    }
-    .nav-bar__tab {
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:4px;
-      padding:4px 0;
-      cursor:pointer;
-      border-radius:12px;
-      transition:var(--t);
-      position:relative;
-    }
-    .nav-bar__tab svg { width:22px; height:22px; stroke:var(--navy-30); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; transition:var(--t); }
-    .nav-bar__tab span { font-family:'Inter',sans-serif; font-size:10px; font-weight:500; color:var(--navy-30); transition:var(--t); }
-    .nav-bar__tab.active svg  { stroke:var(--navy); }
-    .nav-bar__tab.active span { color:var(--navy); font-weight:700; }
-    .nav-bar__tab:not(.active):hover svg  { stroke:var(--lavender); }
-    .nav-bar__tab:not(.active):hover span { color:var(--lav-dark); }
-    /* home tab filled icon */
-    .nav-bar__tab.active .icon-home { fill:var(--navy); stroke:none; }
-
-    /* ─────────────────────────────────────────
-       TOAST
-    ───────────────────────────────────────── */
-    .toast {
-      position:fixed;
-      bottom:88px; left:50%;
-      transform:translateX(-50%) translateY(6px);
-      background:var(--navy);
-      color:#fff;
-      font-family:'Manrope',sans-serif;
-      font-size:14px;
-      font-weight:500;
-      padding:11px 22px;
-      border-radius:var(--r-pill);
-      white-space:nowrap;
-      opacity:0;
-      pointer-events:none;
-      transition:opacity 0.25s ease, transform 0.25s var(--ease);
-      z-index:200;
-      box-shadow:0 8px 28px rgba(0,0,0,0.2);
-    }
+    /* ─────────────────────────────────────────  TOAST  ───────────────────────────────────────── */
+    .toast { position:fixed; bottom:92px; left:50%; transform:translateX(-50%) translateY(6px);
+      background:var(--navy); color:#fff; font-family:'Manrope',sans-serif; font-size:13.5px; font-weight:600;
+      padding:11px 20px; border-radius:var(--r-pill); max-width:340px; text-align:center;
+      opacity:0; pointer-events:none; transition:opacity 0.25s ease, transform 0.25s var(--ease); z-index:200;
+      box-shadow:0 10px 30px rgba(0,0,0,0.24); display:flex; align-items:center; gap:8px; }
+    .toast svg { width:16px; height:16px; stroke:#9BE3C4; fill:none; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; flex:none; }
     .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-    /* ─────────────────────────────────────────
-       SPACER SECTION BETWEEN GROUPS
-    ───────────────────────────────────────── */
-    .spacer { height:8px; }
+    /* ─────────────────────────────────────────  REDUCED MOTION  ───────────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      *,*::before,*::after { animation-duration:0.001ms !important; animation-iteration-count:1 !important;
+        transition-duration:0.001ms !important; scroll-behavior:auto !important; }
+    }
   </style>
 </head>
 <body>
 <div class="phone">
 
-  <!-- SVG DEFS -->
-  <svg width="0" height="0" style="position:absolute">
-    <defs>
-      <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#9E8CEF"/>
-        <stop offset="100%" stop-color="#F4A0A0"/>
-      </linearGradient>
-    </defs>
+  <!-- gradient def for arc -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs><linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#9E8CEF"/><stop offset="100%" stop-color="#F4A0A0"/>
+    </linearGradient></defs>
   </svg>
 
   <!-- STATUS BAR -->
   <div class="statusbar">
     <span class="statusbar__time" id="sbTime">9:30 AM</span>
-    <div class="statusbar__icons">
+    <div class="statusbar__icons" aria-hidden="true">
       <svg viewBox="0 0 16 16"><rect x="1" y="10" width="2" height="5" rx=".5"/><rect x="4.5" y="7" width="2" height="8" rx=".5"/><rect x="8" y="4" width="2" height="11" rx=".5"/><rect x="11.5" y="1" width="2" height="14" rx=".5"/></svg>
-      <svg viewBox="0 0 16 16"><path d="M8 10.5a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/><path d="M5.2 8.3A4.1 4.1 0 0 1 8 7.2c1.1 0 2.1.4 2.8 1.1" stroke-width="1.3" stroke-linecap="round" stroke="currentColor" fill="none"/><path d="M2.5 5.7A7.6 7.6 0 0 1 8 3.8c2.1 0 4 .8 5.5 2" stroke-width="1.3" stroke-linecap="round" stroke="currentColor" fill="none"/></svg>
-      <svg viewBox="0 0 20 12"><rect x="0" y="1" width="17" height="10" rx="2" stroke="currentColor" stroke-width="1.3" fill="none"/><rect x="1.5" y="2.5" width="11" height="7" rx="1" fill="currentColor"/><path d="M18 4v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <svg viewBox="0 0 16 16"><path d="M8 10.5a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/><path d="M5.2 8.3A4.1 4.1 0 0 1 8 7.2c1.1 0 2.1.4 2.8 1.1" stroke-width="1.3" stroke-linecap="round" stroke="#13233C" fill="none"/><path d="M2.5 5.7A7.6 7.6 0 0 1 8 3.8c2.1 0 4 .8 5.5 2" stroke-width="1.3" stroke-linecap="round" stroke="#13233C" fill="none"/></svg>
+      <svg viewBox="0 0 20 12"><rect x="0" y="1" width="17" height="10" rx="2" stroke="#13233C" stroke-width="1.3" fill="none"/><rect x="1.5" y="2.5" width="11" height="7" rx="1" fill="#13233C"/><path d="M18 4v4" stroke="#13233C" stroke-width="1.5" stroke-linecap="round"/></svg>
     </div>
   </div>
 
@@ -781,282 +263,256 @@
       <span class="nav__wordmark">Ovify</span>
     </div>
     <div class="nav__right">
-      <div class="nav__bell">
+      <button class="icon-btn" aria-label="Notifications" onclick="toast('No new notifications')">
         <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        <span class="nav__bell-dot"></span>
-      </div>
-      <div class="nav__avatar">S</div>
+        <span class="nav__dot"></span>
+      </button>
+      <button class="nav__avatar" aria-label="Your profile, Sarah" onclick="toast('Profile — coming soon')">S</button>
     </div>
   </nav>
 
-  <!-- SCROLL AREA -->
+  <!-- SCROLL -->
   <div class="scroll">
 
     <!-- HERO -->
-    <div class="hero">
+    <section class="hero" aria-label="Cycle overview">
       <div class="hero__top">
         <div>
           <div class="hero__greeting" id="heroGreeting">Good morning</div>
           <div class="hero__name">Sarah</div>
         </div>
-        <div class="hero__phase-pill">
-          <span class="hero__phase-dot"></span>
-          Stimulation Phase
-        </div>
+        <span class="hero__phase"><span class="hero__phase-dot"></span>Stimulation</span>
       </div>
-      <div class="hero__progress-row">
+      <div class="hero__row">
         <div class="hero__arc">
-          <svg class="hero__arc-svg" viewBox="0 0 96 96">
+          <svg class="hero__arc-svg" viewBox="0 0 96 96" aria-hidden="true">
             <circle class="arc-track" cx="48" cy="48" r="40"/>
             <circle class="arc-fill" id="arcFill" cx="48" cy="48" r="40"/>
           </svg>
-          <div class="hero__arc-label">
-            <span class="hero__arc-day">Day 5</span>
-            <span class="hero__arc-sub">OF 12</span>
-          </div>
+          <div class="hero__arc-lbl"><span class="hero__arc-day">Day 5</span><span class="hero__arc-sub">OF 12</span></div>
         </div>
         <div class="hero__stats">
-          <div class="hero__stat">
-            <span class="hero__stat-label">Next Scan</span>
-            <span class="hero__stat-val">Wed, 5 Jul</span>
+          <div>
+            <div class="hero__stat-label">Next scan</div>
+            <div class="hero__stat-val">Wed, 5 Jul · 9:00 AM</div>
           </div>
-          <div class="hero__stat">
-            <span class="hero__stat-label">Injections Today</span>
-            <span class="hero__stat-val hero__stat-val--accent">2 pending</span>
+          <div>
+            <div class="hero__stat-label">Injections today</div>
+            <div class="hero__stat-val hero__stat-val--accent" id="heroPending">2 pending</div>
           </div>
-
         </div>
       </div>
       <div class="hero__bar-row">
-        <div class="hero__bar-label">
-          <span>Treatment progress</span>
-          <strong>42%</strong>
-        </div>
-        <div class="hero__bar-track">
-          <div class="hero__bar-fill" id="heroBar"></div>
-        </div>
+        <div class="hero__bar-top"><span>Treatment progress</span><strong>42%</strong></div>
+        <div class="hero__bar-track"><div class="hero__bar-fill" id="heroBar"></div></div>
       </div>
-    </div>
+    </section>
 
     <!-- MEDICATIONS -->
-    <div class="section-head">
-      <span class="section-head__title">Today's Medications</span>
-      <span class="section-head__link">View all</span>
+    <div class="sec">
+      <span class="sec__title">Today's medications</span>
+      <button class="sec__link" onclick="toast('Full schedule — coming soon')">View all</button>
     </div>
     <div class="med-stack">
 
       <!-- Med 1 -->
-      <div class="med">
+      <article class="med" id="med1">
         <div class="med__row">
-          <div class="med__icon med__icon--lav" style="background:transparent;padding:0;overflow:hidden;">
-            <img src="/static/gonal_f.jpg" alt="Gonal-F" style="width:46px;height:46px;object-fit:cover;border-radius:15px;">
-          </div>
+          <span class="med__icon" aria-hidden="true" style="background:transparent;padding:0;overflow:hidden;border-radius:14px;">
+            <img src="/static/gonal_f.jpg" alt="Gonal-F" style="width:46px;height:46px;object-fit:cover;border-radius:14px;display:block;">
+          </span>
           <div class="med__info">
-            <div class="med__name">Gonal-F 150 IU</div>
-            <div class="med__time">Tonight at 8:00 PM</div>
+            <h3 class="med__name">Gonal-F 150 IU</h3>
+            <p class="med__meta">Tonight · 8:00 PM · Subcutaneous</p>
           </div>
-          <div class="med__status med__status--on">
-            <span class="med__status-dot"></span>On track
-          </div>
+          <span class="med__status med__status--due" id="med1Status"><span class="med__status-dot"></span>Due</span>
         </div>
-
-      </div>
+      </article>
 
       <!-- Med 2 -->
-      <div class="med">
+      <article class="med" id="med2">
         <div class="med__row">
-          <div class="med__icon med__icon--blush" style="background:transparent;padding:0;overflow:hidden;">
-            <img src="/static/menopur.jpg" alt="Menopur" style="width:46px;height:46px;object-fit:cover;border-radius:15px;">
-          </div>
+          <span class="med__icon" aria-hidden="true" style="background:transparent;padding:0;overflow:hidden;border-radius:14px;">
+            <img src="/static/menopur.jpg" alt="Menopur" style="width:46px;height:46px;object-fit:cover;border-radius:14px;display:block;">
+          </span>
           <div class="med__info">
-            <div class="med__name">Menopur 75 IU</div>
-            <div class="med__time">Tonight at 8:00 PM</div>
+            <h3 class="med__name">Menopur 75 IU</h3>
+            <p class="med__meta">Tonight · 8:00 PM · Subcutaneous</p>
           </div>
-          <div class="med__status med__status--on">
-            <span class="med__status-dot"></span>On track
-          </div>
+          <span class="med__status med__status--due" id="med2Status"><span class="med__status-dot"></span>Due</span>
         </div>
-
-      </div>
+      </article>
     </div>
 
     <!-- QUICK ACTIONS -->
-    <div class="section-head">
-      <span class="section-head__title">Quick Actions</span>
-    </div>
+    <div class="sec"><span class="sec__title">Quick actions</span></div>
     <div class="qa-grid">
-      <div class="qa" onclick="toast('Ovify AI — coming soon')">
-        <div class="qa__icon qa__icon--lav">
-          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-        </div>
-        <div>
-          <div class="qa__label">Ask a Question</div>
-          <div class="qa__sub">Powered by Ovify AI</div>
-        </div>
-      </div>
-      <div class="qa" onclick="toast('Learn More — coming soon')">
-        <div class="qa__icon qa__icon--blush">
-          <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
-        </div>
-        <div>
-          <div class="qa__label">Learn More</div>
-          <div class="qa__sub">About your protocol</div>
-        </div>
-      </div>
+      <button class="qa" onclick="toast('Ovify AI — coming soon')">
+        <span class="qa__icon qa__icon--lav" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </span>
+        <span>
+          <span class="qa__label">Ask a question</span>
+          <span class="qa__sub">Powered by Ovify AI</span>
+        </span>
+      </button>
+      <button class="qa" onclick="toast('Injection guides — coming soon')">
+        <span class="qa__icon qa__icon--blush" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        </span>
+        <span>
+          <span class="qa__label">Injection guides</span>
+          <span class="qa__sub">Step-by-step help</span>
+        </span>
+      </button>
     </div>
-
-
 
     <!-- CALMSEED -->
-    <div class="section-head">
-      <span class="section-head__title">How are you feeling?</span>
-    </div>
-    <div class="calmseed" id="calmseed" onclick="toggleCalm()">
-      <div class="calmseed__row">
-        <div class="calmseed__orb">
-          <svg viewBox="0 0 48 48" fill="none">
-            <ellipse cx="24" cy="9"  rx="5" ry="8" fill="#9E8CEF" opacity=".45" transform="rotate(0 24 24)"/>
-            <ellipse cx="24" cy="9"  rx="5" ry="8" fill="#9E8CEF" opacity=".35" transform="rotate(45 24 24)"/>
-            <ellipse cx="24" cy="9"  rx="5" ry="8" fill="#9E8CEF" opacity=".35" transform="rotate(90 24 24)"/>
-            <ellipse cx="24" cy="9"  rx="5" ry="8" fill="#9E8CEF" opacity=".35" transform="rotate(135 24 24)"/>
-            <ellipse cx="24" cy="9"  rx="5" ry="8" fill="#9E8CEF" opacity=".45" transform="rotate(180 24 24)"/>
-            <ellipse cx="24" cy="9"  rx="5" ry="8" fill="#9E8CEF" opacity=".35" transform="rotate(225 24 24)"/>
-            <ellipse cx="24" cy="9"  rx="5" ry="8" fill="#9E8CEF" opacity=".35" transform="rotate(270 24 24)"/>
-            <ellipse cx="24" cy="9"  rx="5" ry="8" fill="#9E8CEF" opacity=".35" transform="rotate(315 24 24)"/>
-            <circle cx="24" cy="24" r="7" fill="#9E8CEF"/>
-          </svg>
+    <div class="sec"><span class="sec__title">How are you feeling?</span></div>
+    <div class="calm" id="calm">
+      <button class="calm__head" aria-expanded="false" aria-controls="calmPanel" onclick="toggleCalm()">
+        <span class="calm__row">
+          <span class="calm__orb" aria-hidden="true">
+            <svg viewBox="0 0 48 48" fill="none">
+              <ellipse cx="24" cy="9" rx="5" ry="8" fill="#9E8CEF" opacity=".45"/>
+              <ellipse cx="24" cy="9" rx="5" ry="8" fill="#9E8CEF" opacity=".35" transform="rotate(45 24 24)"/>
+              <ellipse cx="24" cy="9" rx="5" ry="8" fill="#9E8CEF" opacity=".35" transform="rotate(90 24 24)"/>
+              <ellipse cx="24" cy="9" rx="5" ry="8" fill="#9E8CEF" opacity=".35" transform="rotate(135 24 24)"/>
+              <ellipse cx="24" cy="9" rx="5" ry="8" fill="#9E8CEF" opacity=".45" transform="rotate(180 24 24)"/>
+              <ellipse cx="24" cy="9" rx="5" ry="8" fill="#9E8CEF" opacity=".35" transform="rotate(225 24 24)"/>
+              <ellipse cx="24" cy="9" rx="5" ry="8" fill="#9E8CEF" opacity=".35" transform="rotate(270 24 24)"/>
+              <ellipse cx="24" cy="9" rx="5" ry="8" fill="#9E8CEF" opacity=".35" transform="rotate(315 24 24)"/>
+              <circle cx="24" cy="24" r="7" fill="#9E8CEF"/>
+            </svg>
+          </span>
+          <span class="calm__txt">
+            <span class="calm__title">Emotional check-in</span>
+            <span class="calm__sub">Optional · takes 5 seconds · private</span>
+          </span>
+          <span class="calm__chev" aria-hidden="true"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </span>
+      </button>
+      <div class="calm__panel" id="calmPanel">
+        <div class="calm__moods">
+          <button class="calm__mood" onclick="selectMood(this,'Difficult')">Difficult</button>
+          <button class="calm__mood" onclick="selectMood(this,'Low')">Low</button>
+          <button class="calm__mood" onclick="selectMood(this,'Okay')">Okay</button>
+          <button class="calm__mood" onclick="selectMood(this,'Good')">Good</button>
+          <button class="calm__mood" onclick="selectMood(this,'Great')">Great</button>
         </div>
-        <div class="calmseed__text">
-          <div class="calmseed__title">Emotional check-in</div>
-          <div class="calmseed__sub">Tap to log — optional, takes 5 seconds</div>
-        </div>
-        <div class="calmseed__chevron">
-          <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
-      </div>
-      <div class="calmseed__panel" id="calmPanel" onclick="event.stopPropagation()">
-        <div class="calmseed__mood-row">
-          <button class="calmseed__mood-btn" onclick="selectMood(this,'Difficult')">Difficult</button>
-          <button class="calmseed__mood-btn" onclick="selectMood(this,'Low')">Low</button>
-          <button class="calmseed__mood-btn" onclick="selectMood(this,'Okay')">Okay</button>
-          <button class="calmseed__mood-btn" onclick="selectMood(this,'Good')">Good</button>
-          <button class="calmseed__mood-btn" onclick="selectMood(this,'Great')">Great</button>
-        </div>
-        <div class="calmseed__response" id="calmResp"></div>
+        <div class="calm__resp" id="calmResp"></div>
       </div>
     </div>
 
-    <div class="spacer"></div>
   </div><!-- /scroll -->
 
   <!-- BOTTOM NAV -->
-  <div class="nav-bar">
-    <div class="nav-bar__tab active">
-      <svg viewBox="0 0 24 24"><path class="icon-home" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-      <span>Home</span>
-    </div>
-    <div class="nav-bar__tab" onclick="switchTab(this)">
-      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      <span>Calendar</span>
-    </div>
-    <div class="nav-bar__tab" onclick="switchTab(this)">
-      <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-      <span>Medications</span>
-    </div>
-    <div class="nav-bar__tab" onclick="switchTab(this)">
-      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-      <span>Support</span>
-    </div>
-    <div class="nav-bar__tab" onclick="switchTab(this)">
-      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      <span>Profile</span>
-    </div>
-  </div>
+  <nav class="tabbar" aria-label="Primary">
+    <button class="tab active" aria-current="page" aria-label="Home">
+      <svg viewBox="0 0 24 24"><path class="icon-home" d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Home</span>
+    </button>
+    <button class="tab" aria-label="Calendar" onclick="switchTab(this)">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Calendar</span>
+    </button>
+    <button class="tab" aria-label="Medications" onclick="switchTab(this)">
+      <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><span>Meds</span>
+    </button>
+    <button class="tab" aria-label="Support" onclick="switchTab(this)">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Support</span>
+    </button>
+    <button class="tab" aria-label="Profile" onclick="switchTab(this)">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profile</span>
+    </button>
+  </nav>
 
 </div><!-- /phone -->
 
-<div class="toast" id="toastEl"></div>
+<div class="toast" id="toastEl" role="status" aria-live="polite"></div>
 
 <script>
-  // ── STATUS TIME
-  (function tick(){
-    const n=new Date(),h=n.getHours(),m=n.getMinutes(),ap=h>=12?'PM':'AM';
-    document.getElementById('sbTime').textContent=`${h%12||12}:${String(m).padStart(2,'0')} ${ap}`;
-  })();
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // ── GREETING
+  // Live status-bar time
+  (function(){ var n=new Date(),h=n.getHours(),m=n.getMinutes(),ap=h>=12?'PM':'AM';
+    document.getElementById('sbTime').textContent = (h%12||12)+':'+String(m).padStart(2,'0')+' '+ap; })();
+
+  // Time-based greeting
+  (function(){ var h=new Date().getHours();
+    document.getElementById('heroGreeting').textContent = h<12?'Good morning':h<17?'Good afternoon':'Good evening'; })();
+
+  // Animate progress arc + bar (set final immediately for reduced motion)
   (function(){
-    const h=new Date().getHours();
-    const g=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
-    document.getElementById('heroGreeting').textContent=g;
+    var pct=0.42, circ=2*Math.PI*40, fill=document.getElementById('arcFill'), bar=document.getElementById('heroBar');
+    function set(){ fill.style.strokeDashoffset = circ*(1-pct); bar.style.width = (pct*100)+'%'; }
+    if (reduce) { set(); } else { window.addEventListener('load', function(){ setTimeout(set, 350); }); }
   })();
 
-  // ── ARC ANIMATE (42% of 251.2 = 145.7 offset from 251.2)
-  window.addEventListener('load',()=>{
-    setTimeout(()=>{
-      const pct=0.42;
-      const circ=2*Math.PI*40; // ~251.2
-      document.getElementById('arcFill').style.strokeDashoffset = circ*(1-pct);
-      document.getElementById('heroBar').style.width='42%';
-    },400);
-  });
-
-  // ── MARK DONE
-  function markDone(btn,remId){
-    if(btn.classList.contains('done')) return;
-    btn.textContent='Done';
-    btn.classList.add('done');
-    btn.disabled=true;
-    const rem=document.getElementById(remId);
-    rem.style.opacity='0.4';
-    rem.disabled=true;
-    toast('Logged — your clinic can see this');
+  // Dose confirmation — the primary daily action
+  var pending = 2;
+  function confirmDose(id, name){
+    var cta = document.getElementById(id+'Cta');
+    if (cta.classList.contains('is-done')) return;
+    var card = document.getElementById(id), status = document.getElementById(id+'Status');
+    card.classList.add('is-done');
+    status.className = 'med__status med__status--done';
+    status.innerHTML = '<span class="med__status-dot"></span>Taken';
+    cta.classList.add('is-done');
+    cta.innerHTML = '<svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 6 9 17 4 12"/></svg>Taken · logged';
+    cta.setAttribute('aria-disabled','true');
+    pending = Math.max(0, pending-1);
+    var hp = document.getElementById('heroPending');
+    if (pending === 0){ hp.textContent = 'All done ✓'; hp.style.color = '#9BE3C4'; }
+    else { hp.textContent = pending+' pending'; }
+    toastOk(name + ' logged — your clinic can see this');
   }
 
-  // ── REMINDER
-  function toggleReminder(btn,med){
-    btn.classList.toggle('set');
-    const isSet=btn.classList.contains('set');
-    btn.innerHTML=isSet
-      ?`<svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 6 9 17 4 12"/></svg>Reminder set`
-      :`<svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Set reminder`;
-    toast(isSet?`Reminder set for ${med}`:`Reminder removed for ${med}`);
+  // Reminder toggle
+  function toggleReminder(btn, name){
+    var on = btn.getAttribute('aria-pressed') === 'true';
+    btn.setAttribute('aria-pressed', on ? 'false' : 'true');
+    toast(on ? 'Reminder removed for '+name : 'Reminder set for '+name);
   }
 
-  // ── CALMSEED
-  const moodCopy={
-    'Difficult':'That is completely understandable. Stimulation days can feel heavy. You are doing something courageous — be gentle with yourself.',
-    'Low':'Low days happen and they are part of the process. Take it one hour at a time. You have already come so far.',
-    'Okay':'Okay is exactly right. Steady and consistent is where you want to be during stimulation. Focus on rest.',
-    'Good':'A good day is a real gift right now. Your body is responding well — hold on to that.',
-    'Great':'That is wonderful to hear. Your clinic team will be glad to know. Keep going.'
+  function openGuide(name){ toast('Opening injection guide for '+name); }
+
+  // Emotional check-in
+  var moodCopy = {
+    Difficult:'That is completely understandable. Stimulation days can feel heavy — you are doing something courageous. Be gentle with yourself today.',
+    Low:'Low days are part of this journey. Take it one hour at a time; you have already come so far.',
+    Okay:'Okay is exactly right. Steady and consistent is where you want to be during stimulation. Rest well.',
+    Good:'A good day is a real gift right now. Your body is responding — hold on to that.',
+    Great:'Wonderful to hear. Your clinic team will be glad to know. Keep going.'
   };
   function toggleCalm(){
-    document.getElementById('calmseed').classList.toggle('open');
+    var c = document.getElementById('calm');
+    var open = c.classList.toggle('open');
+    c.setAttribute('aria-expanded', open ? 'true' : 'false');
   }
-  function selectMood(btn,mood){
-    document.querySelectorAll('.calmseed__mood-btn').forEach(b=>b.classList.remove('active'));
+  function selectMood(btn, mood){
+    document.querySelectorAll('.calm__mood').forEach(function(b){ b.classList.remove('active'); });
     btn.classList.add('active');
-    const r=document.getElementById('calmResp');
-    r.textContent=moodCopy[mood];
+    var r = document.getElementById('calmResp');
+    r.textContent = moodCopy[mood];
     r.classList.add('show');
   }
 
-  // ── TAB SWITCH
+  // Bottom-nav tabs (demo)
   function switchTab(el){
-    document.querySelectorAll('.nav-bar__tab').forEach(t=>t.classList.remove('active'));
-    el.classList.add('active');
+    document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); t.removeAttribute('aria-current'); });
+    el.classList.add('active'); el.setAttribute('aria-current','page');
     toast('This screen is coming soon');
   }
 
-  // ── TOAST
-  function toast(msg){
-    const t=document.getElementById('toastEl');
-    t.textContent=msg;
+  // Toasts
+  function showToast(html){
+    var t = document.getElementById('toastEl');
+    t.innerHTML = html;
     t.classList.add('show');
     clearTimeout(t._tid);
-    t._tid=setTimeout(()=>t.classList.remove('show'),2600);
+    t._tid = setTimeout(function(){ t.classList.remove('show'); }, 2600);
   }
+  function toast(msg){ showToast(String(msg).replace(/</g,'&lt;')); }
+  function toastOk(msg){ showToast('<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'+String(msg).replace(/</g,'&lt;')); }
 </script>
 </body>
 </html>
