@@ -26,6 +26,7 @@ class SDLCState(TypedDict):
     status: str
     iteration: int
     max_iterations: int
+    ui_approved: bool
 
 # ==========================================
 # 2. PII Scrubber (DLP Guardrail)
@@ -140,6 +141,63 @@ class SecOpsEvaluation(BaseModel):
 # ==========================================
 # 6. Node Implementations
 # ==========================================
+
+def ui_designer_agent(state: SDLCState) -> Dict:
+    """Acts as a Senior UI/UX Designer to implement high-fidelity, accessible UI mockups based on spec.md"""
+    print("--- [UI/UX Designer Agent Node] Designing and writing user interfaces ---")
+    
+    spec_content = read_workspace_file.invoke({"path": ".spec-kit/spec.md"})
+    constitution = read_workspace_file.invoke({"path": ".spec-kit/constitution.md"})
+    
+    system_prompt = f"""You are the Senior UI/UX Designer for Ovify, with 20 years of experience designing premium, accessible Digital Health and IVF applications.
+Your job is to read the spec (spec.md) and system guidelines (constitution.md), and design/update the frontend interface (usually index.html).
+
+DESIGN RULES:
+1. Keep the interface extremely clean, warm, and professional (lavender #9E8CEF and blush #F4A0A0 accents on light ivory #F8F5F1 background).
+2. Prioritize accessibility (contrasting text colors, proper screen-reader aria labels, prefers-reduced-motion compatibility).
+3. Do not include cluttered medication confirmation/action buttons on the main screen unless requested in the spec.
+4. Output complete code with no placeholders.
+
+Constitution:
+{constitution}
+"""
+    
+    messages = [
+        SystemMessage(content=redact_pii(system_prompt)),
+        HumanMessage(content=f"Review the specification and update index.html to reflect the requested UI/UX features:\n{spec_content}")
+    ]
+    
+    # Use tools to implement the UI design
+    model_with_tools = flash_model.bind_tools([read_workspace_file, write_workspace_file, list_workspace_dir])
+    
+    for i in range(10):
+        response = model_with_tools.invoke(messages)
+        messages.append(response)
+        
+        if not response.tool_calls:
+            break
+            
+        for tool_call in response.tool_calls:
+            tool_name = tool_call["name"]
+            tool_args = tool_call["args"]
+            tool_id = tool_call["id"]
+            
+            if tool_name == "read_workspace_file":
+                output = read_workspace_file.invoke(tool_args)
+            elif tool_name == "write_workspace_file":
+                output = write_workspace_file.invoke(tool_args)
+            elif tool_name == "list_workspace_dir":
+                output = list_workspace_dir.invoke(tool_args)
+            else:
+                output = f"Error: Tool {tool_name} not found."
+                
+            messages.append(ToolMessage(content=output, tool_call_id=tool_id))
+            
+    print("--- [UI/UX Designer Agent Node] UI implementation finished. Pending user approval. ---")
+    return {
+        "ui_approved": False,
+        "status": "pending_ui_approval"
+    }
 
 def architecture_agent(state: SDLCState) -> Dict:
     """Reads spec.md and generates plan.md and tasks.md"""
@@ -308,6 +366,14 @@ If no critical vulnerabilities are found, set passed=True. Otherwise set passed=
 # 7. Conditional Edge Logic
 # ==========================================
 
+def route_start(state: SDLCState) -> str:
+    """If UI design is approved, proceed to architect. Otherwise start with UI designer."""
+    if state.get("ui_approved"):
+        print("--- [Routing] UI Approved! Proceeding to Architecture Agent ---")
+        return "architect"
+    print("--- [Routing] Starting with UI/UX Designer Agent ---")
+    return "ui_designer"
+
 def should_retry(state: SDLCState) -> str:
     """Decides whether to retry coding or halt (success or failure)"""
     if state["test_results"].get("passed"):
@@ -328,15 +394,23 @@ def should_retry(state: SDLCState) -> str:
 workflow = StateGraph(SDLCState)
 
 # Add node definitions
+workflow.add_node("ui_designer", ui_designer_agent)
 workflow.add_node("architect", architecture_agent)
 workflow.add_node("developer", developer_agent)
 workflow.add_node("qa_critic", qa_agent)
 workflow.add_node("secops", secops_agent)
 
-# Set entrypoint
-workflow.set_entry_point("architect")
+# Set conditional entry point
+workflow.set_conditional_entry_point(
+    route_start,
+    {
+        "ui_designer": "ui_designer",
+        "architect": "architect"
+    }
+)
 
 # Static transitions
+workflow.add_edge("ui_designer", END)
 workflow.add_edge("architect", "developer")
 workflow.add_edge("developer", "qa_critic")
 
@@ -380,7 +454,8 @@ if __name__ == "__main__":
         "critic_feedback": [],
         "status": "init",
         "iteration": 0,
-        "max_iterations": 3
+        "max_iterations": 3,
+        "ui_approved": False
     }
     
     if os.path.exists(state_file):
