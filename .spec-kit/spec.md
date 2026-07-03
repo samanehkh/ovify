@@ -90,6 +90,30 @@ Then the system automatically logs a "Missed" dose record in the database for th
 And updates the patient's active status to alert the clinic coordinators
 ```
 
+#### Scenario 6: Step-by-step injection assistance
+```gherkin
+Given a patient is ready to administer their scheduled Gonal-F dose
+When they select the Gonal-F card to open the injection guide
+Then the page displays the following details:
+  | Component          | Detail                                                         |
+  | Medication Photo  | High-resolution visual of the Gonal-F pen                     |
+  | Drug Details       | Name: Gonal-F, Dosage: 150 IU                                  |
+  | Video Guide        | Inline tutorial ready to play without leaving the screen       |
+  | Prep Checklist     | 1. Wash hands, 2. Clean injection site, 3. Store pen in fridge |
+  | Log Action Button  | A highly visible "Injection Completed" button                   |
+When the patient checks all items and clicks "Injection Completed"
+Then the system records the logged dose in the database
+And the medication status on the homepage updates to "Taken" (with the "On track" indicator updated to verify completion)
+```
+
+#### Scenario 7: Partner notification hook for late or missed doses
+```gherkin
+Given a Gonal-F injection scheduled for 8:00 PM (20:00)
+When the clock reaches 9:00 PM (60 minutes overdue) and the dose remains unlogged
+Then the system triggers a background webhook/message event for the partner application
+And logs the payload: "Sarah has not confirmed her 8:00 PM Gonal-F injection yet."
+```
+
 ### 2.2 Database Schema
 To support Journey 3 adherence logging, we define three relational tables. The schemas must work with SQLite (local development) and Azure Database for PostgreSQL (production).
 
