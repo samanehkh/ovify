@@ -206,7 +206,7 @@ def architecture_agent(state: SDLCState) -> Dict:
     spec_content = read_workspace_file.invoke({"path": ".spec-kit/spec.md"})
     constitution = read_workspace_file.invoke({"path": ".spec-kit/constitution.md"})
     
-    system_prompt = f"""You are the Senior Digital Health & IVF Systems Architect for Ovify.
+    system_prompt = f"""You are the Lead Solution Architect for Ovify, with 20 years of experience in cloud architecture, AI architecture, Azure architecture, application designing, API integrations, and legacy modernization, specialized in digital health architecting.
 Your job is to read the user feature specification (spec.md) and the system constitution (constitution.md), and design a high-fidelity technical implementation plan and a list of developer tasks.
 
 Constitution:
