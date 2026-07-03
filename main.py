@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from api import cycles, symptoms, users
 from db.session import Base, engine
 
@@ -7,6 +8,7 @@ from db.session import Base, engine
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/", response_class=HTMLResponse)
 def read_root():
