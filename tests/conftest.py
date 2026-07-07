@@ -18,10 +18,13 @@ def patched_request(self, method, url, *args, **kwargs):
         headers = dict(headers)
 
     # Auto-inject a real clinician Bearer token for clinician routes
-    # (except /login, which is the public token-issuing endpoint)
-    if "/api/clinician" in url and "/api/clinician/login" not in url:
+    # (except /login, which is the public token-issuing endpoint).
+    # The manual sweep triggers are also clinician-gated.
+    is_clinician_route = ("/api/clinician" in url and "/api/clinician/login" not in url) \
+        or "check-overdue" in url or "process-missed" in url
+    if is_clinician_route:
         if "Authorization" not in headers:
-            headers["Authorization"] = f"Bearer {generate_token(0, 'clinician')}"
+            headers["Authorization"] = f"Bearer {generate_token(0, 'clinician', name='Test Nurse')}"
 
     # Auto-inject patient Bearer token for patient routes
     elif "/users/" in url or "/api/medications" in url or "/symptoms/" in url or "/cycles/" in url:

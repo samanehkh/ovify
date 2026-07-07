@@ -4,6 +4,7 @@ from db.session import get_db
 from db import models
 from schemas.user import UserCreate, UserResponse, UserOnboardUpdate, OTPRequest, OTPVerify, PartnerConsentUpdate, UserAuthResponse
 from services.auth import verify_patient_token, generate_token
+from core.phone import normalize_phone
 
 router = APIRouter()
 
@@ -29,7 +30,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 @router.post("/request-otp")
 def request_otp(otp_req: OTPRequest, db: Session = Depends(get_db)):
     # Normalize input phone number
-    normalized_phone = "".join(c for c in otp_req.phone if c.isdigit() or c == "+")
+    normalized_phone = normalize_phone(otp_req.phone)
     user = db.query(models.User).filter(models.User.phone == normalized_phone).first()
     if not user:
         raise HTTPException(status_code=404, detail=f"Phone number '{otp_req.phone}' not registered with any patient chart.")
@@ -38,7 +39,7 @@ def request_otp(otp_req: OTPRequest, db: Session = Depends(get_db)):
 @router.post("/verify-otp", response_model=UserAuthResponse)
 def verify_otp(otp_ver: OTPVerify, db: Session = Depends(get_db)):
     # Normalize input phone number
-    normalized_phone = "".join(c for c in otp_ver.phone if c.isdigit() or c == "+")
+    normalized_phone = normalize_phone(otp_ver.phone)
     user = db.query(models.User).filter(models.User.phone == normalized_phone).first()
     if not user:
         raise HTTPException(status_code=404, detail="Phone number not registered.")
@@ -119,9 +120,45 @@ def update_partner_consent(
         raise HTTPException(status_code=403, detail="Forbidden: You cannot access another patient's data")
     
     # Normalize partner phone number
-    normalized_partner = "".join(c for c in req.partner_phone if c.isdigit() or c == "+")
+    normalized_partner = normalize_phone(req.partner_phone)
     user.partner_phone = normalized_partner
     user.partner_consent = req.partner_consent
     db.commit()
     db.refresh(user)
     return user
+
+@router.post("/{user_id}/callback-request")
+def request_nurse_callback(
+    user_id: int,
+    token_payload: dict = Depends(verify_patient_token),
+    db: Session = Depends(get_db)
+):
+    """
+    Persists a patient's nurse-callback request (Recovery Mode). Idempotent:
+    an existing Pending request is returned rather than duplicated. Surfaced
+    in the clinician triage console until a nurse completes it.
+    """
+    if user_id != token_payload.get("user_id"):
+        raise HTTPException(status_code=403, detail="Forbidden: You cannot access another patient's data")
+
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    existing = db.query(models.CallbackRequest).filter(
+        models.CallbackRequest.user_id == user_id,
+        models.CallbackRequest.status == "Pending"
+    ).first()
+    if existing:
+        return {"message": "A callback request is already pending. Your clinic will call you back.",
+                "callback_id": existing.id, "status": existing.status}
+
+    callback = models.CallbackRequest(user_id=user_id, status="Pending")
+    db.add(callback)
+    db.add(models.AuditLog(actor=f"patient:{user_id}", role="patient",
+                           action="request_callback", target_user_id=user_id,
+                           detail=f"{user.name} requested a nurse callback."))
+    db.commit()
+    db.refresh(callback)
+    return {"message": "Callback requested. A clinic coordinator will call you within 24 hours.",
+            "callback_id": callback.id, "status": callback.status}

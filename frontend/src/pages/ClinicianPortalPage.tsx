@@ -33,6 +33,7 @@ export const ClinicianPortalPage: React.FC = () => {
   // Clinician session state — token lives in localStorage, key is never stored
   const [clinicianToken, setClinicianToken] = useState<string | null>(() => localStorage.getItem('clinician_token'));
   const [accessKey, setAccessKey] = useState('');
+  const [nurseName, setNurseName] = useState(() => localStorage.getItem('clinician_name') || '');
   const [loginError, setLoginError] = useState<string | null>(null);
   const [loggingIn, setLoggingIn] = useState(false);
 
@@ -41,8 +42,9 @@ export const ClinicianPortalPage: React.FC = () => {
     setLoggingIn(true);
     setLoginError(null);
     try {
-      const data = await loginClinician(accessKey);
+      const data = await loginClinician(accessKey, nurseName.trim());
       localStorage.setItem('clinician_token', data.token);
+      localStorage.setItem('clinician_name', data.clinician_name);
       setClinicianToken(data.token);
       setAccessKey('');
     } catch (err: any) {
@@ -129,7 +131,7 @@ export const ClinicianPortalPage: React.FC = () => {
     try {
       const data = await parseProtocolText(protocolText);
       // Map to local parsed state with expected keys
-      const mapped = data.prescriptions.map(p => ({
+      const mapped = data.parsed_medications.map(p => ({
         name: p.name,
         dosage: p.dosage,
         route: p.route,
@@ -139,7 +141,7 @@ export const ClinicianPortalPage: React.FC = () => {
         flagged: p.flagged
       }));
       setParsedMeds(mapped);
-      setUnrecognizedMeds(data.unrecognized_meds);
+      setUnrecognizedMeds(data.unrecognized_medications);
     } catch (err: any) {
       setErrorMessage(err.message || 'Failed to parse protocol text');
     } finally {
@@ -192,6 +194,24 @@ export const ClinicianPortalPage: React.FC = () => {
           )}
 
           <form onSubmit={handleClinicianLogin} className="space-y-5">
+            <div>
+              <label htmlFor="nurseName" className="block font-heading text-[10px] font-bold text-navy-55 uppercase tracking-wider mb-1.5">
+                Your Name
+              </label>
+              <input
+                id="nurseName"
+                type="text"
+                autoComplete="name"
+                value={nurseName}
+                onChange={(e) => setNurseName(e.target.value)}
+                placeholder="e.g. Nurse Amina"
+                required
+                className="w-full px-4 py-3 border border-navy-10 rounded-xl text-sm text-navy bg-white font-data focus:outline-none focus:ring-2 focus:ring-lavender/10 focus:border-lavender transition-all"
+              />
+              <p className="mt-2 text-[11px] font-body text-navy-55 leading-relaxed">
+                Recorded on the clinical audit trail for every action you take.
+              </p>
+            </div>
             <div>
               <label htmlFor="clinicAccessKey" className="block font-heading text-[10px] font-bold text-navy-55 uppercase tracking-wider mb-1.5">
                 Clinic Access Key

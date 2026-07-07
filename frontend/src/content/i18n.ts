@@ -6,6 +6,17 @@ export interface LanguageContent {
   recoveryText: string;
   recoveryGuidelineHeader: string;
   recoverySteps: string[];
+  recoveryGreeting: string;
+  recoveryPauseNote: string;
+  callbackHeader: string;
+  callbackText: string;
+  callbackBtnLabel: string;
+  callbackRequestedLabel: string;
+  callbackSubmittingLabel: string;
+  callbackErrorFallback: string;
+  guideQuickHeader: string;
+  guideShowFullLabel: string;
+  guideHideFullLabel: string;
   settingsTitle: string;
   settingsSubtitle: string;
   settingsOnboardingPrefs: string;
@@ -41,6 +52,17 @@ export const i18nContent: Record<'en' | 'ar', LanguageContent> = {
       "Schedule follow-up review with your coordinator.",
       "Allow yourself space to feel and process emotions."
     ],
+    recoveryGreeting: "Thinking of you",
+    recoveryPauseNote: "All injection alarms and daily schedules have been automatically paused. No protocol actions are required of you today.",
+    callbackHeader: "Speak with a Clinic Nurse",
+    callbackText: "If you need supportive advice or want to coordinate cycle logs, click below. A clinic coordinator will call you back.",
+    callbackBtnLabel: "Request Nurse Callback",
+    callbackRequestedLabel: "✓ Callback Requested (Within 24 Hours)",
+    callbackSubmittingLabel: "Contacting your clinic…",
+    callbackErrorFallback: "Could not reach the clinic. Please try again or call directly.",
+    guideQuickHeader: "Quick Confirm",
+    guideShowFullLabel: "Show full step-by-step guide",
+    guideHideFullLabel: "Hide full guide",
     settingsTitle: "Settings Console",
     settingsSubtitle: "Configure Companion",
     settingsOnboardingPrefs: "Onboarding Preferences",
@@ -74,6 +96,17 @@ export const i18nContent: Record<'en' | 'ar', LanguageContent> = {
       "جدولة موعد مراجعة للمتابعة مع منسق الحالة الخاص بك.",
       "امنحي نفسك المساحة الكافية للشعور بالمشاعر ومعالجتها."
     ],
+    recoveryGreeting: "نفكر فيكِ",
+    recoveryPauseNote: "تم إيقاف جميع تنبيهات الحقن والجداول اليومية تلقائياً. لا يُطلب منكِ أي إجراءات علاجية اليوم.",
+    callbackHeader: "التحدث مع ممرضة العيادة",
+    callbackText: "إذا كنتِ بحاجة إلى نصيحة داعمة أو تنسيق سجلات الدورة، اضغطي أدناه. سيتصل بكِ منسق العيادة.",
+    callbackBtnLabel: "طلب اتصال من الممرضة",
+    callbackRequestedLabel: "✓ تم طلب الاتصال (خلال ٢٤ ساعة)",
+    callbackSubmittingLabel: "جارٍ التواصل مع عيادتك…",
+    callbackErrorFallback: "تعذر الوصول إلى العيادة. يرجى المحاولة مرة أخرى أو الاتصال مباشرة.",
+    guideQuickHeader: "تأكيد سريع",
+    guideShowFullLabel: "عرض الدليل الكامل خطوة بخطوة",
+    guideHideFullLabel: "إخفاء الدليل الكامل",
     settingsTitle: "لوحة التحكم بالإعدادات",
     settingsSubtitle: "تهيئة رفيق الدعم",
     settingsOnboardingPrefs: "تفضيلات التهيئة الأولى",

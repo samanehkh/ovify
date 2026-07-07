@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from db import models
 from db.session import get_db
 from services.auth import generate_token, verify_token
+from core.phone import normalize_phone
 from core.time import UAE_TZ
 
 router = APIRouter()
@@ -18,7 +19,7 @@ class PartnerLoginRequest(BaseModel):
 
 @router.post("/login")
 def partner_login(req: PartnerLoginRequest, db: Session = Depends(get_db)):
-    normalized_phone = "".join(c for c in req.phone if c.isdigit() or c == "+")
+    normalized_phone = normalize_phone(req.phone)
     
     # Check if there is any patient user linked to this partner phone
     patient = db.query(models.User).filter(models.User.partner_phone == normalized_phone).first()

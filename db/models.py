@@ -8,6 +8,7 @@ class User(Base):
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     phone = Column(String, unique=True, nullable=True)
+    dob = Column(Date, nullable=True)  # captured at clinic registration (J1)
     sleep_time = Column(String, nullable=True)
     injection_comfort = Column(String, nullable=True)
     onboarded = Column(Boolean, default=False, nullable=False)
@@ -17,13 +18,6 @@ class User(Base):
     partner_phone = Column(String, nullable=True)
     partner_consent = Column(Boolean, default=False, nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
-
-class Cycle(Base):
-    __tablename__ = "cycles"
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    start_date = Column(Date, nullable=False)
-    end_date = Column(Date, nullable=True)
 
 class SymptomLog(Base):
     __tablename__ = "symptom_logs"
@@ -53,6 +47,12 @@ class DoseLog(Base):
     scheduled_date = Column(Date, nullable=False)  # The date this dose was scheduled for
     status = Column(String, nullable=False)  # "On Time", "Late", or "Missed"
     self_reported = Column(Boolean, default=False, nullable=False)
+    # Nurse resolution NEVER rewrites status — the adherence history stays
+    # truthful. A resolved Missed/Late is excluded from active triage alerts
+    # but remains auditable as what actually happened.
+    resolved = Column(Boolean, default=False, nullable=False)
+    resolved_by = Column(String, nullable=True)   # nurse name from the clinician token
+    resolved_at = Column(TIMESTAMP(timezone=True), nullable=True)
 
     __table_args__ = (
         UniqueConstraint('prescription_id', 'scheduled_date', name='uq_prescription_scheduled_date'),
@@ -62,3 +62,26 @@ class ProcessedDate(Base):
     __tablename__ = "processed_dates"
     run_date = Column(Date, primary_key=True, index=True)
     processed_at = Column(TIMESTAMP(timezone=True), nullable=False)
+
+class CallbackRequest(Base):
+    """A patient's request for a nurse callback (Journey 12 Recovery Mode).
+    Persisted so the clinic actually sees and actions it — never a UI-only toggle."""
+    __tablename__ = "callback_requests"
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    requested_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
+    status = Column(String, default="Pending", nullable=False)  # "Pending" or "Completed"
+    completed_by = Column(String, nullable=True)  # nurse name
+    completed_at = Column(TIMESTAMP(timezone=True), nullable=True)
+
+class AuditLog(Base):
+    """Attribution trail for clinically significant actions (UAE Health Data Law).
+    Records WHO (actor from token) did WHAT to WHOSE record."""
+    __tablename__ = "audit_log"
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    actor = Column(String, nullable=False)         # e.g. nurse name or "patient:{id}"
+    role = Column(String, nullable=False)          # "clinician" / "patient" / "system"
+    action = Column(String, nullable=False)        # e.g. "register_patient", "resolve_alert"
+    target_user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    detail = Column(String, nullable=True)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)

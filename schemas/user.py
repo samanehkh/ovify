@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from typing import Optional
 from pydantic import BaseModel, ConfigDict
 
@@ -23,6 +23,7 @@ class UserResponse(BaseModel):
     name: str
     email: str
     phone: Optional[str] = None
+    dob: Optional[date] = None
     sleep_time: Optional[str] = None
     injection_comfort: Optional[str] = None
     onboarded: bool

@@ -4,7 +4,7 @@ import { ProgressRing } from '../components/ProgressRing';
 import { MoodSelector } from '../components/MoodSelector';
 import { MedicationCard } from '../components/MedicationCard';
 import { Sparkles, AlertTriangle, Info, Phone } from 'lucide-react';
-import { updatePartnerConsent } from '../services/api';
+import { updatePartnerConsent, requestNurseCallback } from '../services/api';
 import { i18nContent } from '../content/i18n';
 
 export const DashboardPage: React.FC = () => {
@@ -83,6 +83,24 @@ export const DashboardPage: React.FC = () => {
   const progress = getStimulationProgress();
 
   const [callbackRequested, setCallbackRequested] = React.useState(false);
+  const [callbackSubmitting, setCallbackSubmitting] = React.useState(false);
+  const [callbackError, setCallbackError] = React.useState<string | null>(null);
+
+  // Persist the callback request server-side — the clinic triage console must
+  // actually see it. Never show "requested" unless the server confirmed it.
+  const handleRequestCallback = async () => {
+    if (!user) return;
+    setCallbackSubmitting(true);
+    setCallbackError(null);
+    try {
+      await requestNurseCallback(user.id);
+      setCallbackRequested(true);
+    } catch (err: any) {
+      setCallbackError(err.message || t.callbackErrorFallback);
+    } finally {
+      setCallbackSubmitting(false);
+    }
+  };
 
   if (user && user.cycle_outcome === 'Failed') {
     return (
@@ -90,7 +108,7 @@ export const DashboardPage: React.FC = () => {
         {/* Header Greeting */}
         <div className="flex flex-col items-center text-center mt-2 mb-8">
           <span className="font-data text-[12px] font-bold text-navy-55 tracking-widest uppercase">
-            Thinking of you
+            {t.recoveryGreeting}
           </span>
           <h2 className="font-heading text-2xl font-bold text-navy mt-1">
             {user.name}
@@ -105,7 +123,7 @@ export const DashboardPage: React.FC = () => {
           </p>
           <div className="flex gap-2 items-start border-t border-navy-10/40 pt-3 font-body text-xs text-navy-55/80 leading-relaxed">
             <Info className="w-4 h-4 flex-none text-navy-55/70 mt-0.5" aria-hidden="true" />
-            <span>All injection alarms and daily schedules have been automatically paused. No protocol actions are required of you today.</span>
+            <span>{t.recoveryPauseNote}</span>
           </div>
         </div>
 
@@ -126,26 +144,34 @@ export const DashboardPage: React.FC = () => {
 
         {/* Nurse Callback Booking Button */}
         <div className="mb-6 bg-lavender/10 border border-lavender/25 rounded-3xl p-5 text-center">
-          <h4 className="font-heading text-xs font-bold text-lavender-dark uppercase tracking-wider mb-2">Speak with a Clinic Nurse</h4>
+          <h4 className="font-heading text-xs font-bold text-lavender-dark uppercase tracking-wider mb-2">{t.callbackHeader}</h4>
           <p className="font-body text-xs text-navy-55 leading-relaxed mb-4">
-            If you need supportive advice or want to coordinate cycle logs, click below. A clinic coordinator will call you back.
+            {t.callbackText}
           </p>
           
+          {callbackError && (
+            <div className="mb-3 p-3 rounded-xl bg-blush-10 border border-blush/25 text-due text-xs font-body font-semibold text-left" role="alert">
+              {callbackError}
+            </div>
+          )}
+
           <button
-            onClick={() => setCallbackRequested(true)}
-            disabled={callbackRequested}
+            onClick={handleRequestCallback}
+            disabled={callbackRequested || callbackSubmitting}
             className={`w-full py-3.5 rounded-xl font-heading text-xs font-bold shadow-md transition-all duration-300 flex items-center justify-center gap-2 ${
               callbackRequested
                 ? 'bg-sage text-white shadow-none cursor-default'
-                : 'bg-navy hover:bg-navy-80 text-white hover:shadow-lg cursor-pointer'
+                : 'bg-navy hover:bg-navy-80 text-white hover:shadow-lg cursor-pointer disabled:opacity-60'
             }`}
           >
             {callbackRequested ? (
-              <span>✓ Callback Requested (Within 24 Hours)</span>
+              <span>{t.callbackRequestedLabel}</span>
+            ) : callbackSubmitting ? (
+              <span>{t.callbackSubmittingLabel}</span>
             ) : (
               <>
                 <Phone className="w-4 h-4" aria-hidden="true" />
-                <span>Request Nurse Callback</span>
+                <span>{t.callbackBtnLabel}</span>
               </>
             )}
           </button>

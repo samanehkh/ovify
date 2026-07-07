@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
-from api import cycles, symptoms, users, medications, clinician, partner
+from api import symptoms, users, medications, clinician, partner
 from db.session import Base, engine
 from db import models  # Ensure all models are registered on Base metadata
 import os
@@ -41,19 +41,31 @@ async def adherence_background_daemon():
                 # Check dates from 14 days ago to yesterday
                 for offset in range(14, 0, -1):
                     target_date = today - timedelta(days=offset)
-                    
+
                     # Check if already processed
                     already_run = db.query(ProcessedDate).filter(ProcessedDate.run_date == target_date).first()
                     if not already_run:
                         print(f"[BACKGROUND DAEMON] Processing missed doses catch-up for date {target_date}...")
                         count = adherence.process_end_of_day_missed_doses(db, target_date)
-                        
+
                         # Save processed log
                         log_run = ProcessedDate(run_date=target_date, processed_at=uae_now)
                         db.add(log_run)
                         db.commit()
                         if count > 0:
                             print(f"[BACKGROUND DAEMON] Caught up: Logged {count} missed doses for date {target_date}.")
+
+                # 3. Same-day end-of-day sweep (BRD J4: the clinic Red Alert must
+                # land the same evening, not next morning). After 23:50 UAE we
+                # process TODAY's unlogged doses. Idempotent by design — the
+                # function only inserts where no log exists — and deliberately
+                # NOT recorded in the ledger, so a dose confirmed at 23:58 after
+                # an earlier sweep still reconciles via Missed→Late upgrade and
+                # tomorrow's ledger pass double-checks the date.
+                if uae_now.hour == 23 and uae_now.minute >= 50:
+                    count = adherence.process_end_of_day_missed_doses(db, today)
+                    if count > 0:
+                        print(f"[BACKGROUND DAEMON] Same-evening sweep: logged {count} missed doses for {today}.")
             finally:
                 db.close()
         except Exception as e:
@@ -87,7 +99,6 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 def read_root():
     return {"message": "Welcome to the Ovify RESTful API. The backend is running successfully!"}
 
-app.include_router(cycles.router, prefix="/cycles", tags=["cycles"])
 app.include_router(symptoms.router, prefix="/symptoms", tags=["symptoms"])
 app.include_router(users.router, prefix="/users", tags=["users"])
 app.include_router(medications.router, prefix="/api/medications", tags=["medications"])

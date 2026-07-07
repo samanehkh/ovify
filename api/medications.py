@@ -8,7 +8,7 @@ from db import models
 from db.session import get_db
 from schemas.medication import MedicationStatusResponse, DoseLogResponse
 from services import adherence
-from services.auth import verify_patient_token
+from services.auth import verify_patient_token, verify_clinician_token
 from core.time import UAE_TZ
 
 router = APIRouter()
@@ -178,14 +178,15 @@ def confirm_medication_dose(
         models.DoseLog.scheduled_date == target_date
     ).first()
     if existing_log:
-        # Reconciliation: the end-of-day daemon may have already written a
-        # "Missed" record before an offline-queued confirmation synced. The
-        # clinically truthful record is that the dose WAS taken (self-reported),
-        # so upgrade the Missed log rather than rejecting the patient's report.
-        if existing_log.status == "Missed" and self_reported:
+        # Reconciliation: the end-of-day sweep may have already written a
+        # "Missed" record before the patient's confirmation arrived (offline
+        # queue syncing late, or a live confirm minutes after the 23:50 sweep).
+        # The clinically truthful record is that the dose WAS taken, so upgrade
+        # the Missed log rather than rejecting the patient's report.
+        if existing_log.status == "Missed":
             existing_log.status = status if status == "On Time" else "Late"
             existing_log.logged_at = log_time
-            existing_log.self_reported = True
+            existing_log.self_reported = self_reported
             db.commit()
             db.refresh(existing_log)
             adherence.auto_clear_user_alert(db, user_id)
@@ -215,11 +216,13 @@ def confirm_medication_dose(
 
     return db_log
 
-@router.post("/check-overdue", response_model=List[str])
+# Manual sweep triggers are clinical operations — clinician token required.
+# (The background daemon calls the adherence service directly, not these routes.)
+@router.post("/check-overdue", response_model=List[str], dependencies=[Depends(verify_clinician_token)])
 def trigger_overdue_check(db: Session = Depends(get_db)):
     return adherence.check_overdue_doses(db)
 
-@router.post("/process-missed")
+@router.post("/process-missed", dependencies=[Depends(verify_clinician_token)])
 def trigger_process_missed(target_date: Optional[date] = Query(None), db: Session = Depends(get_db)):
     date_val = target_date or datetime.now(UAE_TZ).date()
     count = adherence.process_end_of_day_missed_doses(db, date_val)

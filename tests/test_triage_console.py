@@ -128,12 +128,25 @@ def test_resolve_alert_happy_path(client, test_db):
     
     # Verify DB user reset
     assert user.active_status == "On Track"
-    
-    # Verify DB dose logs cleared to "On Time"
-    cleared_log = test_db.query(models.DoseLog).filter(models.DoseLog.user_id == 1).first()
-    assert cleared_log.status == "On Time"
-    
-    # Verify triage is now "On Track"
+
+    # AUDIT TRAIL: the original status is preserved — resolution never rewrites
+    # clinical history. The log is flagged resolved with nurse attribution.
+    resolved_log = test_db.query(models.DoseLog).filter(models.DoseLog.user_id == 1).first()
+    test_db.refresh(resolved_log)
+    assert resolved_log.status == "Missed"          # truth preserved
+    assert resolved_log.resolved is True
+    assert resolved_log.resolved_by == "Test Nurse"
+    assert resolved_log.resolved_at is not None
+
+    # An audit event was written for the resolution
+    audit = test_db.query(models.AuditLog).filter(
+        models.AuditLog.action == "resolve_alert",
+        models.AuditLog.target_user_id == 1
+    ).first()
+    assert audit is not None
+    assert audit.actor == "Test Nurse"
+
+    # Verify triage is now "On Track" (resolved logs no longer rank)
     response_triage = client.get("/api/clinician/triage")
     assert response_triage.json()[0]["status"] == "On Track"
 
@@ -141,3 +154,33 @@ def test_resolve_alert_unhappy_path_not_found(client):
     response = client.post("/api/clinician/resolve-alert/999")
     assert response.status_code == 404
     assert "User not found" in response.json()["detail"]
+
+
+def test_triage_recency_window_old_missed_does_not_rank(client, test_db):
+    # D8: an unresolved Missed from 10 days ago must NOT keep the patient Red
+    old_missed = models.DoseLog(
+        prescription_id=1,
+        user_id=1,
+        status="Missed",
+        scheduled_date=date.today() - timedelta(days=10)
+    )
+    test_db.add(old_missed)
+    test_db.commit()
+
+    data = client.get("/api/clinician/triage").json()
+    me = next(p for p in data if p["id"] == 1)
+    assert me["status"] == "On Track"
+
+    # ...but a recent Missed (yesterday) still ranks Red
+    recent_missed = models.DoseLog(
+        prescription_id=2,
+        user_id=1,
+        status="Missed",
+        scheduled_date=date.today() - timedelta(days=1)
+    )
+    test_db.add(recent_missed)
+    test_db.commit()
+
+    data = client.get("/api/clinician/triage").json()
+    me = next(p for p in data if p["id"] == 1)
+    assert me["status"] == "Red Alert"

@@ -150,3 +150,53 @@ def test_parse_protocol_empty_text(client):
     assert response.status_code == 400
     assert "cannot be empty" in response.json()["detail"]
 
+
+
+def _base_payload(**overrides):
+    tomorrow = (date.today() + timedelta(days=1)).isoformat()
+    end_date = (date.today() + timedelta(days=12)).isoformat()
+    payload = {
+        "name": "Sarah Khan",
+        "phone": "+971 50 123 4567",
+        "email": "sarah.khan@example.com",
+        "dob": "1992-05-15",
+        "cycle_type": "Fresh IVF",
+        "prescriptions": [
+            {
+                "name": "Gonal-F",
+                "dosage": "150 IU",
+                "route": "Subcutaneous",
+                "scheduled_time": "19:00:00",
+                "start_date": tomorrow,
+                "end_date": end_date,
+                "flagged": False
+            }
+        ]
+    }
+    payload.update(overrides)
+    return payload
+
+
+def test_register_persists_dob(client, test_db):
+    # D5: DOB entered by the nurse must land in the patient record
+    response = client.post("/api/clinician/register", json=_base_payload())
+    assert response.status_code == 200
+
+    user = test_db.query(models.User).filter(models.User.email == "sarah.khan@example.com").first()
+    assert user is not None
+    assert user.dob is not None
+    assert user.dob.isoformat() == "1992-05-15"
+
+
+def test_register_rejects_unapproved_medication(client, test_db):
+    # D6: server-side formulary re-validation — the register endpoint must not
+    # trust the client's prescription list
+    payload = _base_payload()
+    payload["prescriptions"][0]["name"] = "Gonal-X"  # not in formulary
+    response = client.post("/api/clinician/register", json=payload)
+    assert response.status_code == 400
+    assert "formulary" in response.json()["detail"].lower()
+    assert "Gonal-X" in response.json()["detail"]
+
+    # Nothing was persisted
+    assert test_db.query(models.User).filter(models.User.email == "sarah.khan@example.com").first() is None

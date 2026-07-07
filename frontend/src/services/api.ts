@@ -51,11 +51,12 @@ export interface ClinicianLoginResponse {
   clinician_name: string;
 }
 
-export async function loginClinician(accessKey: string, clinicianName?: string): Promise<ClinicianLoginResponse> {
+export async function loginClinician(accessKey: string, clinicianName: string): Promise<ClinicianLoginResponse> {
   const res = await fetch(`${API_BASE_URL}/api/clinician/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ access_key: accessKey, ...(clinicianName ? { clinician_name: clinicianName } : {}) }),
+    // clinician_name is required — it becomes the actor identity on the audit trail
+    body: JSON.stringify({ access_key: accessKey, clinician_name: clinicianName }),
   });
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({ detail: 'Login failed' }));
@@ -208,6 +209,18 @@ export async function updatePartnerConsent(
   return res.json();
 }
 
+export async function requestNurseCallback(userId: number): Promise<{ message: string; callback_id: number; status: string }> {
+  const res = await fetch(`${API_BASE_URL}/users/${userId}/callback-request`, {
+    method: 'POST',
+    headers: getPatientHeaders(),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({ detail: 'Failed to request callback' }));
+    throw new Error(errorData.detail || 'Failed to request callback');
+  }
+  return res.json();
+}
+
 export interface PartnerLoginResponse {
   token: string;
   partner_phone: string;
@@ -271,6 +284,7 @@ export interface TriagePatient {
   reason: string;
   cycle_type: string;
   cycle_outcome: string | null;
+  callback_requested: boolean;
 }
 
 export async function fetchTriagePatients(): Promise<TriagePatient[]> {
@@ -300,17 +314,20 @@ export async function updateCycleOutcome(userId: number, outcome: string | null)
   return res.json();
 }
 
+export interface ParsedMedication {
+  name: string;
+  dosage: string;
+  route: string;
+  scheduled_time: string;
+  start_date: string;
+  end_date: string;
+  flagged: boolean;
+}
+
+// Field names must match the backend ProtocolParseResponse schema exactly
 export interface ParseProtocolResponse {
-  prescriptions: Array<{
-    name: string;
-    dosage: string;
-    route: string;
-    scheduled_time: string;
-    start_date: string;
-    end_date: string;
-    flagged: boolean;
-  }>;
-  unrecognized_meds: Array<{
+  parsed_medications: ParsedMedication[];
+  unrecognized_medications: Array<{
     text: string;
     message: string;
   }>;
@@ -332,7 +349,7 @@ export async function registerPatient(patientData: {
   email: string;
   dob: string;
   cycle_type: string;
-  prescriptions: ParseProtocolResponse['prescriptions'];
+  prescriptions: ParsedMedication[];
 }): Promise<User> {
   const res = await fetch(`${API_BASE_URL}/api/clinician/register`, {
     method: 'POST',

@@ -16,15 +16,19 @@ CLINICIAN_API_KEY = os.getenv("CLINICIAN_API_KEY")
 if not CLINICIAN_API_KEY:
     raise RuntimeError("Critical: CLINICIAN_API_KEY environment variable is not configured. Server must fail closed.")
 
-def generate_token(user_id: int, role: str) -> str:
+def generate_token(user_id: int, role: str, name: Optional[str] = None) -> str:
     """
     Generates a secure signed token mapping user_id and role with an expiry timestamp.
+    `name` carries the individual actor's identity (e.g. the nurse's name) so
+    clinical actions are attributable in the audit log.
     """
     payload = {
         "user_id": user_id,
         "role": role,
         "exp": int(time.time()) + (24 * 3600)  # 24 hours expiry
     }
+    if name:
+        payload["name"] = name
     payload_b64 = base64.urlsafe_b64encode(json.dumps(payload).encode()).decode()
     signature = hmac.new(SECRET_KEY.encode(), payload_b64.encode(), hashlib.sha256).hexdigest()
     return f"{payload_b64}.{signature}"
