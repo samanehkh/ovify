@@ -47,3 +47,20 @@ Configured the background thread in [main.py](file:///Users/samaneh/Documents/Ov
   - Overdue logging alerts for late injection times.
   - End-of-day sweeps correctly inserting Missed logs and updating clinical statuses.
   - Triage resolutions clearing alerts from both database records and user screens.
+
+---
+
+## 5. As-Built Truth Sync (2026-07-08)
+
+Reconciled against code at commit `7d3f2e0`+.
+
+| Item | Status |
+|---|---|
+| **Level 1 cadence: plan says checks every 15 min. As-built: every 5 min.** Partner "webhook" remains a console log (`[PARTNER WEBHOOK ALERT] …`) — no Twilio/SMS integration exists. | ⚠️ Deviation (accepted for local dev; message says exactly what BRD J4 specifies) |
+| **Level 2 timing: plan says 23:50 same-day EOD sweep. As-built: idempotent `processed_dates` ledger processing dates up to *yesterday*, every 5 min.** More robust (survives restarts, never silently loses a day — each date processed exactly once), but the Red Alert appears the **following morning**, not same-evening. BRD J4 specifies T+120-min same-evening escalation. | ⚠️ Deviation — **needs product decision**: keep ledger + add a same-day sweep pass, or accept next-morning escalation for MVP |
+| **Level 3 resolution: `resolve-alert` rewrites `Missed`/`Late` logs to `"On Time"`.** This **destroys the adherence audit trail** — a resolved miss becomes indistinguishable from genuine on-time compliance, corrupting the compliance data the clinic pays for and breaking Health Data Law auditability. | 🔴 **Defect** — resolution must be its own state (e.g. `"Resolved by Nurse"` + resolution reason + timestamp), never history rewriting |
+| **Auto-clear**: patient `active_status` now auto-resets to "On Track" when all of today's overdue doses get logged (`adherence.auto_clear_user_alert`) — no manual nurse action needed for self-corrected lates. | ⚠️ Deviation (accepted — better UX than plan) |
+| Escalation thresholds (60 min partner, EOD clinic) are hardcoded constants, not clinic-configurable. BRD J4 defines T+30/T+60/T+120 levels; as-built implements two of three (no T+30 gentle PWA ping). | ⚠️ Deviation (accepted for MVP) — T+30 push requires web-push infra (Phase 2) |
+| `check-overdue` / `process-missed` endpoints unauthenticated. | 🔴 **Defect** — same as J3 sync |
+
+> **Post-fix update (2026-07-08):** All 🔴 rows and the timing decision above are resolved — Level 3 resolution now preserves dose statuses (`resolved`/`resolved_by`/`resolved_at` flags + audit event, D2); sweep endpoints are clinician-gated (D1); and the daemon runs a **same-evening sweep after 23:50 UAE** on top of the catch-up ledger, restoring BRD J4's same-night Red Alert (D12). A live confirm minutes after the sweep upgrades the Missed record instead of bouncing. See `DEFECT_REGISTER.md`.

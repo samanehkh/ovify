@@ -44,3 +44,23 @@ Developed guides inside `frontend/src/pages/MedicationLogPage.tsx` and the dashb
   - Missed dose database logs.
   - User status escalations.
   - Double confirmation logging blocks.
+
+---
+
+## 6. As-Built Truth Sync (2026-07-08)
+
+Reconciled against code at commit `7d3f2e0`+.
+
+| Item | Status |
+|---|---|
+| **Timing window (§2): plan says "±60 minutes". As-built: signed −15/+60 window** — confirming more than 15 min *early* classifies as Late. The symmetric ±60 wording is wrong. | ⚠️ Deviation (accepted — clinically safer); fix plan wording in field-level pass |
+| **`actual_time` now also accepts full ISO-8601 timestamps** (used by the offline queue). Guardrails: future times rejected (5-min skew tolerance), bare HH:MM max 24h old, ISO max 48h old. Cross-midnight doses resolve against the *reported* date. All timing pinned to UAE tz via `core/time.py`. | ⚠️ Deviation (accepted) — add to plan scope |
+| **`dose_logs.self_reported`** (bool) records whether the time was patient-reported vs live-confirmed — nurse-visible truthfulness signal. `UniqueConstraint(prescription_id, scheduled_date)` blocks double-log races. | ⚠️ Deviation (accepted) |
+| **Missed→Late reconciliation:** a self-reported confirmation arriving after the EOD sweep wrote `Missed` upgrades that record in place to `Late (self_reported=true)`. Tested in `tests/test_auth_security.py`. | ⚠️ Deviation (accepted — desired clinical behavior) |
+| **Daemon (§3): plan says 15-minute scans + 23:50 same-day sweep. As-built: 5-minute scans + an idempotent `processed_dates` catch-up ledger that processes dates up to *yesterday*.** Missed records therefore land after midnight, not at 23:50 same-day. | ⚠️ Deviation — **needs product decision** (see J4 sync §5) |
+| **Frontend offline dose queue** (not in this plan): offline confirms persist in `localStorage` with full ISO timestamps, show an honest "Sync Pending" badge, drain on app mount / window focus / `online` event, drop 4xx-rejected items, retry only network/5xx, and merge date-scoped so stale items can't mark today taken. | ⚠️ Deviation (accepted) — add to plan scope |
+| All medication endpoints token-gated (`role=patient`); `user_id` comes from the token, not the query param. | ⚠️ Deviation (accepted) |
+| **`check-overdue` and `process-missed` trigger endpoints are unauthenticated.** | 🔴 **Defect** — gate before deployment |
+| Prep checklist remains decorative in `MedicationLogPage.tsx` (§4 says "decorative safety instructions" — accurate but the checklist should not gate the log action; currently it doesn't in React app). | ✅ Accurate |
+
+> **Post-fix update (2026-07-08):** The 🔴 rows above are resolved — sweep trigger endpoints are clinician-token gated (D1), and the legacy `cycles` module was removed entirely (D10). Reconciliation now upgrades a daemon-written `Missed` on ANY genuine confirmation (live or self-reported), not just offline syncs. See `DEFECT_REGISTER.md`.

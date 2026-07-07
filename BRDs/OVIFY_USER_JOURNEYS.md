@@ -89,6 +89,13 @@ Scenario: AI Onboarding Parser fails to recognize a drug (Edge Case)
   Then the AI Onboarding Parser flags the item
   And highlights the text in Red
   And displays a warning: "We couldn't identify this medication. Please select from the dropdown."
+
+Scenario: Server re-validates formulary at registration (Never Trust the Client)
+  Given a registration request reaches the backend containing a prescription "Gonal-X 150 IU"
+  When the register endpoint re-checks every medication against the approved clinic formulary
+  Then the API rejects the request with HTTP 400 naming the unapproved medication
+  And persists neither the patient record nor any prescriptions
+  And the registration event, when successful, is written to the audit log attributed to the named nurse
 ```
 
 ### 1.5 Design & Technical Notes
@@ -404,8 +411,16 @@ Scenario: Nurse views dashboard and resolves a Red Missed Dose alert
   And the Nurse calls the patient and confirms they administered the dose but forgot to click confirm
   And the Nurse clicks the "[Resolved]" button on the dashboard card
   Then the card shifts to "On Track (Green)"
-  And logs the resolution reason as "Patient administered on time, logged by Nurse"
-  And updates the patient compliance log in the database
+  And the underlying dose log KEEPS its truthful "Missed" status — resolution NEVER rewrites clinical history
+  And the log is flagged resolved with the nurse's name and timestamp (audit trail)
+  And an audit event is recorded attributing the resolution to the named nurse
+
+Scenario: Triage ranking uses a recency window (No Forever-Red Patients)
+  Given a patient has one unresolved "Missed" dose log from 10 days ago
+  And has logged every dose on time since
+  When the Nurse opens the Triage Console
+  Then the patient ranks as "On Track" — alerts only consider unresolved logs from the last 7 days
+  But a Missed dose from yesterday still ranks the patient as "Red Alert"
 ```
 
 ---
@@ -540,6 +555,17 @@ Scenario: Patient cycle is marked as negative
   And shifts PWA interface colors to soft calming sage/neutral tones
   And unlocks the "Emotional Recovery & Reset Program"
   And sends a notification to the Support/Partner app with guidance: "Sarah's test was negative. The best thing to do today is simply be present..."
+
+Scenario: Recovery-mode nurse callback is persisted and actioned (Never a UI-Only Promise)
+  Given the Patient is in Recovery Mode and taps "Request Nurse Callback"
+  When the PWA sends the request to the backend
+  Then the system persists a Pending callback record in the database
+  And only THEN shows the patient "✓ Callback Requested (Within 24 Hours)"
+  And the Clinic Triage Console surfaces the patient as "Yellow Attention — 📞 Nurse callback requested"
+  When the Nurse resolves the patient's alert
+  Then the callback record is marked Completed with the nurse's name and timestamp
+  And a repeated tap while a request is Pending returns the same request (idempotent — no duplicates)
+  But if the backend is unreachable, the patient sees an honest error with a direct-call fallback — never a false confirmation
 ```
 
 ---

@@ -33,3 +33,20 @@ Updated the triage console component inside `frontend/src/pages/ClinicianPortalP
 * Created integration tests in `tests/test_triage_console.py` verifying:
   - **Happy Path**: Correct ranking calculations for on-track, late, and missed doses, and verify that the resolve alert route successfully clears user status and updates database dose log statuses.
   - **Unhappy Path**: Resolve alert attempts on invalid user IDs return a `404 Not Found` response.
+
+---
+
+## 5. As-Built Truth Sync (2026-07-08)
+
+Reconciled against code at commit `7d3f2e0`+.
+
+| Item | Status |
+|---|---|
+| Sections 1–3 (triage calculations, endpoints, frontend wiring) | ✅ Accurate |
+| **Authentication** (not in this plan): all triage routes require a `role=clinician` Bearer token from `POST /api/clinician/login`; portal has login/sign-out and 401 fallback. Auto-injected real tokens in tests. | ⚠️ Deviation (accepted) — add to plan scope |
+| **`resolve-alert` remediates `Missed`/`Late` → `"On Time"`, erasing the audit trail.** Same defect as J4 §5 — the triage console's own history becomes untrustworthy after any resolution. | 🔴 **Defect** — dedicated resolution status + reason + nurse identity |
+| Triage view also surfaces `cycle_outcome`, a **"Mark Failed"** action (launches J12 Recovery Mode, confirm-gated) and a "Recovery Active" state — beyond this plan's scope but shipped. | ⚠️ Deviation (accepted) — add to plan scope |
+| Red/Yellow ranking scans a patient's **entire dose-log history** — one Missed log from weeks ago keeps a patient Red forever (until resolution rewrites it, which is the defect above). No recency window. | 🔴 **Defect** — rank on a rolling window (e.g. current cycle / last 7 days) in the field-level pass |
+| No per-nurse identity on resolutions (shared clinic token). | 🔴 **Defect** (pre-pilot) — same as J1 sync |
+
+> **Post-fix update (2026-07-08):** All 🔴 rows above are resolved — resolution preserves the audit trail with nurse attribution (D2/D4), triage ranks only unresolved logs within a rolling 7-day recency window (D8), and pending nurse-callback requests surface as Yellow Attention (D3). See `DEFECT_REGISTER.md`.

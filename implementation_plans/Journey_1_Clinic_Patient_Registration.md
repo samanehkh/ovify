@@ -36,3 +36,22 @@ Built a dedicated widescreen Clinician Portal interface at `frontend/src/pages/C
   - Correct AM/PM hour extractions.
   - Dropdown error flag mappings.
   - Database patient writes.
+
+---
+
+## 5. As-Built Truth Sync (2026-07-08)
+
+Reconciled against code at commit `7d3f2e0`+. Classification: ✅ accurate ·
+⚠️ as-built deviation (accepted) · 🔴 defect (to fix).
+
+| Item | Status |
+|---|---|
+| Sections 1–3 (parser, register endpoint, portal UI) | ✅ Accurate |
+| **Clinician authentication** (not in this plan): all `/api/clinician/*` routes now require a `role=clinician` Bearer token from `POST /api/clinician/login` (nurse enters the clinic access key; key checked server-side, never shipped in the client bundle). Portal has a login screen, sign-out, and 401 session-expiry fallback. | ⚠️ Deviation (accepted) — add to plan scope |
+| **`dob` is collected by the intake form and accepted by `RegisterPatientRequest`, but the `User` model has no `dob` column — the value is silently discarded.** | 🔴 **Defect** — either persist it (age is clinically relevant per BRD J11 roadmap) or remove the field |
+| **`POST /register` performs no server-side formulary validation** on the prescriptions array — it persists whatever medication names/dosages the client sends. Parser flags unrecognized drugs, but the register step doesn't re-check. | 🔴 **Defect** — re-validate against the approved formulary at registration time |
+| Phone normalization (strip to digits/+) duplicated across `users.py`, `partner.py`, `clinician.py` with identical inline code. | ⚠️ Debt — extract one normalizer before field-level pass |
+| No SMS invite is actually sent ("SMS invite sent" message is aspirational copy). | ⚠️ Deviation (accepted for local dev; Twilio is pre-launch scope) |
+| Clinician token has no per-nurse identity (shared clinic key, `user_id=0`) — registration events aren't attributable to an individual nurse. | 🔴 **Defect** (pre-pilot) — Health Data Law auditability |
+
+> **Post-fix update (2026-07-08):** All 🔴 rows above are resolved — `users.dob` is persisted (D5), `/register` re-validates prescriptions against the approved formulary server-side and rejects unknowns with a 400 (D6), phone normalization is centralized in `core/phone.py` (D11), and registrations are attributed to the named nurse in the new `audit_log` table (D4). See `DEFECT_REGISTER.md`.
