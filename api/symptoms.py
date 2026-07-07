@@ -18,7 +18,7 @@ def log_symptom(symptom: SymptomLogCreate, db: Session = Depends(get_db)):
     return db_symptom
 
 @router.get("/log/{user_id}", response_model=List[SymptomLogResponse])
-def get_symptoms_by_date(user_id: str, log_date: date, db: Session = Depends(get_db)):
+def get_symptoms_by_date(user_id: int, log_date: date, db: Session = Depends(get_db)):
     symptoms = db.query(models.SymptomLog).filter(
         models.SymptomLog.user_id == user_id,
         models.SymptomLog.log_date == log_date
@@ -26,6 +26,6 @@ def get_symptoms_by_date(user_id: str, log_date: date, db: Session = Depends(get
     return symptoms
 
 @router.get("/logs/{user_id}", response_model=List[SymptomLogResponse])
-def get_all_symptoms(user_id: str, db: Session = Depends(get_db)):
+def get_all_symptoms(user_id: int, db: Session = Depends(get_db)):
     symptoms = db.query(models.SymptomLog).filter(models.SymptomLog.user_id == user_id).order_by(models.SymptomLog.log_date).all()
     return symptoms

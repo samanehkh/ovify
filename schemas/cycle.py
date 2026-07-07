@@ -1,6 +1,5 @@
 from datetime import date
 from typing import Optional
-from uuid import UUID
 from pydantic import BaseModel
 
 class CycleBase(BaseModel):
@@ -8,14 +7,14 @@ class CycleBase(BaseModel):
     end_date: Optional[date] = None
 
 class CycleCreate(CycleBase):
-    user_id: UUID
+    user_id: int
 
 class CycleUpdate(CycleBase):
     pass
 
 class CycleResponse(CycleBase):
     id: int
-    user_id: UUID
+    user_id: int
 
     class Config:
         from_attributes = True

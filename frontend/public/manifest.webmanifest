@@ -1,0 +1,23 @@
+{
+  "name": "Ovify Care Companion",
+  "short_name": "Ovify",
+  "description": "Premium IVF Stimulation Adherence & Support Companion",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F8F5F1",
+  "theme_color": "#9E8CEF",
+  "icons": [
+    {
+      "src": "/static/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

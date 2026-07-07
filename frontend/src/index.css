@@ -1,0 +1,115 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --color-bg-ivory: #F8F5F1;
+  --color-navy: #13233C;
+  --color-navy-70: rgba(19, 35, 60, 0.72);
+  --color-navy-55: rgba(19, 35, 60, 0.85);
+  --color-navy-10: rgba(19, 35, 60, 0.07);
+  --color-lavender: #9E8CEF;
+  --color-lavender-dark: #6F5AD1;
+  --color-lavender-mid: #7E6BD3;
+  --color-lavender-soft: rgba(158, 140, 239, 0.13);
+  --color-blush: #F4A0A0;
+  --color-blush-soft: rgba(244, 160, 160, 0.16);
+  --color-sage: #3E8E6E;
+  --color-sage-soft: rgba(62, 142, 110, 0.13);
+  --color-due: #C24C57;
+  --color-due-soft: rgba(194, 76, 87, 0.12);
+
+  --font-heading: 'DM Sans', sans-serif;
+  --font-body: 'Manrope', sans-serif;
+  --font-data: 'Inter', sans-serif;
+
+  --radius-xl: 24px;
+  --radius-lg: 18px;
+  --radius-md: 12px;
+  --radius-pill: 9999px;
+  
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Custom CSS utilities and scrollbar styling */
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: var(--color-bg-ivory);
+    background-image: 
+      radial-gradient(circle at 0% 0%, rgba(158, 140, 239, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 100% 100%, rgba(244, 160, 160, 0.1) 0%, transparent 40%);
+    font-family: var(--font-body);
+    color: var(--color-navy);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* Target default root frame */
+  #root {
+    width: 100%;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Target mobile phone frame for Patient PWA */
+  .mobile-pwa-frame {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 40px 100px rgba(19, 35, 60, 0.08);
+    background: rgba(248, 245, 241, 0.45);
+  }
+}
+
+/* Glassmorphism helpers */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 0 8px 32px rgba(158, 140, 239, 0.08);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-panel:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 36px rgba(158, 140, 239, 0.14);
+  border-color: rgba(158, 140, 239, 0.3);
+}
+
+.glass-card-navy {
+  background: var(--color-navy);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(19, 35, 60, 0.15);
+}
+
+/* Hide scrollbars but keep functionality */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-delay: 0s !important;
+    animation-duration: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0s !important;
+    scroll-behavior: auto !important;
+  }
+}

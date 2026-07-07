@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ovify Patient Home</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Variables - Ovify Brand Tokens */
+        :root {
+            --bg-ivory: #F8F5F1;
+            --card-white: #FFFFFF;
+            --navy: #13233C;
+            --navy-70: rgba(19, 35, 60, 0.7);
+            --navy-55: rgba(19, 35, 60, 0.55);
+            --navy-10: rgba(19, 35, 60, 0.1);
+            --lavender: #9E8CEF;
+            --lav-dark: #6F5AD1;
+            --lav-mid: #7E6BD3;
+            --lav-soft: rgba(158, 140, 239, 0.13);
+            --blush: #F4A0A0;
+            --blush-soft: rgba(244, 160, 160, 0.16);
+            --sage: #3E8E6E;
+            --sage-soft: rgba(62, 142, 110, 0.13);
+            --red-alert: #C24C57;
+            --due-soft: rgba(194, 76, 87, 0.12);
+
+            --r-xl: 24px;
+            --r-lg: 18px;
+            --r-md: 12px;
+
+            --font-heading: 'DM Sans', sans-serif;
+            --font-body: 'Manrope', sans-serif;
+            --font-data: 'Inter', sans-serif;
+        }
+
+        /* Base Styles */
+        body {
+            margin: 0;
+            font-family: var(--font-body);
+            background-color: var(--bg-ivory);
+            color: var(--navy);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        /* Utility for screen readers */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
+        /* Mobile Frame for max-width simulation */
+        .mobile-frame {
+            max-width: 390px;
+            width: 100%;
+            background-color: var(--card-white);
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Header with Logo */
+        .header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 0;
+            background-color: var(--card-white);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px var(--navy-10);
+        }
+        .header img {
+            height: 36px; /* Appropriate size for the logo */
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            padding: 20px;
+            flex-grow: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling for iOS */
+        }
+
+        h1, h2, h3 {
+            font-family: var(--font-heading);
+            color: var(--navy);
+        }
+
+        /* Cycle Day Ring Section */
+        .cycle-ring-section {
+            background-color: var(--card-white);
+            border-radius: var(--r-xl);
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 4px 8px var(--navy-10);
+        }
+        .cycle-ring {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: var(--lav-soft);
+            border: 8px solid var(--lavender);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 15px;
+            position: relative;
+        }
+        .cycle-ring::before {
+            content: "Cycle Day";
+            position: absolute;
+            top: 30px; /* Adjust vertical position */
+            font-family: var(--font-data);
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--navy-55);
+        }
+        .cycle-day-number {
+            font-family: var(--font-data);
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--navy);
+            line-height: 1; /* Adjust to sit well with ::before */
+            margin-top: 25px; /* Adjust to sit well with ::before */
+        }
+        .cycle-phase {
+            font-family: var(--font-heading);
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--lav-mid);
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+        .cycle-status {
+            font-family: var(--font-body);
+            color: var(--navy-70);
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 20px;
+        }
+        .next-step-button {
+            background-color: var(--lavender);
+            color: var(--card-white);
+            border: none;
+            border-radius: var(--r-md);
+            padding: 12px 20px;
+            font-family: var(--font-data);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            max-width: 250px;
+            transition: background-color 0.2s ease;
+        }
+        .next-step-button:hover {
+            background-color: var(--lav-dark);
+        }
+
+        /* Today's Medications Section */
+        .meds-section {
+            background-color: var(--card-white);
+            border-radius: var(--r-xl);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px var(--navy-10);
+        }
+        .meds-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .meds-header h2 {
+            font-size: 20px;
+            margin: 0;
+            font-weight: 600;
+        }
+        .meds-header .view-all-button {
+            background-color: var(--lav-soft);
+            color: var(--navy); /* FIX 2: Text color changed to Navy */
+            border: none;
+            border-radius: var(--r-md);
+            padding: 8px 15px;
+            font-family: var(--font-data);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .meds-header .view-all-button:hover {
+            background-color: rgba(158, 140, 239, 0.2);
+        }
+
+        .med-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--navy-10);
+        }
+        .med-item:last-child {
+            border-bottom: none;
+        }
+        .med-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--lav-soft);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .med-icon svg {
+            width: 20px;
+            height: 20px;
+            color: var(--lavender);
+        }
+        .med-details {
+            flex-grow: 1;
+            padding-right: 10px;
+        }
+        .med-name {
+            font-family: var(--font-body);
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 4px;
+            color: var(--navy);
+        }
+        .med-time {
+            font-family: var(--font-data);
+            font-size: 14px;
+            color: var(--navy-70);
+            margin-bottom: 4px;
+        }
+        .med-dose {
+            font-family: var(--font-body);
+            font-size: 14px;
+            color: var(--navy-55);
+        }
+        .med-status-button {
+            border: none;
+            border-radius: var(--r-md);
+            padding: 8px 12px;
+            font-family: var(--font-data);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            min-width: 80px;
+            text-align: center;
+            flex-shrink: 0;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        /* Medication statuses */
+        .med-status-due {
+            background-color: var(--due-soft);
+            color: var(--red-alert);
+        }
+        .med-status-due:hover {
+            background-color: rgba(194, 76, 87, 0.2);
+        }
+        .med-status-taken {
+            background-color: var(--sage-soft);
+            color: var(--sage);
+        }
+        .med-status-taken:hover {
+            background-color: rgba(62, 142, 110, 0.2);
+        }
+        .med-status-missed {
+            background-color: var(--blush-soft);
+            color: var(--blush);
+        }
+        .med-status-missed:hover {
+            background-color: rgba(244, 160, 160, 0.2);
+        }
+        /* FIX 3: Inactive/Gray 'Taken' button text color changed to Navy */
+        .med-status-taken.inactive {
+            background-color: var(--navy-10);
+            color: var(--navy);
+        }
+        .med-status-taken.inactive:hover {
+            background-color: rgba(19, 35, 60, 0.15);
+        }
+
+        /* Emotional Check-in Section */
+        .checkin-section {
+            background-color: var(--card-white);
+            border-radius: var(--r-xl);
+            padding: 20px;
+            margin-bottom: 100px; /* Space for fixed bottom bar */
+            box-shadow: 0 4px 8px var(--navy-10);
+        }
+        .checkin-section h2 {
+            font-size: 20px;
+            margin: 0 0 15px 0;
+            font-weight: 600;
+        }
+        .emotion-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .emotion-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--navy-10);
+            border-radius: var(--r-md);
+            padding: 15px 10px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+            color: var(--navy);
+            font-family: var(--font-data);
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .emotion-button svg {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 8px;
+            color: var(--navy-55);
+            transition: color 0.2s ease;
+        }
+        .emotion-button:hover {
+            background-color: rgba(19, 35, 60, 0.15);
+        }
+        .emotion-button.selected {
+            background-color: var(--lav-soft);
+            border-color: var(--lavender);
+        }
+        .emotion-button.selected svg {
+            color: var(--lav-dark);
+        }
+
+        /* Bottom Tab Bar */
+        .bottom-tab-bar {
+            position: sticky; /* Sticky to allow backdrop-filter to work within parent bounds */
+            bottom: 0;
+            width: 100%;
+            max-width: 390px; /* Constrain to mobile frame width */
+            background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent white base */
+            padding: 10px 0;
+            border-top: 1px solid var(--navy-10);
+            display: flex;
+            justify-content: space-around;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 200;
+            /* FIX 4: Frosted glass theme */
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px); /* For Safari support */
+        }
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--navy-70);
+            text-decoration: none;
+            font-family: var(--font-data);
+            font-size: 12px;
+            font-weight: 500;
+            padding: 5px 0;
+            flex: 1;
+        }
+        .tab-item svg {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+            color: var(--navy-70);
+        }
+        .tab-item.active {
+            color: var(--lav-dark);
+        }
+        .tab-item.active svg {
+            color: var(--lavender);
+        }
+
+        /* Accessibility: Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            .next-step-button,
+            .meds-header .view-all-button,
+            .med-status-button,
+            .emotion-button {
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-frame">
+        <header class="header">
+            <!-- FIX 1: Replaced 'Ovify' text with the official logo image -->
+            <img src="/static/logo.png" alt="Ovify Logo">
+        </header>
+
+        <main class="main-content">
+            <!-- Cycle Day Ring Section -->
+            <section class="cycle-ring-section" aria-labelledby="cycle-heading">
+                <h2 id="cycle-heading" class="sr-only">Your Cycle Progress</h2>
+                <div class="cycle-ring">
+                    <span class="cycle-day-number">09</span>
+                </div>
+                <p class="cycle-phase">Follicular Phase</p>
+                <p class="cycle-status">You're progressing well! Your next scan is due in 3 days.</p>
+                <button class="next-step-button" aria-label="View detailed cycle information">View Details</button>
+            </section>
+
+            <!-- Today's Medications Section -->
+            <section class="meds-section" aria-labelledby="meds-heading">
+                <div class="meds-header">
+                    <h2 id="meds-heading">Today's Medications</h2>
+                    <!-- FIX 2: 'View All' button text color changed to Navy -->
+                    <button class="view-all-button" aria-label="View all upcoming medications">View All</button>
+                </div>
+
+                <div class="med-list">
+                    <!-- Medication Item 1 (Due) -->
+                    <div class="med-item">
+                        <div class="med-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75l3 3m0 0l3-3m-3 3v-2.25M12 1.5c-4.635 0-8.44 4.001-8.724 9.471C3.77 15.655 7.914 21 12 21s8.23-5.345 8.724-10.029C20.44 5.501 16.635 1.5 12 1.5z" />
+                            </svg>
+                        </div>
+                        <div class="med-details">
+                            <p class="med-name">Gonal-F 900 IU</p>
+                            <p class="med-time">Today, 8:00 AM</p>
+                            <p class="med-dose">225 IU, Subcutaneous</p>
+                        </div>
+                        <button class="med-status-button med-status-due" aria-label="Mark Gonal-F as taken">Due</button>
+                    </div>
+
+                    <!-- Medication Item 2 (Taken - Inactive) -->
+                    <div class="med-item">
+                        <div class="med-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="med-details">
+                            <p class="med-name">Menopur 75 IU</p>
+                            <p class="med-time">Today, 9:00 AM</p>
+                            <p class="med-dose">150 IU, Subcutaneous</p>
+                        </div>
+                        <!-- FIX 3: Inactive medication button text color changed to Navy -->
+                        <button class="med-status-button med-status-taken inactive" aria-label="Menopur already taken">Taken</button>
+                    </div>
+
+                    <!-- Medication Item 3 (Missed - example) -->
+                    <div class="med-item">
+                        <div class="med-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.174 3.355 1.945 3.355h17.14c1.77 0 2.81-1.855 1.943-3.356L1.83 2.699c-.867-1.5-.07-3.449 1.77-3.449a1.75 1.75 0 011.662 1.054c.43.987 1.636 1.815 3.366 1.815h.698M12 15h.008v.008H12z" />
+                            </svg>
+                        </div>
+                        <div class="med-details">
+                            <p class="med-name">Cetrotide 0.25 mg</p>
+                            <p class="med-time">Today, 10:00 AM</p>
+                            <p class="med-dose">0.25 mg, Subcutaneous</p>
+                        </div>
+                        <button class="med-status-button med-status-missed" aria-label="Mark Cetrotide as missed">Missed</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Emotional Check-in Section -->
+            <section class="checkin-section" aria-labelledby="checkin-heading">
+                <h2 id="checkin-heading">How are you feeling today?</h2>
+                <div class="emotion-grid">
+                    <button class="emotion-button" aria-label="Feeling happy">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.182 12.182a4.5 4.5 0 01-6.364 0M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.756 3 12c0 4.556 4.03 8.25 9 8.25z" />
+                        </svg>
+                        Happy
+                    </button>
+                    <button class="emotion-button selected" aria-label="Feeling content">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                        </svg>
+                        Content
+                    </button>
+                    <button class="emotion-button" aria-label="Feeling anxious">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.182 12.182a4.5 4.5 0 01-6.364 0M9.75 14.25c-.75 0-1.5-.06-2.25-.172a7.5 7.5 0 00-.783-.099c-1.376-.061-2.235 1.05-1.954 2.235.244 1.011 1.488 1.834 2.766 1.834 1.077 0 2.155-.224 3.226-.653M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Anxious
+                    </button>
+                    <button class="emotion-button" aria-label="Feeling sad">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.182 12.182a4.5 4.5 0 01-6.364 0M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25-9 3.694-9 8.25 4.03 8.25 9 8.25zM12 7.5a.75.75 0 01.75.75v.75H11.25V8.25A.75.75 0 0112 7.5z" />
+                        </svg>
+                        Sad
+                    </button>
+                    <button class="emotion-button" aria-label="Feeling tired">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M18 12H6m-2.25 0h17.25M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Tired
+                    </button>
+                    <button class="emotion-button" aria-label="Feeling stressed">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 100-18 9 9 0 000 18zM15 9a3 3 0 11-6 0 3 3 0 016 0zm-3 6h.01M12 12v1.5h.01v-1.5z" />
+                        </svg>
+                        Stressed
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Tab Bar -->
+        <nav class="bottom-tab-bar" aria-label="Main navigation">
+            <a href="#" class="tab-item active" aria-current="page" aria-label="Home">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                    <path d="M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a1.5 1.5 0 01.36 1.815V19.5a2.25 2.25 0 01-2.25 2.25H15a2.25 2.25 0 01-2.25-2.25V15.75a2.25 2.25 0 00-2.25-2.25H8.25a2.25 2.25 0 00-2.25 2.25V19.5a2.25 2.25 0 01-2.25 2.25H3.69a1.5 1.5 0 01-.36-1.815l8.69-8.69z" />
+                </svg>
+                <span>Home</span>
+            </a>
+            <a href="#" class="tab-item" aria-label="Calendar">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12v-.008zM12 18h.008v.008H12v-.008zM12 21h.008v.008H12v-.008z" />
+                </svg>
+                <span>Calendar</span>
+            </a>
+            <a href="#" class="tab-item" aria-label="Messages">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h1.5A2.25 2.25 0 018.25 12v.75m-7.5 3A.75.75 0 013 16.5h18a.75.75 0 010 1.5H3a.75.75 0 01-.75-.75zM5.25 12h.008v.008H5.25V12zm7.5 0h.008v.008H12.75V12zm7.5 0h.008v.008H20.25V12z" />
+                </svg>
+                <span>Messages</span>
+            </a>
+            <a href="#" class="tab-item" aria-label="Profile">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span>Profile</span>
+            </a>
+        </nav>
+    </div>
+</body>
+</html>

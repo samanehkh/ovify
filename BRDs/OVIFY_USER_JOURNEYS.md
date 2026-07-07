@@ -131,6 +131,19 @@ Scenario: Successful onboarding flow and PWA install
   And updates the patient status to "Active"
   And displays the PWA installation prompt ("Add to Home Screen")
   And schedules the first medication reminder
+
+Scenario: Personalization branches the patient guide experience
+  Given the Patient has completed onboarding with Injection Comfort set to "Experienced"
+  When the Patient opens the Medication Log Page for their daily dose
+  Then the system collapses the detailed step-by-step video and guidelines
+  And shows a condensed, checklist-only view with high-level summaries to prevent UI fatigue
+  But if the Patient had selected "First time", the system displays the fully expanded step-by-step videos and injection guides
+
+Scenario: OTP verification fails to deliver (Sad Path Fallback)
+  Given the Patient is on the Login Screen and requests an access code
+  When the SMS network experiences latency and the OTP does not arrive within 30 seconds
+  And the Patient clicks the "Resend Code" trigger
+  Then the system checks the routing carrier and falls back to a voice-call OTP gateway to guarantee authentication
 ```
 
 ---
@@ -162,6 +175,31 @@ Scenario: Patient confirms injection on time
   Then the system logs the injection time as 7:02 PM (Adherence status: "On Time")
   And updates the Clinic Dashboard card for this patient to Green
   And sends a confirmation SMS/Push to the Support/Partner app: "Sarah completed her injection."
+
+Scenario: Patient logs a backdated injection retroactively (Forgot to Tap)
+  Given the Patient administered their injection at 7:00 PM but forgot to confirm on the app
+  When the Patient opens the PWA at 9:30 PM (T+150 min)
+  And selects "Log offline or specify actual injection time"
+  And inputs the actual administration time as "19:00"
+  Then the system logs the dose with the actual time "19:00" (Adherence status: "On Time")
+  And resolves any active Missed Dose triage alerts on the Clinic Dashboard
+  And sends an updated notification to the Support/Partner companion app
+
+Scenario: Offline injection logging saves locally and syncs (Offline-First)
+  Given the Patient is in an area with zero network connectivity when an injection is due
+  When the Patient administers the dose and taps "Confirm Injection Completed"
+  Then the PWA intercepts the request and saves it locally in the offline queue
+  And displays a warning: "Logged offline: Your confirmation is saved locally and will upload when online."
+  And keeps the UI checkmarks green to prevent anxiety
+  When network connectivity is restored
+  Then the PWA automatically synchronizes the queued log with the backend database
+  And updates the Clinic Dashboard compliance status
+
+Scenario: Backend database down at confirmation time (Graceful Degradation)
+  Given the Patient has active internet connectivity but the FastAPI backend is down
+  When the Patient clicks "Confirm Injection Completed"
+  Then the PWA handles the server error gracefully by queueing the log locally
+  And triggers a reassuring, styled feedback toast: "Connection timeout. Your confirmation is safely saved on this device."
 ```
 
 ---
@@ -327,6 +365,16 @@ Scenario: Support/Partner receives daily trigger alert
   When the clock reaches 8:00 AM
   Then the system triggers a push notification to the Support/Partner: "Good morning! Today is Sarah's 10th stimulation day. She's feeling a bit anxious..."
   And provides 2 concrete recommendations: "1. Offer to drive her to the clinic scan. 2. Prepare her favorite meal tonight."
+
+Scenario: Patient revokes partner data sharing consent (Granular Consent Lifecycle)
+  Given the Patient previously authorized cycle sharing with their partner phone number
+  When the Patient opens Settings, untoggles the "Granular Consent Grant" checkmark, and clicks Save
+  Then the system updates the user profile record in the database (`partner_consent = false`)
+  And displays a feedback message: "Sharing consent revoked."
+  When the Support Partner opens the partner companion app and attempts to access the cycle dashboard
+  Then the API gates the request and returns a HTTP 403 status code
+  And the partner app renders a legal notice screen: "Consent Revoked: Sharing has been paused. Please consult your partner to re-establish secure link."
+  And prevents any patient medication logs, mood check-ins, or protocol details from loading
 ```
 
 ---
@@ -522,8 +570,33 @@ Scenario: Patient cycle is marked as negative
 
 ---
 
+## ACCESSIBILITY (A11Y) & DUAL-LANGUAGE ARABIC PARITY (DoD)
+
+To align with UAE and international digital health platform compliance criteria, all user journeys in **Part A** and **Part B** must satisfy the following **Definition of Done (DoD)** rules:
+
+### 1. Web Content Accessibility Guidelines (WCAG 2.2 AA)
+* **Contrast Thresholds**: All text elements (body copies, labels, sub-texts, instructions) must enforce a minimum contrast ratio of **4.5:1** against the background. Low-opacity colors (like light grey Navy-55) are prohibited on ivory backgrounds.
+* **Keyboard Reachability**: All interactive buttons, checkboxes, custom list items, and form elements must be fully focusable using keyboard tab navigation. Clear visible focus rings (`focus:ring-2 focus:ring-lavender`) must be rendered.
+* **Semantic HTML**: No raw emojis can be used as standalone interactive targets. Screen readers must be supplied with descriptive `aria-label` tags (e.g. `aria-label="Warning Alert"`, not just "⚠️").
+
+### 2. Arabic RTL (Right-to-Left) Parity
+* **Bi-directional Layout Grid**: Dynamic CSS wrappers must adapt text alignments and flex directions from left-to-right (LTR) to right-to-left (RTL) upon setting `document.documentElement.dir = 'rtl'`. Text padding, border locations, and icon positions must mirror cleanly to prevent interface truncation or text overlap.
+* **Clinical Language Translation**: Emotional reassuring check-in responses, error popups, safety preparation instructions, and drug timeline labels must load from data-driven content dictionaries. Hardcoded copywriting in view templates is forbidden.
+
+---
+
+## IOS PWA NOTIFICATION ESCALATION POLICY (CRITICAL SAFETY NET)
+
+Because web-push notifications on iOS PWAs are heavily restricted by Apple sandboxes and require active homescreen installation, the Missed-Dose Escalation engine (Journey 4) enforces an **SMS-Primary / Push-Secondary** dispatcher architecture for critical IVF stimulation alarms:
+* **Reminders (T-30 / Scheduled)**: Emitted via Web Push gateway if PWA connection is active.
+* **Level 1 Alert (T+30 Unconfirmed)**: Emitted as a backup SMS message to ensure delivery if PWA push goes undelivered.
+* **Level 2 Alert (T+60 Unconfirmed)**: Partner/Supporter companion alert is sent as a Direct Twilio SMS (to the verified companion phone) rather than relying on web-push connection states.
+* **Level 3 Alert (T+120 Urgent Triage)**: Clinic emergency alerts are dispatched via Direct Telephony/SMS API.
+
+---
+
 **STATUS:**
 *   **Part A (Journeys 1, 2, 3, 4, 8):** 🚀 APPROVED & READY FOR DEVELOPMENT
 *   **Part B (Journeys 5, 6, 7, 9, 10, 11, 12):** 🟡 ROADMAP — NOT approved for build; each gated per BRD §7.3 before entering a sprint.
 
-**Version Control:** MVP journeys aligned with JIRA Project Board `OVIFY-2026-V1`. Roadmap journeys held in backlog pending regulatory/consent gating.
+**Version Control:** MVP journeys aligned with JIRA Project Board `OVIFY-2026-V1`. Roadmap journeys held in backlog pending regulatory/consent gating. All documents are version-controlled active references in source code.

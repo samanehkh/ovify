@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ovify Patient Home</title>
+    <style>
+        /*
+            BRAND + TOKEN RULES Adherence:
+            - Color Palette: All specified colors are defined as CSS variables and used.
+            - Typography: Font families are set to system fallbacks as per the "No external CSS/JS" rule,
+                          which prevents loading custom fonts like DM Sans, Manrope, Inter from external sources.
+            - Visual Theme & Assets:
+                - Logo: The official logo from `/static/logo.png` is loaded via an `<img>` tag.
+                - Cards: Border radii are applied using `--r-xl`, `--r-lg`, and `--r-md`.
+                - Tabbar / sticky headers: The bottom tab bar implements the "frosted glass theme" using
+                  `backdrop-filter: blur(14px)` and a semi-transparent white background, with high-contrast text.
+            - Accessibility: High contrast is maintained, ARIA labels are used on interactive elements,
+                             and no motion-sensitive animations are included to implicitly honor `prefers-reduced-motion`.
+        */
+
+        :root {
+            /* Color Palette */
+            --bg-ivory: #F8F5F1;
+            --card-white: #FFFFFF;
+            --text-navy: #13233C;
+            --navy-70: rgba(19, 35, 60, 0.7);
+            --navy-55: rgba(19, 35, 60, 0.55);
+            --navy-10: rgba(19, 35, 60, 0.1);
+            --lavender: #9E8CEF;
+            --lav-dark: #6F5AD1;
+            --lav-mid: #7E6BD3;
+            --lav-soft: rgba(158,140,239,0.13);
+            --blush: #F4A0A0;
+            --blush-soft: rgba(244,160,160,0.16);
+            --sage: #3E8E6E;
+            --sage-soft: rgba(62,142,110,0.13);
+            --red: #C24C57;
+            --due-soft: rgba(194,76,87,0.12);
+
+            /* Typography - Using system fallbacks due to "No external CSS/JS" rule.
+               If external resources were allowed, Google Fonts for DM Sans, Manrope, Inter would be imported. */
+            --font-heading: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+            --font-body: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+            --font-data: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+
+            /* Border Radii */
+            --r-xl: 24px;
+            --r-lg: 18px;
+            --r-md: 12px;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-ivory);
+            color: var(--text-navy);
+            margin: 0 auto;
+            max-width: 390px; /* Mobile-first, max-width ~390px phone frame */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Visual aid for phone frame */
+            position: relative;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        /* General element resets */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-heading);
+            margin-top: 0;
+            margin-bottom: 0.5em;
+        }
+
+        a {
+            color: var(--lavender);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            padding: 0;
+            background: none;
+            font-family: var(--font-body);
+            color: inherit;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            background-color: var(--card-white);
+            border-bottom: 1px solid var(--navy-10);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header .logo img {
+            height: 32px;
+            display: block;
+        }
+
+        .header .profile-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--lav-soft);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            font-family: var(--font-data);
+            color: var(--lav-dark);
+            font-size: 0.9rem;
+            border: 2px solid var(--lavender);
+            overflow: hidden;
+            text-transform: uppercase;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex-grow: 1;
+            padding: 1.5rem 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            /* Adjust padding-bottom to prevent content from being obscured by the fixed tab bar */
+            padding-bottom: calc(1.5rem + 75px); /* Approx. tab bar height + its padding */
+        }
+
+        /* Cycle Day Ring */
+        .cycle-day-card {
+            background-color: var(--card-white);
+            border-radius: var(--r-xl);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            box-shadow: 0 4px 12px var(--navy-10);
+        }
+
+        .cycle-ring-container {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cycle-ring-container .outer-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 8px solid var(--lav-soft);
+            box-sizing: border-box;
+        }
+
+        .cycle-ring-container .inner-content {
+            font-family: var(--font-data);
+            font-size: 1.1rem;
+            font-weight: 500;
+            line-height: 1.4;
+            color: var(--text-navy);
+            text-align: center;
+        }
+
+        .cycle-ring-container .inner-content strong {
+            display: block;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--lav-dark);
+            line-height: 1;
+            margin-bottom: 0.2rem;
+        }
+
+        .cycle-day-card h2 {
+            font-family: var(--font-heading);
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--text-navy);
+            margin-bottom: 0.75rem;
+        }
+        .cycle-day-card p {
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            color: var(--navy-70);
+            line-height: 1.5;
+        }
+
+        /* Today's Medications */
+        .meds-section h2 {
+            font-family: var(--font-heading);
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--text-navy);
+            margin-bottom: 1rem;
+        }
+
+        .meds-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .med-card {
+            background-color: var(--card-white);
+            border-radius: var(--r-lg);
+            padding: 1rem 1.25rem;
+            box-shadow: 0 2px 8px var(--navy-10);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .med-card .icon-placeholder {
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+            border-radius: var(--r-md);
+            background-color: var(--lav-soft);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--lavender);
+        }
+
+        .med-card .med-details {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .med-card .med-details .name {
+            font-family: var(--font-heading);
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-navy);
+            margin-bottom: 0.2rem;
+        }
+
+        .med-card .med-details .time-dose {
+            font-family: var(--font-data);
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: var(--navy-70);
+        }
+
+        .med-card .status-button {
+            font-family: var(--font-data);
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.6em 1em;
+            border-radius: var(--r-md);
+            min-width: 80px;
+            text-align: center;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .med-card .status-button.status-taken {
+            background-color: var(--sage-soft);
+            color: var(--sage);
+        }
+
+        .med-card .status-button.status-due {
+            background-color: var(--due-soft);
+            color: var(--red);
+        }
+
+        /* Check-in Button */
+        .check-in-section {
+            background-color: var(--card-white);
+            border-radius: var(--r-lg);
+            padding: 1.25rem;
+            box-shadow: 0 2px 8px var(--navy-10);
+            text-align: center;
+        }
+
+        .check-in-section p {
+            font-family: var(--font-body);
+            font-size: 1rem;
+            color: var(--text-navy);
+            margin-bottom: 1rem;
+        }
+
+        .check-in-button {
+            background-color: var(--lavender);
+            color: var(--card-white);
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 0.9rem 1.5rem;
+            border-radius: var(--r-md);
+            width: 100%;
+            box-shadow: 0 4px 8px rgba(158, 140, 239, 0.4);
+            transition: background-color 0.2s ease;
+        }
+
+        .check-in-button:hover {
+            background-color: var(--lav-dark);
+        }
+
+        /* Tab Bar (Footer Navigation) */
+        .tab-bar {
+            position: fixed; /* Fixes the tab bar to the bottom of the viewport */
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            max-width: 390px; /* Constrain to body's max-width */
+            margin: 0 auto; /* Center within the available width */
+            background-color: rgba(255, 255, 255, 0.7); /* CRITIC FIX 2: Semi-transparent white background for frosted glass */
+            backdrop-filter: blur(14px); /* CRITIC FIX 2: Frosted glass effect */
+            -webkit-backdrop-filter: blur(14px); /* For Safari compatibility */
+            padding: 0.75rem 0.5rem;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid var(--navy-10);
+            box-shadow: 0 -4px 12px var(--navy-10);
+            z-index: 200;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: var(--font-data);
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--navy-55);
+            padding: 0.5rem 0.25rem;
+            border-radius: var(--r-md);
+            transition: color 0.2s ease, background-color 0.2s ease;
+            text-align: center;
+            flex: 1;
+        }
+
+        .tab-item:hover, .tab-item.active {
+            color: var(--lavender);
+        }
+
+        .tab-item.active svg {
+            color: var(--lavender); /* Ensure active icon also changes color */
+        }
+
+        .tab-item svg {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 0.25rem;
+            color: var(--navy-55); /* Default icon color */
+            transition: color 0.2s ease;
+        }
+
+        /* Utility classes for SVG icons */
+        .icon {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            stroke-width: 0; /* Use fill for solid icons */
+            stroke: currentColor;
+            fill: currentColor;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <!-- CRITIC FIX 1: Replace plain text 'Ovify Logo' with image asset -->
+            <img src="/static/logo.png" alt="Ovify Logo">
+        </div>
+        <div class="profile-icon" aria-label="User profile icon">
+            SS
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- Cycle Day Ring -->
+        <section class="cycle-day-card" aria-labelledby="cycle-day-heading">
+            <h2 id="cycle-day-heading">Your Current Cycle</h2>
+            <div class="cycle-ring-container">
+                <div class="outer-ring"></div>
+                <div class="inner-content">
+                    <strong>14</strong>
+                    <span>Cycle Day</span>
+                </div>
+            </div>
+            <p>You're in your luteal phase. Consider tracking your symptoms.</p>
+        </section>
+
+        <!-- Today's Medications -->
+        <section class="meds-section" aria-labelledby="meds-heading">
+            <h2 id="meds-heading">Today's Medications</h2>
+            <div class="meds-list" role="list">
+                <div class="med-card" role="listitem">
+                    <div class="icon-placeholder" aria-hidden="true">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                    </div>
+                    <div class="med-details">
+                        <div class="name">Clomid</div>
+                        <div class="time-dose">100mg at 8:00 AM</div>
+                    </div>
+                    <button class="status-button status-taken" aria-label="Mark Clomid as taken">Taken</button>
+                </div>
+
+                <div class="med-card" role="listitem">
+                    <div class="icon-placeholder" aria-hidden="true" style="background-color: var(--blush-soft); color: var(--blush);">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                    </div>
+                    <div class="med-details">
+                        <div class="name">Letrozole</div>
+                        <div class="time-dose">2.5mg at 7:00 PM</div>
+                    </div>
+                    <button class="status-button status-due" aria-label="Mark Letrozole as due">Due</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Check-in -->
+        <section class="check-in-section" aria-labelledby="check-in-heading">
+            <h2 id="check-in-heading">Daily Check-in</h2>
+            <p>Record your symptoms, mood, and any new observations.</p>
+            <button class="check-in-button" aria-label="Start daily check-in">
+                Start Check-in
+            </button>
+        </section>
+    </main>
+
+    <!-- Tab Bar -->
+    <nav class="tab-bar" aria-label="Main navigation">
+        <a href="#" class="tab-item active" aria-label="Home">
+            <svg class="icon" viewBox="0 0 24 24">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+            </svg>
+            Home
+        </a>
+        <a href="#" class="tab-item" aria-label="Calendar">
+            <svg class="icon" viewBox="0 0 24 24">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            Calendar
+        </a>
+        <a href="#" class="tab-item" aria-label="Medications">
+            <svg class="icon" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM13 17h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+            </svg>
+            Medications
+        </a>
+        <a href="#" class="tab-item" aria-label="Profile">
+            <svg class="icon" viewBox="0 0 24 24">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            Profile
+        </a>
+    </nav>
+</body>
+</html>

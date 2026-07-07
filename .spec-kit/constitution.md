@@ -5,7 +5,7 @@ This constitution defines the mandatory architectural rules, regulatory constrai
 
 ## 1. Technical & Architectural Boundaries
 
-* **Frontend Framework:** Plain HTML/JS/CSS (Vanilla) or TailwindCSS (if explicitly requested). Keep components clean, lightweight, and structured as a Progressive Web App (PWA).
+* **Frontend Framework:** React (via Vite) and TailwindCSS. Keep components clean, lightweight, and structured as a Progressive Web App (PWA).
 * **Backend Framework:** FastAPI (Python) or serverless backend APIs.
 * **Database Engine:** **Azure Database for PostgreSQL (Flexible Server)**. 
   * Relational tables must be used for scheduling cycle protocols, dose logs, and timing windows.

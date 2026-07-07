@@ -36,3 +36,5 @@ build/
 *.log
 tmp/
 scratch/
+*.db
+.spec-kit/

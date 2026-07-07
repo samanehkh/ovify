@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ovify Patient Home</title>
+    <!-- Google Fonts: DM Sans for headings, Manrope for body, Inter for data/labels -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Spec-Kit Agent Swarm Constitution: UI/UX Style & Brand Consistency (Ovify Patient PWA) */
+        /* --- Color Palette --- */
+        :root {
+            --color-ivory: #F8F5F1;
+            --color-white: #FFFFFF;
+            --color-navy: #13233C;
+            --color-navy-70: rgba(19, 35, 60, 0.7);
+            --color-navy-55: rgba(19, 35, 60, 0.55);
+            --color-navy-10: rgba(19, 35, 60, 0.1);
+            --color-lavender: #9E8CEF;
+            --color-lav-dark: #6F5AD1;
+            --color-lav-mid: #7E6BD3;
+            --color-lav-soft: rgba(158, 140, 239, 0.13);
+            --color-blush: #F4A0A0;
+            --color-blush-soft: rgba(244, 160, 160, 0.16);
+            --color-sage: #3E8E6E;
+            --color-sage-soft: rgba(62, 142, 110, 0.13);
+            --color-red: #C24C57;
+            --color-due-soft: rgba(194, 76, 87, 0.12);
+
+            /* --- Typography --- */
+            --font-heading: 'DM Sans', sans-serif;
+            --font-body: 'Manrope', sans-serif;
+            --font-data: 'Inter', sans-serif;
+
+            /* --- Visual Theme & Assets --- */
+            /* Border Radii */
+            --r-xl: 24px;
+            --r-lg: 18px;
+            --r-md: 12px;
+        }
+
+        /* General Body Styles */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: var(--font-body);
+            color: var(--color-navy);
+            background-color: var(--color-ivory);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            line-height: 1.5;
+        }
+
+        /* Headings */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            color: var(--color-navy);
+            margin: 0;
+        }
+
+        p {
+            margin: 0;
+        }
+
+        /* Utility Classes (Tailwind-like approach) */
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-1 { gap: 4px; }
+        .gap-2 { gap: 8px; }
+        .gap-3 { gap: 12px; }
+        .gap-4 { gap: 16px; }
+        .gap-6 { gap: 24px; }
+        .gap-8 { gap: 32px; }
+        .p-4 { padding: 16px; }
+        .px-4 { padding-left: 16px; padding-right: 16px; }
+        .py-2 { padding-top: 8px; padding-bottom: 8px; }
+        .pb-24 { padding-bottom: 96px; } /* Space for fixed bottom tab bar */
+        .text-center { text-align: center; }
+        .text-navy { color: var(--color-navy); }
+        .text-white { color: var(--color-white); }
+        .text-lavender { color: var(--color-lavender); }
+        .text-navy-70 { color: var(--color-navy-70); }
+        .text-navy-55 { color: var(--color-navy-55); }
+
+        .font-dm-sans { font-family: var(--font-heading); }
+        .font-manrope { font-family: var(--font-body); }
+        .font-inter { font-family: var(--font-data); }
+
+        .text-xl { font-size: 1.25rem; line-height: 1.75rem; } /* 20px */
+        .text-lg { font-size: 1.125rem; line-height: 1.75rem; } /* 18px */
+        .text-base { font-size: 1rem; line-height: 1.5rem; } /* 16px */
+        .text-sm { font-size: 0.875rem; line-height: 1.25rem; } /* 14px */
+        .text-xs { font-size: 0.75rem; line-height: 1rem; } /* 12px */
+
+        .font-bold { font-weight: 700; }
+        .font-semibold { font-weight: 600; }
+        .font-medium { font-weight: 500; }
+        .font-normal { font-weight: 400; }
+
+        .bg-white { background-color: var(--color-white); }
+        .bg-lav-soft { background-color: var(--color-lav-soft); }
+        .bg-blush-soft { background-color: var(--color-blush-soft); }
+        .bg-sage-soft { background-color: var(--color-sage-soft); }
+        .bg-due-soft { background-color: var(--color-due-soft); }
+
+        .rounded-xl { border-radius: var(--r-xl); }
+        .rounded-lg { border-radius: var(--r-lg); }
+        .rounded-md { border-radius: var(--r-md); }
+        .rounded-full { border-radius: 9999px; }
+
+        .w-full { width: 100%; }
+
+        /* Mobile Frame Wrapper */
+        .mobile-frame {
+            max-width: 390px; /* Max-width for mobile-first design */
+            margin: 0 auto;
+            min-height: 100vh;
+            background-color: var(--color-ivory);
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.08); /* Soft shadow for frame */
+            overflow: hidden; /* Prevent content overflow outside the frame */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header (Placeholder for Logo) */
+        .header {
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 60px;
+            box-sizing: border-box;
+            background-color: var(--color-ivory); /* Matches body background */
+            z-index: 10;
+        }
+        .logo-text {
+            font-size: 1.5rem; /* Larger for logo */
+            font-weight: 700;
+            font-family: var(--font-heading);
+            color: var(--color-navy);
+            text-decoration: none; /* In case it's an anchor */
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex-grow: 1; /* Allows content to take available space */
+            display: flex;
+            flex-direction: column;
+            gap: 24px; /* gap-6 */
+            padding: 16px; /* p-4 */
+            padding-bottom: 96px; /* pb-24: Accounts for tab bar height */
+            overflow-y: auto; /* Enable scrolling for content if needed */
+        }
+
+        /* Cycle Day Ring */
+        .cycle-ring-container {
+            width: 140px;
+            height: 140px;
+            position: relative;
+            margin: 0 auto;
+        }
+        .cycle-ring-svg {
+            transform: rotate(-90deg); /* Start progress from top */
+        }
+        .cycle-ring-bg {
+            stroke: var(--color-navy-10);
+            stroke-width: 14;
+            fill: none;
+        }
+        .cycle-ring-progress {
+            stroke: var(--color-lavender);
+            stroke-width: 14;
+            fill: none;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.5s ease-in-out;
+        }
+        .cycle-day-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-family: var(--font-data);
+            line-height: 1.1;
+        }
+        .cycle-day-text .day-number {
+            font-size: 3rem; /* ~48px */
+            font-weight: 700;
+            color: var(--color-navy);
+        }
+        .cycle-day-text .day-label {
+            font-size: 0.875rem; /* 14px */
+            font-weight: 500;
+            color: var(--color-navy-70);
+            text-transform: uppercase;
+        }
+
+        /* Card Surfaces */
+        .card {
+            background-color: var(--color-white);
+            border-radius: var(--r-xl);
+            padding: 24px; /* p-6 */
+            box-shadow: 0 4px 10px rgba(19, 35, 60, 0.05); /* Subtle shadow for premium feel */
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px; /* mb-6 */
+        }
+
+        .card-title {
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 700;
+            color: var(--color-navy);
+            font-family: var(--font-heading);
+        }
+
+        /* Medication Item */
+        .med-item {
+            display: flex;
+            align-items: center;
+            gap: 16px; /* gap-4 */
+            padding: 16px; /* p-4 */
+            border-radius: var(--r-lg);
+            margin-bottom: 12px; /* mb-3 */
+            border: 1px solid var(--color-navy-10);
+        }
+        .med-item:last-child {
+            margin-bottom: 0; /* No margin on the last item */
+        }
+
+        .med-item-status-pill {
+            padding: 6px 12px; /* py-1.5 px-3 */
+            border-radius: var(--r-md);
+            font-family: var(--font-inter);
+            font-weight: 600;
+            font-size: 0.75rem; /* text-xs */
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        .med-item-status-pill.status-taken {
+            background-color: var(--color-sage-soft);
+            color: var(--color-sage);
+        }
+        .med-item-status-pill.status-due {
+            background-color: var(--color-due-soft);
+            color: var(--color-red);
+        }
+
+        .med-item-details {
+            flex-grow: 1;
+        }
+        .med-item-name {
+            font-family: var(--font-body);
+            font-weight: 600;
+            font-size: 1rem; /* text-base */
+            color: var(--color-navy);
+            margin-bottom: 4px;
+        }
+        .med-item-info {
+            display: flex;
+            gap: 8px; /* gap-2 */
+            font-family: var(--font-data);
+            font-weight: 500;
+            font-size: 0.875rem; /* text-sm */
+            color: var(--color-navy-70);
+        }
+
+        .med-action-button {
+            background-color: var(--color-lavender);
+            color: var(--color-white);
+            border: none;
+            padding: 10px 14px; /* py-2.5 px-3.5 */
+            border-radius: var(--r-md);
+            font-family: var(--font-inter);
+            font-weight: 600;
+            font-size: 0.875rem; /* text-sm */
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            white-space: nowrap;
+        }
+        .med-action-button:hover {
+            background-color: var(--color-lav-dark);
+        }
+        .med-action-button:disabled {
+            background-color: var(--color-navy-10);
+            color: var(--color-navy-55);
+            cursor: not-allowed;
+        }
+
+        /* Emotional Check-in */
+        .emotion-options {
+            display: flex;
+            flex-wrap: wrap; /* Allows options to wrap to next line */
+            gap: 12px; /* gap-3 */
+        }
+        .emotion-button {
+            background-color: var(--color-navy-10); /* Default neutral */
+            color: var(--color-navy);
+            border: none;
+            padding: 12px 18px; /* py-3 px-4.5 */
+            border-radius: var(--r-lg);
+            font-family: var(--font-body);
+            font-weight: 500;
+            font-size: 1rem; /* text-base */
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .emotion-button:hover {
+            background-color: var(--color-lav-soft);
+            color: var(--color-lav-dark); /* Ensure high contrast */
+        }
+        .emotion-button.active {
+            background-color: var(--color-lavender);
+            color: var(--color-white); /* High contrast white text on lavender */
+        }
+        .emotion-button.active:hover {
+            background-color: var(--color-lav-dark);
+        }
+
+        /* Bottom Tab Bar */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 390px; /* Matches mobile frame width */
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.8); /* White with opacity */
+            backdrop-filter: blur(14px); /* Frosted glass theme */
+            -webkit-backdrop-filter: blur(14px); /* Safari support */
+            padding: 16px 0; /* py-4 */
+            border-top-left-radius: var(--r-xl);
+            border-top-right-radius: var(--r-xl);
+            box-shadow: 0 -4px 10px rgba(19, 35, 60, 0.05); /* Subtle shadow above */
+            z-index: 20;
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px; /* gap-1 */
+            color: var(--color-navy-70);
+            text-decoration: none;
+            font-family: var(--font-inter);
+            font-weight: 500;
+            font-size: 0.75rem; /* text-xs */
+            transition: color 0.2s ease, font-weight 0.2s ease;
+            cursor: pointer;
+            padding: 8px 0; /* Make clickable area larger */
+        }
+
+        .tab-item:hover {
+            color: var(--color-navy);
+        }
+
+        .tab-item.active {
+            color: var(--color-lavender);
+            font-weight: 600; /* High contrast text for active state */
+        }
+
+        .tab-item svg {
+            width: 24px;
+            height: 24px;
+            stroke-width: 2;
+            stroke: currentColor; /* Inherit color from parent */
+            fill: none;
+            transition: stroke 0.2s ease;
+        }
+
+        /* Accessibility: Screen Reader Only */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
+        /* Accessibility: prefers-reduced-motion */
+        @media (prefers-reduced-motion: reduce) {
+            .cycle-ring-progress {
+                transition: none; /* Disable animation */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-frame">
+        <!-- Header (Ovify Logo) -->
+        <header class="header">
+            <!-- As per the rules: "Must load the official logo from `/static/logo.png`." -->
+            <!-- For this self-contained HTML output, a text placeholder is used. -->
+            <!-- In a PWA, an <img> tag pointing to /static/logo.png would be used. -->
+            <a href="#" class="logo-text" aria-label="Ovify Home">Ovify</a>
+        </header>
+
+        <main class="main-content">
+            <!-- Cycle Day Ring -->
+            <section class="flex flex-col items-center gap-4">
+                <h2 class="sr-only">Cycle Day Overview</h2>
+                <div class="cycle-ring-container" role="progressbar" aria-valuenow="14" aria-valuemin="1" aria-valuemax="28" aria-label="Cycle day 14, Follicular Phase">
+                    <svg class="cycle-ring-svg" width="140" height="140" viewBox="0 0 140 140">
+                        <!-- Background track -->
+                        <circle cx="70" cy="70" r="60" class="cycle-ring-bg"></circle>
+                        <!-- Progress indicator (14/28 days = 50% progress) -->
+                        <circle cx="70" cy="70" r="60" class="cycle-ring-progress" style="stroke-dasharray: 376.99; stroke-dashoffset: calc(376.99 - (376.99 * (14 / 28)));"></circle>
+                    </svg>
+                    <div class="cycle-day-text">
+                        <span class="day-number font-inter font-bold">14</span>
+                        <span class="day-label font-inter font-medium">Cycle Day</span>
+                    </div>
+                </div>
+                <p class="font-inter text-sm font-medium text-navy-70">Follicular Phase</p>
+            </section>
+
+            <!-- Today's Medications Card -->
+            <section class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Today's Medications</h2>
+                    <button class="font-inter text-sm font-semibold text-lavender" aria-label="View all scheduled medications for today">View All</button>
+                </div>
+                <div class="flex flex-col gap-3">
+                    <!-- Med Item 1: Due -->
+                    <div class="med-item">
+                        <div class="med-item-details">
+                            <p class="med-item-name">Follistim Pen</p>
+                            <div class="med-item-info">
+                                <span>150 IU</span>
+                                &bullet;
+                                <time datetime="2023-10-27T08:00">8:00 AM</time>
+                            </div>
+                        </div>
+                        <span class="med-item-status-pill status-due">Due</span>
+                        <button class="med-action-button" aria-label="Mark Follistim Pen 150 IU at 8 AM as taken">Take</button>
+                    </div>
+
+                    <!-- Med Item 2: Taken -->
+                    <div class="med-item">
+                        <div class="med-item-details">
+                            <p class="med-item-name">Menopur</p>
+                            <div class="med-item-info">
+                                <span>75 IU</span>
+                                &bullet;
+                                <time datetime="2023-10-27T07:30">7:30 AM</time>
+                            </div>
+                        </div>
+                        <span class="med-item-status-pill status-taken">Taken</span>
+                        <button class="med-action-button" disabled aria-label="Menopur 75 IU at 7:30 AM already taken">Taken</button>
+                    </div>
+
+                    <!-- Med Item 3: Due -->
+                     <div class="med-item">
+                        <div class="med-item-details">
+                            <p class="med-item-name">Prenatal Vitamin</p>
+                            <div class="med-item-info">
+                                <span>1 Tablet</span>
+                                &bullet;
+                                <time datetime="2023-10-27T09:00">9:00 AM</time>
+                            </div>
+                        </div>
+                        <span class="med-item-status-pill status-due">Due</span>
+                        <button class="med-action-button" aria-label="Mark Prenatal Vitamin 1 Tablet at 9 AM as taken">Take</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Emotional Check-in Card -->
+            <section class="card">
+                <div class="card-header">
+                    <h2 class="card-title">How are you feeling?</h2>
+                </div>
+                <div class="emotion-options" role="group" aria-label="Select your current emotion">
+                    <button class="emotion-button font-manrope font-medium" aria-pressed="false">Hopeful</button>
+                    <button class="emotion-button font-manrope font-medium" aria-pressed="false">Anxious</button>
+                    <button class="emotion-button font-manrope font-medium" aria-pressed="false">Tired</button>
+                    <button class="emotion-button font-manrope font-medium active" aria-pressed="true">Grateful</button>
+                    <button class="emotion-button font-manrope font-medium" aria-pressed="false">Happy</button>
+                    <button class="emotion-button font-manrope font-medium" aria-pressed="false">Sad</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Tab Bar -->
+        <nav class="tab-bar" aria-label="Main navigation">
+            <a href="#" class="tab-item active" aria-current="page">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span>Home</span>
+            </a>
+            <a href="#" class="tab-item" aria-label="Go to Calendar">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <span>Calendar</span>
+            </a>
+            <a href="#" class="tab-item" aria-label="Go to Chat">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span>Chat</span>
+            </a>
+            <a href="#" class="tab-item" aria-label="Go to Profile">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>Profile</span>
+            </a>
+        </nav>
+    </div>
+</body>
+</html>

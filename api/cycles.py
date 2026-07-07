@@ -30,7 +30,7 @@ def update_cycle(cycle_id: int, cycle: CycleUpdate, db: Session = Depends(get_db
     return db_cycle
 
 @router.get("/summary/{user_id}", response_model=CycleSummary)
-def get_cycle_summary(user_id: str, db: Session = Depends(get_db)):
+def get_cycle_summary(user_id: int, db: Session = Depends(get_db)):
     cycles = db.query(models.Cycle).filter(models.Cycle.user_id == user_id).order_by(models.Cycle.start_date).all()
 
     if not cycles:
@@ -57,6 +57,6 @@ def get_cycle_summary(user_id: str, db: Session = Depends(get_db)):
     )
 
 @router.get("/{user_id}", response_model=List[CycleResponse])
-def get_cycles(user_id: str, db: Session = Depends(get_db)):
+def get_cycles(user_id: int, db: Session = Depends(get_db)):
     cycles = db.query(models.Cycle).filter(models.Cycle.user_id == user_id).order_by(models.Cycle.start_date).all()
     return cycles

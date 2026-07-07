@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#F8F5F1">
+  <title>Ovify - Modern Patient Home</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,500;9..40,700&family=Manrope:wght@500;600;700&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F8F5F1;
+      --surface: #FFFFFF;
+      --navy: #13233C;
+      --navy-70: rgba(19,35,60,0.72);
+      --navy-55: rgba(19,35,60,0.55);
+      --navy-10: rgba(19,35,60,0.07);
+      --lavender: #9E8CEF;
+      --lav-dark: #6F5AD1;
+      --lav-soft: rgba(158,140,239,0.13);
+      --blush: #F4A0A0;
+      --blush-soft: rgba(244,160,160,0.16);
+      --due: #C24C57;
+      --due-soft: rgba(194,76,87,0.12);
+      --sage: #3E8E6E;
+      --sage-soft: rgba(62,142,110,0.13);
+      --border: rgba(19,35,60,0.06);
+      --r-xl: 24px; --r-lg: 18px; --r-pill: 999px;
+      --ease: cubic-bezier(0.175, 0.885, 0.32, 1.05);
+      --t: 0.35s var(--ease);
+    }
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+    html { -webkit-text-size-adjust:100%; overflow-x:hidden; }
+    body {
+      background: var(--bg);
+      background-image: 
+        radial-gradient(circle at 0% 0%, rgba(158,140,239,0.08) 0%, transparent 40%),
+        radial-gradient(circle at 100% 100%, rgba(244,160,160,0.1) 0%, transparent 40%);
+      display:flex; justify-content:center; min-height:100dvh;
+      font-family:'Manrope',sans-serif; color:var(--navy); -webkit-font-smoothing:antialiased;
+    }
+    button { font-family:inherit; cursor:pointer; border:none; background:none; }
+    svg { display:block; }
+    
+    .phone {
+      width:100%; max-width:400px; min-height:100dvh;
+      display:flex; flex-direction:column; position:relative; overflow:hidden;
+      box-shadow: 0 40px 100px rgba(19,35,60,0.08);
+      background: rgba(248,245,241,0.4);
+    }
+
+    /* TOP NAV */
+    .nav { padding: 16px 20px 12px; display:flex; align-items:center; justify-content:space-between; z-index:10; }
+    .nav__logo-wrap { display:flex; align-items:center; gap:10px; }
+    .nav__logo { width:32px; height:32px; object-fit:contain; border-radius:10px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .nav__title { font-family:'DM Sans',sans-serif; font-size:20px; font-weight:700; letter-spacing:-0.5px; }
+    .nav__avatar {
+      width:40px; height:40px; border-radius:50%;
+      background: linear-gradient(135deg, var(--lavender), var(--blush));
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Inter',sans-serif; font-size:16px; font-weight:700; color:#fff;
+      box-shadow: 0 6px 16px var(--lav-soft); transition: var(--t);
+    }
+    .nav__avatar:hover { transform: scale(1.08); box-shadow: 0 8px 24px var(--lav-soft); }
+
+    /* SCROLL */
+    .scroll { flex:1; overflow-y:auto; padding: 0 20px 120px; }
+
+    /* HERO */
+    .hero {
+      margin-top: 10px; margin-bottom: 32px;
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+    }
+    .hero__greeting { font-family:'Inter',sans-serif; font-size:14px; font-weight:600; color:var(--navy-55); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.05em; }
+    .hero__name { font-family:'DM Sans',sans-serif; font-size:28px; font-weight:700; letter-spacing:-0.6px; margin-bottom: 24px; }
+    
+    .ring-container { position:relative; width: 220px; height: 220px; }
+    .ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); filter: drop-shadow(0px 8px 24px rgba(158,140,239,0.25)); }
+    .ring-track { fill:none; stroke: var(--surface); stroke-width: 14; }
+    .ring-fill { 
+      fill:none; stroke: url(#ringGrad); stroke-width: 14; stroke-linecap: round;
+      stroke-dasharray: 565.48; stroke-dashoffset: 565.48; 
+      transition: stroke-dashoffset 1.8s cubic-bezier(0.2, 1, 0.3, 1);
+    }
+    .ring-content {
+      position: absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+      border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+    }
+    .ring-day { font-family:'DM Sans',sans-serif; font-size:46px; font-weight:700; line-height:1; letter-spacing:-1px; color: var(--navy); }
+    .ring-sub { font-family:'Inter',sans-serif; font-size:12px; font-weight:700; color:var(--lav-dark); letter-spacing:0.1em; text-transform:uppercase; margin-top:8px; }
+    
+    .hero__phase { margin-top: 24px; display:inline-flex; align-items:center; gap:8px; padding: 8px 16px; background:var(--surface); border-radius:var(--r-pill); box-shadow: 0 4px 14px rgba(19,35,60,0.04); font-family:'Inter',sans-serif; font-size:13px; font-weight:600; color:var(--navy); }
+    .hero__phase-dot { width:8px; height:8px; border-radius:50%; background:var(--lavender); animation: pulse 2s infinite; }
+    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(158,140,239,0.4); } 70% { box-shadow: 0 0 0 8px rgba(158,140,239,0); } 100% { box-shadow: 0 0 0 0 rgba(158,140,239,0); } }
+
+    /* SEC HEAD */
+    .sec-head { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 16px; margin-top:8px; }
+    .sec-head__title { font-family:'DM Sans',sans-serif; font-size:20px; font-weight:700; letter-spacing:-0.4px; }
+    .sec-head__link { font-family:'Inter',sans-serif; font-size:14px; font-weight:600; color:var(--lav-dark); transition:var(--t); }
+    .sec-head__link:hover { color:var(--navy); }
+
+    /* MED CARDS */
+    .med-stack { display:flex; flex-direction:column; gap:16px; margin-bottom: 32px; }
+    .med {
+      background: var(--surface); border-radius: var(--r-xl); padding: 18px;
+      box-shadow: 0 8px 24px rgba(19,35,60,0.03); border: 1px solid var(--border);
+      transition: var(--t); position: relative;
+    }
+    .med:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(19,35,60,0.06); border-color: rgba(158,140,239,0.3); }
+    .med.is-done { opacity: 0.8; background: linear-gradient(to bottom, #FFFFFF, rgba(62,142,110,0.02)); border-color: var(--sage-soft); }
+    .med.is-done:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(19,35,60,0.03); }
+    
+    .med__row { display:flex; align-items:center; gap:16px; }
+    .med__img-wrap { width:56px; height:56px; border-radius:16px; background:var(--bg); display:flex; align-items:center; justify-content:center; overflow:hidden; flex:none; }
+    .med__img { width:100%; height:100%; object-fit:cover; mix-blend-mode: multiply; }
+    .med__info { flex:1; min-width:0; }
+    .med__name { font-family:'DM Sans',sans-serif; font-size:18px; font-weight:700; letter-spacing:-0.3px; color:var(--navy); margin-bottom:2px; }
+    .med__time { font-family:'Inter',sans-serif; font-size:13px; font-weight:500; color:var(--navy-55); }
+    
+    .med__status { padding: 6px 12px; border-radius: var(--r-pill); font-family:'Inter',sans-serif; font-size:12px; font-weight:700; display:inline-flex; align-items:center; gap:6px; flex:none; }
+    .med__status--due { background: var(--due-soft); color: var(--due); }
+    .med__status--done { background: var(--sage-soft); color: var(--sage); }
+    .med__status-dot { width:6px; height:6px; border-radius:50%; background:currentColor; }
+
+    /* CALM BLOCK */
+    .calm {
+      background: rgba(255,255,255,0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-radius: var(--r-xl); padding: 24px; border: 1px solid rgba(255,255,255,0.8);
+      box-shadow: 0 12px 32px rgba(19,35,60,0.04); margin-bottom: 32px; transition: var(--t);
+    }
+    .calm:hover { box-shadow: 0 16px 40px rgba(19,35,60,0.07); }
+    .calm__head { width:100%; display:flex; align-items:center; justify-content:space-between; text-align:left; }
+    .calm__left { display:flex; align-items:center; gap:16px; }
+    .calm__icon { width:48px; height:48px; background:linear-gradient(135deg, var(--lav-soft), var(--blush-soft)); border-radius:16px; display:flex; align-items:center; justify-content:center; color:var(--lav-dark); }
+    .calm__icon svg { width:24px; height:24px; stroke:currentColor; stroke-width:2; fill:none; }
+    .calm__title { font-family:'DM Sans',sans-serif; font-size:18px; font-weight:700; color:var(--navy); margin-bottom:4px; }
+    .calm__sub { font-family:'Inter',sans-serif; font-size:13px; font-weight:500; color:var(--navy-55); }
+    .calm__chev { transition: transform var(--t); color:var(--navy-55); }
+    .calm.open .calm__chev { transform: rotate(180deg); color:var(--navy); }
+    
+    .calm__panel { max-height:0; overflow:hidden; transition: max-height 0.4s var(--ease), opacity 0.4s var(--ease); opacity:0; }
+    .calm.open .calm__panel { max-height: 300px; opacity:1; }
+    .calm__moods { display:flex; gap:10px; margin-top: 24px; }
+    .calm__mood { flex:1; padding: 12px 0; border-radius: 14px; background: var(--surface); border: 1px solid var(--border); font-family:'Inter',sans-serif; font-size:13px; font-weight:600; color:var(--navy-70); transition: var(--t); box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+    .calm__mood:hover, .calm__mood.active { background: var(--lav-dark); color: #fff; border-color: var(--lav-dark); transform: translateY(-4px); box-shadow: 0 8px 20px rgba(111,90,209,0.3); }
+    .calm__resp { margin-top: 16px; padding: 16px; background: var(--surface); border-radius: 16px; border-left: 4px solid var(--lavender); font-family:'Manrope',sans-serif; font-size:14px; font-weight:500; color:var(--navy); line-height:1.6; opacity:0; transform:translateY(10px); transition: var(--t); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+    .calm__resp.show { opacity:1; transform:translateY(0); }
+
+    /* TAB BAR */
+    .tabbar {
+      position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:400px;
+      background: rgba(255,255,255,0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255,255,255,0.6);
+      display:flex; justify-content:space-between; padding: 12px 24px calc(12px + env(safe-area-inset-bottom, 16px)); z-index:99;
+      box-shadow: 0 -10px 40px rgba(19,35,60,0.04);
+    }
+    .tab { display:flex; flex-direction:column; align-items:center; gap:6px; color:var(--navy-55); transition:var(--t); width: 60px; position: relative; }
+    .tab svg { width:24px; height:24px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; transition:var(--t); }
+    .tab span { font-family:'Inter',sans-serif; font-size:11px; font-weight:600; transition:var(--t); }
+    .tab.active { color:var(--lav-dark); }
+    .tab.active svg { stroke:var(--lav-dark); transform: translateY(-2px); }
+    .tab.active .icon-home { fill:var(--lav-dark); stroke:none; }
+    .tab.active span { font-weight:700; transform: translateY(-2px); }
+    .tab:not(.active):hover { color:var(--navy); }
+    .tab.active::after { content: ''; position:absolute; top:-12px; left:50%; transform:translateX(-50%); width: 32px; height: 4px; background: var(--lav-dark); border-radius: 0 0 4px 4px; }
+\n/* ─────────────────────────────────────────  INJECTION GUIDE MODAL (FULL PAGE)  ───────────────────────────────────────── */
+    .guide-modal {
+      position: absolute;
+      inset: 0;
+      background: var(--bg);
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s var(--ease);
+      display: flex;
+      flex-direction: column;
+    }
+    .guide-modal.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .guide-modal__nav {
+      padding: 12px 18px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .guide-modal__back-btn {
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      color: var(--navy);
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+    }
+    .guide-modal__back-btn svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .guide-modal__logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .guide-modal__nav-logo {
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+    }
+    .guide-modal__nav-title {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: -0.4px;
+    }
+    .guide-modal__nav-placeholder {
+      width: 38px;
+    }
+    .guide-modal__scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 16px 40px;
+    }
+
+    /* Cards */
+    .guide-card {
+      background: var(--surface);
+      border-radius: 20px;
+      padding: 24px 20px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03), 0 4px 12px rgba(0,0,0,0.02);
+      text-align: center;
+    }
+    .guide-card__subtitle {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--lav-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+    .guide-card__title {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: -0.5px;
+      margin-bottom: 16px;
+    }
+    .guide-card__med-photo {
+      width: auto;
+      max-width: 100%;
+      height: 132px;              /* shorter */
+      object-fit: contain;
+      margin: 0 auto 14px;
+      display: block;
+      mix-blend-mode: multiply;   /* drops the white photo background against the white card */
+    }
+    .guide-card__instruction {
+      font-family: 'Manrope', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--navy-70);
+    }
+
+    /* Video Card */
+    .video-card {
+      background: var(--surface);
+      border-radius: 20px;
+      padding: 12px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03), 0 4px 12px rgba(0,0,0,0.02);
+    }
+    .video-card__container {
+      position: relative;
+      width: 100%;
+      border-radius: 14px;
+      overflow: hidden;
+      aspect-ratio: 16/9;
+      background: #000;
+    }
+    .video-card__video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .video-card__overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(19, 35, 60, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: opacity 0.3s;
+      z-index: 10;
+    }
+    .video-card__overlay.playing {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .video-card__play-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #9E8CEF;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(158,140,239,0.4);
+      transition: transform 0.25s var(--ease);
+    }
+    .video-card__overlay:hover .video-card__play-btn {
+      transform: scale(1.1);
+    }
+    .video-card__play-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+      margin-left: 2px;
+    }
+    .video-card__footer {
+      font-family: 'Manrope', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--navy);
+      text-align: center;
+      padding: 12px 0 4px;
+    }
+
+    /* Checklist Block */
+    .checklist-card {
+      background: rgba(244, 160, 160, 0.12);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(244, 160, 160, 0.2);
+      text-align: left;
+    }
+    .checklist-card__title {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15.5px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 14px;
+    }
+    .checklist-card__list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .checklist-card__item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .checklist-card__icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .checklist-card__icon--checked {
+      background: #9E8CEF;
+      color: #fff;
+    }
+    .checklist-card__icon--unchecked {
+      border: 2px solid var(--border);
+      background: #fff;
+    }
+    .checklist-card__icon svg {
+      width: 11px;
+      height: 11px;
+      stroke: currentColor;
+      stroke-width: 3;
+      fill: none;
+    }
+    .checklist-card__text {
+      font-family: 'Manrope', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--navy-70);
+    }
+
+    /* Action button */
+    .action-btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: var(--r-pill);
+      background: #13233C;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--t);
+      text-align: center;
+      border: none;
+      box-shadow: 0 4px 14px rgba(19, 35, 60, 0.2);
+      margin-bottom: 12px;
+    }
+    .action-btn:hover {
+      background: var(--lav-dark);
+      box-shadow: 0 6px 20px rgba(111, 90, 209, 0.3);
+    }
+
+    /* Support Alert Strip */
+    .support-strip {
+      background: rgba(19, 35, 60, 0.04);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-family: 'Manrope', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--navy-70);
+    }
+    .support-strip svg {
+      width: 16px;
+      height: 16px;
+      stroke: var(--navy-55);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Guide eyebrow — neutral opener with schedule + late state */
+    .guide-card__eyebrow { display:inline-flex; align-items:center; gap:6px; font-family:'Inter',sans-serif;
+      font-size:11.5px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--lav-dark); margin-bottom:8px; }
+    .guide-card__eyebrow.is-late { color:var(--due); }
+    .guide-card__eyebrow .dot { width:6px; height:6px; border-radius:50%; background:currentColor; flex:none; }
+
+    /* Dose — the highest-rigor element, emphasised */
+    .guide-card__dose { display:inline-flex; flex-direction:column; align-items:center; gap:2px; margin-top:2px;
+      background:var(--lav-soft); border:1px solid rgba(158,140,239,0.28); border-radius:16px; padding:12px 24px; }
+    .guide-card__dose-label { font-family:'Inter',sans-serif; font-size:10.5px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:var(--navy-70); }
+    .guide-card__dose-value { font-family:'DM Sans',sans-serif; font-size:27px; font-weight:700; color:var(--navy); letter-spacing:-0.6px; line-height:1.1; }
+
+    /* Earned readiness line (below the checklist) */
+    .guide-ready { display:flex; align-items:center; justify-content:center; gap:8px; margin:2px 0 14px; text-align:center;
+      font-family:'Manrope',sans-serif; font-size:13.5px; font-weight:600; color:var(--sage); }
+    .guide-ready svg { width:17px; height:17px; stroke:currentColor; fill:none; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+
+    /* Animated injection guide (replaces the empty <video>) */
+    .vguide { position:relative; width:100%; aspect-ratio:2 / 1; border-radius:14px; overflow:hidden;
+      background:linear-gradient(160deg,#ECE7F8 0%,#FBEFEF 100%); }
+    .vguide__scene { position:absolute; inset:0; width:100%; height:100%; }
+    .vguide__caption { position:absolute; left:0; right:0; bottom:12px; text-align:center;
+      font-family:'Manrope',sans-serif; font-size:13px; font-weight:700; color:var(--navy); padding:0 12px; }
+    .vguide__progress { position:absolute; left:14px; right:14px; bottom:6px; height:3px; border-radius:2px; background:rgba(19,35,60,0.12); overflow:hidden; }
+    .vguide__progress i { display:block; height:100%; width:0; background:linear-gradient(90deg,var(--lavender),var(--blush)); }
+    .vguide__overlay { position:absolute; inset:0; z-index:5; border:none; cursor:pointer; background:rgba(19,35,60,0.35);
+      display:flex; align-items:center; justify-content:center; transition:opacity .3s; }
+    .vguide.playing .vguide__overlay { opacity:0; pointer-events:none; }
+    .vguide__play { width:52px; height:52px; border-radius:50%; background:#9E8CEF; color:#fff;
+      display:flex; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(158,140,239,0.4); }
+    .vguide__play svg { width:22px; height:22px; fill:currentColor; margin-left:2px; }
+    /* scene animation — only while playing */
+    .vg-pen { transform:translate(0,-46px); opacity:0; }
+    .vg-fill { stroke-dasharray:170; stroke-dashoffset:170; }
+    .vg-check { opacity:0; transform-box:fill-box; transform-origin:center; transform:scale(.5); }
+    .vguide.playing .vg-pen   { animation:vgPen 9s var(--ease) infinite; }
+    .vguide.playing .vg-fill  { animation:vgFill 9s linear infinite; }
+    .vguide.playing .vg-check { animation:vgCheck 9s ease infinite; }
+    .vguide.playing .vguide__progress i { animation:vgProg 9s linear infinite; }
+    @keyframes vgPen  { 0%{transform:translate(0,-46px);opacity:0} 12%{opacity:1} 34%{transform:translate(0,4px)} 58%{transform:translate(0,4px)} 72%{transform:translate(0,-46px);opacity:0} 100%{transform:translate(0,-46px);opacity:0} }
+    @keyframes vgFill { 0%,34%{stroke-dashoffset:170} 58%{stroke-dashoffset:0} 100%{stroke-dashoffset:0} }
+    @keyframes vgCheck{ 0%,74%{opacity:0;transform:scale(.5)} 84%{opacity:1;transform:scale(1)} 100%{opacity:1;transform:scale(1)} }
+    @keyframes vgProg { 0%{width:0} 100%{width:100%} }
+
+    /* Success confirmation state */
+    .guide-success { position:absolute; inset:0; z-index:20; background:var(--bg); display:flex; flex-direction:column;
+      align-items:center; justify-content:center; text-align:center; padding:32px; gap:6px;
+      opacity:0; pointer-events:none; transition:opacity .3s var(--ease); }
+    .guide-success.show { opacity:1; pointer-events:all; }
+    .guide-success__check { width:76px; height:76px; border-radius:50%; background:var(--sage-soft); color:var(--sage);
+      display:flex; align-items:center; justify-content:center; margin-bottom:14px; }
+    .guide-success__check svg { width:36px; height:36px; stroke:currentColor; fill:none; stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
+    .guide-success__title { font-family:'DM Sans',sans-serif; font-size:21px; font-weight:700; color:var(--navy); }
+    .guide-success__sub { font-family:'Manrope',sans-serif; font-size:14px; color:var(--navy-70); }
+    .guide-success__meta { font-family:'Inter',sans-serif; font-size:12px; font-weight:600; color:var(--lav-dark); margin-top:4px; }
+
+    /* ═════════════  JOURNEY 3 — MODERN WINDOW (refinements)  ═════════════ */
+    .guide-modal__nav {
+      background:rgba(248,245,241,0.82); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--border); padding:12px 16px;
+    }
+    .guide-modal__nav-logo { width:26px; height:26px; object-fit:contain; }
+    .guide-modal__scroll { padding:18px 16px 40px; }
+
+    .guide-card { border-radius:24px; padding:16px 18px 20px; text-align:center; margin-bottom:14px;
+      border:1px solid var(--border); box-shadow:0 1px 3px rgba(19,35,60,0.04), 0 10px 30px rgba(19,35,60,0.05); }
+    .guide-card__head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:4px; }
+    .guide-card__eyebrow { display:inline-flex; align-items:center; gap:6px; margin:0;
+      font-family:'Inter',sans-serif; font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--lav-dark); }
+    .guide-card__eyebrow .dot { width:6px; height:6px; border-radius:50%; background:currentColor; flex:none; }
+    .guide-card__due { flex:none; font-family:'Inter',sans-serif; font-size:12px; font-weight:700; padding:5px 11px;
+      border-radius:var(--r-pill); background:var(--lav-soft); color:var(--lav-dark); white-space:nowrap; }
+    .guide-card__due.is-late { background:var(--due-soft); color:var(--due); }
+    .guide-card__med-photo { height:118px; margin:8px auto 12px; }
+    .guide-card__title { font-size:22px; margin-bottom:14px; }
+    .guide-card__dose { display:flex; align-items:center; justify-content:space-between; width:100%; margin:0;
+      background:var(--lav-soft); border:1px solid rgba(158,140,239,0.24); border-radius:16px; padding:13px 18px; }
+    .guide-card__dose-label { font-family:'Inter',sans-serif; font-size:11.5px; font-weight:600; letter-spacing:0.04em; text-transform:uppercase; color:var(--navy-70); }
+    .guide-card__dose-value { font-family:'DM Sans',sans-serif; font-size:24px; font-weight:700; color:var(--navy); letter-spacing:-0.5px; line-height:1; }
+
+    /* Walkthrough card — real clinical illustration */
+    .vcard { background:var(--surface); border:1px solid var(--border); border-radius:24px; padding:14px; margin-bottom:14px;
+      box-shadow:0 1px 3px rgba(19,35,60,0.04), 0 10px 30px rgba(19,35,60,0.05); }
+    .vcard__head { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; padding:0 2px; }
+    .vcard__title { font-family:'DM Sans',sans-serif; font-size:15px; font-weight:700; color:var(--navy); }
+    .vcard__time { font-family:'Inter',sans-serif; font-size:12px; font-weight:600; color:var(--navy-55); background:var(--navy-10); padding:3px 10px; border-radius:var(--r-pill); }
+    .vguide { position:relative; width:100%; aspect-ratio:16/10; border-radius:16px; overflow:hidden; background:#EDE9F8; }
+    .vguide__poster { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center 40%; }
+    .vguide__scrim { position:absolute; inset:0; background:linear-gradient(to top, rgba(19,35,60,0.6) 0%, rgba(19,35,60,0) 46%); }
+    .vguide__caption { position:absolute; left:14px; right:14px; bottom:14px; text-align:left; color:#fff;
+      font-family:'Manrope',sans-serif; font-size:13px; font-weight:700; text-shadow:0 1px 4px rgba(0,0,0,0.4); }
+    .vguide__progress { left:0; right:0; bottom:0; height:4px; background:rgba(255,255,255,0.28); border-radius:0; }
+    .vguide__overlay { background:rgba(19,35,60,0.26); }
+
+    /* Checklist — clean white card, sage checks */
+    .checklist-card { background:var(--surface); border:1px solid var(--border); border-radius:24px; padding:18px; margin-bottom:16px; text-align:left;
+      box-shadow:0 1px 3px rgba(19,35,60,0.04), 0 10px 30px rgba(19,35,60,0.05); }
+    .checklist-card__title { font-family:'DM Sans',sans-serif; font-size:15px; font-weight:700; color:var(--navy); margin-bottom:14px; }
+    .checklist-card__list { gap:13px; }
+    .checklist-card__icon { width:22px; height:22px; background:var(--sage); color:#fff; border:none; }
+    .checklist-card__icon svg { width:12px; height:12px; stroke-width:3; }
+    .checklist-card__text { font-size:14px; font-weight:500; color:var(--navy); }
+
+    /* Primary CTA + ready caption */
+    .action-btn { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:8px; }
+    .action-btn svg { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round; }
+    .guide-ready { display:block; text-align:center; margin:0 0 14px; color:var(--navy-55);
+      font-family:'Manrope',sans-serif; font-size:12.5px; font-weight:500; }
+
+    /* ─────────────────────────────────────────  REDUCED MOTION  ───────────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      *,*::before,*::after { animation-duration:0.001ms !important; animation-iteration-count:1 !important;
+        transition-duration:0.001ms !important; scroll-behavior:auto !important; }
+    }
+  
+  </style>
+</head>
+<body>
+<div class="phone">
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#9E8CEF"/>
+        <stop offset="100%" stop-color="#F4A0A0"/>
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <nav class="nav">
+    <div class="nav__logo-wrap">
+      <img src="/static/logo.png" alt="Ovify" class="nav__logo">
+      <span class="nav__title">Ovify</span>
+    </div>
+    <button class="nav__avatar" aria-label="Profile" onclick="toast('Profile')">S</button>
+  </nav>
+
+  <div class="scroll">
+    
+    <section class="hero">
+      <div class="hero__greeting" id="heroGreeting">Good Morning</div>
+      <div class="hero__name">Sarah</div>
+      
+      <div class="ring-container">
+        <svg class="ring-svg" viewBox="0 0 200 200">
+          <circle class="ring-track" cx="100" cy="100" r="90" />
+          <circle class="ring-fill" id="arcFill" cx="100" cy="100" r="90" />
+        </svg>
+        <div class="ring-content">
+          <span class="ring-day">Day 5</span>
+          <span class="ring-sub">Stimulation</span>
+        </div>
+      </div>
+      
+      <div class="hero__phase">
+        <span class="hero__phase-dot"></span>
+        <span id="heroPending">2 Injections Pending</span>
+      </div>
+    </section>
+
+    <div class="sec-head">
+      <h2 class="sec-head__title">Today's Plan</h2>
+      <button class="sec-head__link" onclick="toast('View Calendar')">View all</button>
+    </div>
+
+    <div class="med-stack" id="medicationStack">
+      <!-- Medications populated by JS -->
+    </div>
+
+    <div class="calm" id="calm">
+      <button class="calm__head" aria-expanded="false" onclick="toggleCalm()">
+        <div class="calm__left">
+          <div class="calm__icon">
+            <svg viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"/><path d="M9 10h.01M15 10h.01"/><path d="M9 15c.5 1 1.5 2 3 2s2.5-1 3-2" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <span class="calm__title">How are you feeling?</span>
+            <span class="calm__sub">Tap to log your mood</span>
+          </div>
+        </div>
+        <div class="calm__chev"><svg width="24" height="24" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke-width="2" stroke-linecap="round" fill="none" stroke="currentColor"/></svg></div>
+      </button>
+      <div class="calm__panel">
+        <div class="calm__moods">
+          <button class="calm__mood" onclick="selectMood(this, 'Difficult')">Difficult</button>
+          <button class="calm__mood" onclick="selectMood(this, 'Okay')">Okay</button>
+          <button class="calm__mood" onclick="selectMood(this, 'Good')">Good</button>
+        </div>
+        <div class="calm__resp" id="calmResp"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <nav class="tabbar">
+    <button class="tab active">
+      <svg viewBox="0 0 24 24"><path class="icon-home" d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Home</span>
+    </button>
+    <button class="tab" onclick="switchTab(this)">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Calendar</span>
+    </button>
+    <button class="tab" onclick="switchTab(this)">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Support</span>
+    </button>
+  </nav>
+
+\n  <!-- INJECTION GUIDE MODAL -->
+  <div class="guide-modal" id="guideModal" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+    <div class="guide-modal__nav">
+      <button class="guide-modal__back-btn" id="guideBackBtn" onclick="closeGuide()" aria-label="Back to home">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="guide-modal__logo-wrap">
+        <img src="/static/logo.png" alt="" class="guide-modal__nav-logo">
+        <span class="guide-modal__nav-title">Ovify</span>
+      </div>
+      <div class="guide-modal__nav-placeholder"></div>
+    </div>
+
+    <div class="guide-modal__scroll">
+      <!-- Hero: medication + prescribed dose -->
+      <div class="guide-card">
+        <div class="guide-card__head">
+          <span class="guide-card__eyebrow"><span class="dot"></span>Tonight's injection</span>
+          <span class="guide-card__due" id="guideDue">Due 8:00 PM</span>
+        </div>
+        <img id="guideMedImg" src="/static/gonal_f_clean.jpg" alt="" class="guide-card__med-photo">
+        <div class="guide-card__title" id="guideTitle">Gonal-F 150 IU</div>
+        <div class="guide-card__dose">
+          <span class="guide-card__dose-label">Set your pen to</span>
+          <span class="guide-card__dose-value" id="guideDose">150 IU</span>
+        </div>
+      </div>
+
+      <!-- Injection walkthrough -->
+      <div class="vcard">
+        <div class="vcard__head">
+          <span class="vcard__title">Injection walkthrough</span>
+          <span class="vcard__time">1:30</span>
+        </div>
+        <div class="vguide" id="vguide">
+          <img class="vguide__poster" src="/static/injection_guide.png" alt="Illustration: inject into an abdominal skin fold at a 90-degree angle">
+          <div class="vguide__scrim"></div>
+          <div class="vguide__caption" id="vguideCaption">Abdomen or thigh · 90° angle</div>
+          <div class="vguide__progress"><i></i></div>
+          <button class="vguide__overlay" id="vguideOverlay" onclick="playGuide()" aria-label="Play the injection walkthrough">
+            <span class="vguide__play"><svg viewBox="0 0 24 24"><polygon points="10 8.5 16 12 10 15.5" fill="currentColor" stroke="none"/></svg></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Preparation checklist -->
+      <div class="checklist-card">
+        <div class="checklist-card__title">Before you start</div>
+        <div class="checklist-card__list">
+          <div class="checklist-card__item">
+            <span class="checklist-card__icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+            <span class="checklist-card__text">Wash your hands</span>
+          </div>
+          <div class="checklist-card__item">
+            <span class="checklist-card__icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+            <span class="checklist-card__text">Clean the injection site (abdomen or thigh)</span>
+          </div>
+          <div class="checklist-card__item">
+            <span class="checklist-card__icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+            <span class="checklist-card__text">Pen out of the fridge for 30 minutes</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="action-btn" id="guideSubmitBtn" onclick="submitDoseFromGuide()">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>I've completed my injection
+      </button>
+      <p class="guide-ready">You're all set — confirm once your injection is done.</p>
+
+      <div class="support-strip">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Your partner will receive a supportive message</span>
+      </div>
+    </div>
+
+    <!-- Success state -->
+    <div class="guide-success" id="guideSuccess" role="status" aria-live="polite">
+      <div class="guide-success__check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="guide-success__title">Injection logged</div>
+      <div class="guide-success__sub" id="guideSuccessSub">Gonal-F 150 IU · well done, Sarah</div>
+      <div class="guide-success__meta" id="guideSuccessMeta">Logged 8:42 PM · your clinic can see this</div>
+    </div>
+  </div>
+
+</div><!-- /phone -->
+
+<div class="toast" id="toastEl" role="status" aria-live="polite"></div>
+
+<script>
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Live status-bar time
+  (function(){
+    function updateTime() {
+      var sb = document.getElementById('sbTime');
+      if (!sb) return;
+      var n=new Date(),h=n.getHours(),m=n.getMinutes(),ap=h>=12?'PM':'AM';
+      sb.textContent = (h%12||12)+':'+String(m).padStart(2,'0')+' '+ap;
+    }
+    updateTime();
+    setInterval(updateTime, 60000); // Update every minute
+  })();
+
+  // Time-based greeting
+  (function(){
+    var h=new Date().getHours();
+    var greeting = document.getElementById('heroGreeting');
+    if (greeting) greeting.textContent = h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  })();
+
+  // Animate progress arc + bar (set final immediately for reduced motion)
+  (function(){
+    var pct=0.42, circ=2*Math.PI*90, fill=document.getElementById('arcFill'), bar=document.getElementById('heroBar');
+    function set(){ 
+      if (fill) fill.style.strokeDashoffset = circ*(1-pct); 
+      if (bar) bar.style.width = (pct*100)+'%'; 
+    }
+    if (reduce) { set(); } else { window.addEventListener('load', function(){ setTimeout(set, 350); }); }
+  })();
+
+  // Dynamic Medication Loading and Confirmation
+  const userId = 1; // Hardcoded user ID for now
+
+  async function fetchMedications() {
+    try {
+      const response = await fetch(`/api/medications?user_id=${userId}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const medications = await response.json();
+      renderMedications(medications);
+    } catch (error) {
+      console.warn("API server not active yet. Falling back to local mock data for preview:", error);
+      // Fallback local mock data so the page renders and remains interactive immediately
+      const mockMedications = [
+        {
+          id: 1,
+          name: "Gonal-F",
+          dosage: "150 IU",
+          route: "Subcutaneous",
+          scheduled_time: "20:00:00",
+          status: "Due"
+        },
+        {
+          id: 2,
+          name: "Menopur",
+          dosage: "75 IU",
+          route: "Subcutaneous",
+          scheduled_time: "20:00:00",
+          status: "Due"
+        }
+      ];
+      renderMedications(mockMedications);
+    }
+  }
+
+  function renderMedications(medications) {
+    const medicationStack = document.getElementById('medicationStack');
+    medicationStack.innerHTML = ''; // Clear existing static cards
+
+    let pendingCount = 0;
+
+    if (medications.length === 0) {
+      medicationStack.innerHTML = '<p style="text-align:center; color:var(--navy-70); font-family:Manrope,sans-serif; padding:20px;">No medications scheduled for today.</p>';
+    }
+
+    medications.forEach(med => {
+      const isDue = med.status === 'Due';
+      if (isDue) {
+        pendingCount++;
+      }
+
+      const medCard = document.createElement('article');
+      medCard.id = `med-${med.id}`;
+      medCard.className = `med ${isDue ? '' : 'is-done'}`;
+      medCard.setAttribute('aria-labelledby', `med-name-${med.id}`);
+
+      // Determine image source based on medication name (simple heuristic for demo)
+      const imgSrc = med.name.toLowerCase().includes('gonal') ? '/static/gonal_f.jpg' :
+                     med.name.toLowerCase().includes('menopur') ? '/static/menopur.jpg' :
+                     '/static/default_med.jpg'; // Fallback image
+
+      medCard.innerHTML = `
+        <div class="med__row" onclick="openGuide(${med.id}, '${med.name}', '${med.dosage}', '${imgSrc}', '${med.scheduled_time}')" style="cursor:pointer;">
+          <div class="med__img-wrap">
+            <img src="${imgSrc}" alt="${med.name}" class="med__img">
+          </div>
+          <div class="med__info">
+            <h3 class="med__name" id="med-name-${med.id}">${med.name} ${med.dosage}</h3>
+            <p class="med__time">Tonight · ${med.scheduled_time.substring(0, 5)}</p>
+          </div>
+          <span class="med__status med__status--${isDue ? 'due' : 'done'}" id="med-status-${med.id}">
+            <span class="med__status-dot"></span>${isDue ? 'Due' : 'Taken'}
+          </span>
+        </div>
+      `;
+      medicationStack.appendChild(medCard);
+    });
+    updateHeroPending(pendingCount);
+  }
+
+  async function logDose(prescriptionId, medicationName) {
+    const cta = document.getElementById(`med-cta-${prescriptionId}`);
+    if (cta && cta.classList.contains('is-done')) return; // Prevent double logging
+
+    try {
+      const response = await fetch(`/api/medications/${prescriptionId}/confirm?user_id=${userId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Update UI on success
+      updateUILocally(prescriptionId, medicationName);
+      toastOk(`${medicationName} logged — your clinic can see this`);
+      fetchMedications();
+
+    } catch (error) {
+      console.warn("API server not active yet. Logging dose locally for preview:", error);
+      // Fallback local update so the user can test the modal and toast transitions immediately
+      updateUILocally(prescriptionId, medicationName);
+      toastOk(`${medicationName} logged (preview mode)`);
+    }
+  }
+
+  function updateUILocally(prescriptionId, medicationName) {
+    const card = document.getElementById(`med-${prescriptionId}`);
+    const status = document.getElementById(`med-status-${prescriptionId}`);
+    const footer = document.getElementById(`med-footer-${prescriptionId}`);
+
+    if (card) card.classList.add('is-done');
+    if (status) {
+      status.className = 'med__status med__status--done';
+      status.innerHTML = '<span class="med__status-dot"></span>Taken';
+    }
+    if (footer) {
+      footer.remove(); // Just in case it existed previously
+    }
+    // Update the hero pending count locally
+    const remaining = document.querySelectorAll('.med:not(.is-done)').length;
+    updateHeroPending(remaining);
+  }
+
+  function updateHeroPending(count) {
+    var hp = document.getElementById('heroPending');
+    if (hp) {
+      if (count === 0){ hp.textContent = 'All done ✓'; hp.style.color = '#9BE3C4'; }
+      else { hp.textContent = count + ' Injections Pending'; hp.style.color = ''; } // Reset color if not all done
+    }
+  }
+
+  // Initial load of medications
+  window.addEventListener('load', fetchMedications);
+
+  // Reminder toggle (kept for future use, not directly used in current spec)
+  function toggleReminder(btn, name){
+    var on = btn.getAttribute('aria-pressed') === 'true';
+    btn.setAttribute('aria-pressed', on ? 'false' : 'true');
+    toast(on ? 'Reminder removed for '+name : 'Reminder set for '+name);
+  }
+
+  // Injection guide (Journey 3) logic
+  let activePrescriptionId = null;
+  let activeMedicationName = "";
+  let guideTrigger = null;    // element focus returns to on close
+  let captionTimer = null;
+
+  function fmtTime(t){ // "20:00:00" -> "8:00 PM"
+    if(!t) return '';
+    var p = t.split(':'), h = +p[0], m = p[1] || '00', ap = h>=12?'PM':'AM';
+    return (h%12||12) + ':' + m + ' ' + ap;
+  }
+
+  function openGuide(id, name, dosage, imgSrc, schedTime) {
+    activePrescriptionId = id;
+    activeMedicationName = name + ' ' + dosage;
+    guideTrigger = document.getElementById('med-' + id) || document.activeElement;
+
+    document.getElementById('guideTitle').textContent = name + ' ' + dosage;
+    // Use the white-point-cleaned photo in the guide (transparent-looking on the white card)
+    var cleanSrc = imgSrc.replace('gonal_f.jpg','gonal_f_clean.jpg').replace('menopur.jpg','menopur_clean.jpg');
+    document.getElementById('guideMedImg').src = cleanSrc;
+    // Dose = highest-rigor value; shown large and verbatim from the prescription.
+    document.getElementById('guideDose').textContent = dosage;
+
+    // Schedule → due pill with on-time / late state
+    var duePill = document.getElementById('guideDue');
+    var due = fmtTime(schedTime), late = false;
+    if (schedTime) {
+      var now = new Date(), p = schedTime.split(':'), d = new Date();
+      d.setHours(+p[0], +(p[1]||0), 0, 0);
+      late = now > d;
+    }
+    duePill.classList.toggle('is-late', late);
+    duePill.textContent = due ? (late ? 'Overdue · ' + due : 'Due ' + due) : 'Due tonight';
+
+    resetGuideAnim();
+    document.getElementById('guideSuccess').classList.remove('show');
+    document.querySelector('.guide-modal__scroll').scrollTop = 0;
+
+    document.getElementById('guideModal').classList.add('open');
+    document.addEventListener('keydown', guideKeydown);
+    setTimeout(function(){ document.getElementById('guideBackBtn').focus(); }, 60);
+  }
+
+  function closeGuide() {
+    document.getElementById('guideModal').classList.remove('open');
+    resetGuideAnim();
+    document.removeEventListener('keydown', guideKeydown);
+    if (guideTrigger && guideTrigger.focus) { try { guideTrigger.focus(); } catch(e){} }
+  }
+
+  function guideKeydown(e){
+    if (e.key === 'Escape') { closeGuide(); return; }
+    if (e.key !== 'Tab') return;
+    var modal = document.getElementById('guideModal');
+    var f = Array.prototype.filter.call(
+      modal.querySelectorAll('button, [href], [tabindex]:not([tabindex="-1"])'),
+      function(el){ return el.offsetParent !== null; });
+    if (!f.length) return;
+    var first = f[0], last = f[f.length-1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+
+  // Animated walkthrough
+  var guideSteps = ['1 · Dial to the dose shown above','2 · Clean the injection site','3 · Insert & press slowly','4 · Hold 10 seconds, then done'];
+  function playGuide(){
+    var vg = document.getElementById('vguide'), cap = document.getElementById('vguideCaption');
+    vg.classList.add('playing');
+    if (reduce) { cap.textContent = 'Follow the steps below'; return; }
+    var i = 0; cap.textContent = guideSteps[0];
+    clearInterval(captionTimer);
+    captionTimer = setInterval(function(){ i = (i+1) % guideSteps.length; cap.textContent = guideSteps[i]; }, 2250);
+  }
+  function resetGuideAnim(){
+    var vg = document.getElementById('vguide'); if (vg) vg.classList.remove('playing');
+    clearInterval(captionTimer); captionTimer = null;
+    var cap = document.getElementById('vguideCaption'); if (cap) cap.textContent = 'Abdomen or thigh · 90° angle';
+  }
+
+  function submitDoseFromGuide() {
+    if (!activePrescriptionId) return;
+    logDose(activePrescriptionId, activeMedicationName);  // updates home card + hero count
+    var now = new Date(), h = now.getHours(), m = String(now.getMinutes()).padStart(2,'0'), ap = h>=12?'PM':'AM';
+    document.getElementById('guideSuccessSub').textContent = activeMedicationName + ' · well done, Sarah';
+    document.getElementById('guideSuccessMeta').textContent = 'Logged ' + (h%12||12) + ':' + m + ' ' + ap + ' · your clinic can see this';
+    resetGuideAnim();
+    document.getElementById('guideSuccess').classList.add('show');
+    setTimeout(closeGuide, 1900);
+  }
+
+  // Emotional check-in
+  var moodCopy = {
+    Difficult:'That is completely understandable. Stimulation days can feel heavy — you are doing something courageous. Be gentle with yourself today.',
+    Low:'Low days are part of this journey. Take it one hour at a time; you have already come so far.',
+    Okay:'Okay is exactly right. Steady and consistent is where you want to be during stimulation. Rest well.',
+    Good:'A good day is a real gift right now. Your body is responding — hold on to that.',
+    Great:'Wonderful to hear. Your clinic team will be glad to know. Keep going.'
+  };
+  function toggleCalm(){
+    var c = document.getElementById('calm');
+    var open = c.classList.toggle('open');
+    c.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  function selectMood(btn, mood){
+    document.querySelectorAll('.calm__mood').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    var r = document.getElementById('calmResp');
+    r.textContent = moodCopy[mood];
+    r.classList.add('show');
+  }
+
+  // Bottom-nav tabs (demo)
+  function switchTab(el){
+    document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); t.removeAttribute('aria-current'); });
+    el.classList.add('active'); el.setAttribute('aria-current','page');
+    toast('This screen is coming soon');
+  }
+
+  // Toasts
+  function showToast(html){
+    var t = document.getElementById('toastEl');
+    t.innerHTML = html;
+    t.classList.add('show');
+    clearTimeout(t._tid);
+    t._tid = setTimeout(function(){ t.classList.remove('show'); }, 2600);
+  }
+  function toast(msg){ showToast(String(msg).replace(/</g,'&lt;')); }
+  function toastOk(msg){ showToast('<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'+String(msg).replace(/</g,'&lt;')); }
+</script>
+</body>
+</html>

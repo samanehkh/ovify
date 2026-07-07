@@ -1,6 +1,5 @@
 from datetime import date
 from typing import Optional
-from uuid import UUID
 from pydantic import BaseModel
 
 class SymptomLogBase(BaseModel):
@@ -9,11 +8,11 @@ class SymptomLogBase(BaseModel):
     value: str
 
 class SymptomLogCreate(SymptomLogBase):
-    user_id: UUID
+    user_id: int
 
 class SymptomLogResponse(SymptomLogBase):
     id: int
-    user_id: UUID
+    user_id: int
 
     class Config:
         from_attributes = True

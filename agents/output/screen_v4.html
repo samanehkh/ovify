@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ovify - Patient Home</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Variables / Design Tokens */
+        :root {
+            /* Colors */
+            --bg-ivory: #F8F5F1;
+            --card-white: #FFFFFF;
+            --navy: #13233C;
+            --navy-70: rgba(19,35,60,0.7); /* 70% opacity */
+            --navy-55: rgba(19,35,60,0.55); /* 55% opacity */
+            --navy-10: rgba(19,35,60,0.1); /* 10% opacity */
+            --lavender: #9E8CEF;
+            --lav-dark: #6F5AD1;
+            --lav-mid: #7E6BD3;
+            --lav-soft: rgba(158,140,239,0.13);
+            --blush: #F4A0A0;
+            --blush-soft: rgba(244,160,160,0.16);
+            --sage: #3E8E6E;
+            --sage-soft: rgba(62,142,110,0.13);
+            --red: #C24C57;
+            --due-soft: rgba(194,76,87,0.12);
+
+            /* Typography */
+            --font-heading: 'DM Sans', sans-serif;
+            --font-body: 'Manrope', sans-serif;
+            --font-data: 'Inter', sans-serif;
+
+            /* Radii */
+            --r-xl: 24px;
+            --r-lg: 18px;
+            --r-md: 12px;
+        }
+
+        /* Base Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-body);
+            background-color: var(--bg-ivory);
+            color: var(--navy);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 390px; /* Mobile phone frame */
+            margin: 0 auto;
+            background-color: var(--bg-ivory); /* Ensure container matches body bg */
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 90px; /* Space for fixed tab bar */
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: center; /* Center the logo horizontally */
+            align-items: center;
+            padding: 20px 0;
+            background-color: var(--bg-ivory);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header img {
+            height: 36px; /* Adjust height as needed for the logo */
+            width: auto;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 0 20px;
+            flex-grow: 1;
+        }
+
+        /* Cycle Day Ring */
+        .cycle-day-card {
+            background-color: var(--card-white);
+            border-radius: var(--r-xl);
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+        }
+
+        .cycle-day-ring {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            border: 8px solid var(--lav-soft);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 16px;
+            position: relative;
+        }
+
+        .cycle-day-ring::before {
+            content: '';
+            position: absolute;
+            top: -8px; /* Offset to overlap the border */
+            left: -8px;
+            width: 100%;
+            height: 100%;
+            border: 8px solid var(--lavender); /* Active part of the ring */
+            border-radius: 50%;
+            /* For a real progress ring, you'd use conic-gradient or SVG stroke-dasharray/offset */
+            /* This is a visual approximation for the static design representing half progress */
+            clip-path: inset(0 50% 0 0);
+            transform: rotate(-90deg); /* Start from top */
+        }
+
+        .cycle-day-number {
+            font-family: var(--font-data);
+            font-weight: 700;
+            font-size: 48px;
+            color: var(--lav-dark); /* Feedback: Changed to --lav-dark for contrast */
+            line-height: 1;
+        }
+
+        .cycle-day-label {
+            font-family: var(--font-body);
+            font-weight: 500;
+            font-size: 16px;
+            color: var(--navy-70);
+            margin-top: 4px;
+        }
+
+        .cycle-day-description {
+            font-family: var(--font-body);
+            font-weight: 400;
+            font-size: 15px;
+            color: var(--navy-70); /* Feedback: Secondary text contrast */
+            margin-top: 8px;
+        }
+
+        /* Today's Meds */
+        .section-title {
+            font-family: var(--font-heading);
+            font-weight: 600;
+            font-size: 20px;
+            color: var(--navy);
+            margin-bottom: 16px;
+        }
+
+        .med-card {
+            background-color: var(--card-white);
+            border-radius: var(--r-xl);
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+            border: 1px solid var(--navy-10); /* Subtle border for definition */
+        }
+
+        .med-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+
+        .med-icon-lavender { background-color: var(--lav-soft); }
+        .med-icon-blush { background-color: var(--blush-soft); }
+        .med-icon-sage { background-color: var(--sage-soft); }
+        .med-icon-due { background-color: var(--due-soft); }
+
+        .med-details {
+            flex-grow: 1;
+        }
+
+        .med-name {
+            font-family: var(--font-heading);
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--navy);
+            margin-bottom: 4px;
+        }
+
+        .med-dose-time {
+            font-family: var(--font-data);
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--navy-70); /* Feedback: Secondary text contrast */
+        }
+
+        .med-status-button {
+            padding: 8px 16px;
+            border-radius: var(--r-md);
+            font-family: var(--font-data);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            outline: none;
+            transition: background-color 0.2s ease;
+            white-space: nowrap; /* Prevent button text from wrapping */
+            min-width: 80px; /* Ensure consistent width */
+            text-align: center;
+        }
+
+        .med-status-button.taken {
+            background-color: var(--sage);
+            color: var(--card-white);
+        }
+
+        .med-status-button.due {
+            background-color: var(--red);
+            color: var(--card-white);
+        }
+
+        .med-status-button:active {
+            filter: brightness(0.9);
+        }
+
+        /* Check-in Button */
+        .check-in-button {
+            display: block;
+            width: calc(100% - 40px); /* Full width minus padding */
+            padding: 18px 24px;
+            background-color: var(--lavender);
+            color: var(--card-white);
+            border-radius: var(--r-lg);
+            font-family: var(--font-heading);
+            font-weight: 600;
+            font-size: 18px;
+            text-align: center;
+            text-decoration: none;
+            margin: 24px auto 32px; /* Center and add spacing */
+            box-shadow: 0 6px 16px rgba(158,140,239,0.3);
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .check-in-button:hover {
+            background-color: var(--lav-dark);
+            box-shadow: 0 8px 20px rgba(158,140,239,0.4);
+        }
+
+        .check-in-button:active {
+            background-color: var(--lav-mid);
+            box-shadow: 0 4px 10px rgba(158,140,239,0.2);
+        }
+
+        /* Tab Bar */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            max-width: 390px; /* Constrain to mobile width */
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+            backdrop-filter: blur(14px); /* Feedback: Frosted glass effect */
+            -webkit-backdrop-filter: blur(14px); /* For Safari */
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            border-top: 1px solid var(--navy-10);
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05); /* Subtle top shadow */
+            z-index: 200;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            font-family: var(--font-data);
+            font-weight: 500;
+            font-size: 12px;
+            padding: 8px 0;
+            flex: 1;
+            transition: color 0.2s ease;
+        }
+
+        .tab-item svg {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+            transition: fill 0.2s ease;
+        }
+
+        .tab-item.active {
+            color: var(--lavender);
+        }
+
+        .tab-item.active svg {
+            fill: var(--lavender);
+        }
+
+        .tab-item:not(.active) {
+            color: var(--navy-70); /* Feedback: Inactive tab bar contrast */
+        }
+
+        .tab-item:not(.active) svg {
+            fill: var(--navy-70); /* Feedback: Inactive tab bar contrast */
+        }
+
+        .tab-item:not(.active):hover {
+            color: var(--lav-mid);
+            svg { fill: var(--lav-mid); }
+        }
+
+        /* Accessibility: prefers-reduced-motion */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <img src="/static/logo.png" alt="Ovify Logo">
+        </header>
+
+        <main class="main-content">
+            <section class="cycle-day-card" aria-labelledby="cycle-day-heading">
+                <h2 id="cycle-day-heading" class="section-title" style="margin-bottom: 16px;">Your Cycle</h2>
+                <div class="cycle-day-ring">
+                    <span class="cycle-day-number">14</span>
+                    <span class="cycle-day-label">Day</span>
+                </div>
+                <p class="cycle-day-description">You are in your estimated ovulation window. Consider logging your symptoms.</p>
+            </section>
+
+            <section aria-labelledby="todays-meds-heading">
+                <h2 id="todays-meds-heading" class="section-title">Today's Protocol</h2>
+
+                <div class="med-card">
+                    <div class="med-icon med-icon-lavender">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.47 2 2 6.47 2 12C2 17.53 6.47 22 12 22C17.53 22 22 17.53 22 12C22 6.47 17.53 2 12 2ZM16 12C16 12.55 15.55 13 15 13H13V15C13 15.55 12.55 16 12 16C11.45 16 11 15.55 11 15V13H9C8.45 13 8 12.55 8 12C8 11.45 8.45 11 9 11H11V9C11 8.45 11.45 8 12 8C12.55 8 13 8.45 13 9V11H15C15.55 11 16 11.45 16 12Z" fill="#9E8CEF"/>
+                        </svg>
+                    </div>
+                    <div class="med-details">
+                        <div class="med-name">Clomiphene Citrate</div>
+                        <div class="med-dose-time">Next dose: 7:00 PM</div>
+                    </div>
+                    <button class="med-status-button due" aria-label="Mark Clomiphene Citrate as taken">Due</button>
+                </div>
+
+                <div class="med-card">
+                    <div class="med-icon med-icon-sage">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.47 2 2 6.47 2 12C2 17.53 6.47 22 12 22C17.53 22 22 17.53 22 12C22 6.47 17.53 2 12 2ZM10.5 16.5L6 12L7.41 10.59L10.5 13.67L16.59 7.59L18 9L10.5 16.5Z" fill="#3E8E6E"/>
+                        </svg>
+                    </div>
+                    <div class="med-details">
+                        <div class="med-name">Folic Acid Supplement</div>
+                        <div class="med-dose-time">Taken: 8:00 AM</div>
+                    </div>
+                    <button class="med-status-button taken" aria-label="Folic Acid Supplement already taken">Taken</button>
+                </div>
+
+                <div class="med-card">
+                    <div class="med-icon med-icon-blush">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.47 2 2 6.47 2 12C2 17.53 6.47 22 12 22C17.53 22 22 17.53 22 12C22 6.47 17.53 2 12 2ZM16 12C16 12.55 15.55 13 15 13H13V15C13 15.55 12.55 16 12 16C11.45 16 11 15.55 11 15V13H9C8.45 13 8 12.55 8 12C8 11.45 8.45 11 9 11H11V9C11 8.45 11.45 8 12 8C12.55 8 13 8.45 13 9V11H15C15.55 11 16 11.45 16 12Z" fill="#F4A0A0"/>
+                        </svg>
+                    </div>
+                    <div class="med-details">
+                        <div class="med-name">Progesterone Suppository</div>
+                        <div class="med-dose-time">Next dose: 10:00 PM</div>
+                    </div>
+                    <button class="med-status-button due" aria-label="Mark Progesterone Suppository as taken">Due</button>
+                </div>
+            </section>
+
+            <button class="check-in-button" aria-label="Daily Check-in">Daily Check-in</button>
+
+        </main>
+
+        <nav class="tab-bar" role="navigation" aria-label="Main Navigation">
+            <a href="#" class="tab-item active" aria-current="page" aria-label="Home">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 20V14H14V20H19V12H22L12 3L2 12H5V20H10Z" fill="currentColor"/>
+                </svg>
+                Home
+            </a>
+            <a href="#" class="tab-item" aria-label="Calendar">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 4H18V2H16V4H8V2H6V4H5C3.89 4 3 4.9 3 6V20C3 21.1 3.89 22 5 22H19C20.11 22 21 21.1 21 20V6C21 4.9 20.11 4 19 4ZM19 20H5V9H19V20ZM19 7H5V6H19V7Z" fill="currentColor"/>
+                </svg>
+                Calendar
+            </a>
+            <a href="#" class="tab-item" aria-label="Protocols">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="currentColor"/>
+                </svg>
+                Protocols
+            </a>
+            <a href="#" class="tab-item" aria-label="More">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 10C7.1 10 8 9.1 8 8C8 6.9 7.1 6 6 6C4.9 6 4 6.9 4 8C4 9.1 4.9 10 6 10ZM12 10C13.1 10 14 9.1 14 8C14 6.9 13.1 6 12 6C10.9 6 10 6.9 10 8C10 9.1 10.9 10 12 10ZM18 10C19.1 10 20 9.1 20 8C20 6.9 19.1 6 18 6C16.9 6 16 6.9 16 8C16 9.1 16.9 10 18 10Z" fill="currentColor"/>
+                </svg>
+                More
+            </a>
+        </nav>
+    </div>
+</body>
+</html>
