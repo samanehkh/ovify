@@ -58,6 +58,9 @@ export const PartnerSupportPage: React.FC = () => {
       const data = await loginPartner(partnerPhone, otp, supporterRole);
       localStorage.setItem('partner_phone', data.partner_phone);
       localStorage.setItem('partner_role', data.supporter_type);
+      if (data.token) {
+        localStorage.setItem('partner_token', data.token);
+      }
       setIsLoggedIn(true);
       fetchDashboard(data.partner_phone);
     } catch (err: any) {
@@ -70,6 +73,7 @@ export const PartnerSupportPage: React.FC = () => {
   const handleLogout = () => {
     localStorage.removeItem('partner_phone');
     localStorage.removeItem('partner_role');
+    localStorage.removeItem('partner_token');
     setIsLoggedIn(false);
     setDashboardData(null);
     setConsentError(false);

@@ -25,10 +25,10 @@ async def adherence_background_daemon():
         try:
             from db.session import SessionLocal
             from services import adherence
-            from datetime import timezone, timedelta, datetime
+            from datetime import timedelta, datetime
             from db.models import ProcessedDate
+            from core.time import UAE_TZ
             
-            UAE_TZ = timezone(timedelta(hours=4))
             uae_now = datetime.now(UAE_TZ)
             today = uae_now.date()
             

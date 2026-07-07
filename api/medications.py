@@ -1,32 +1,25 @@
-from datetime import date, datetime, time, timezone, timedelta
+from datetime import date, datetime, time, timedelta
 from typing import List, Optional
-import os
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 from db import models
 from db.session import get_db
 from schemas.medication import MedicationStatusResponse, DoseLogResponse
 from services import adherence
 from services.auth import verify_patient_token
+from core.time import UAE_TZ
 
 router = APIRouter()
 
-# Global UAE Timezone
-UAE_TZ = timezone(timedelta(hours=4))
-
 @router.get("/", response_model=List[MedicationStatusResponse])
 def get_daily_medications(
-    user_id: Optional[int] = Query(None),
     token_payload: dict = Depends(verify_patient_token), 
     db: Session = Depends(get_db)
 ):
-    if os.getenv("TESTING") == "true" and user_id is not None:
-        resolved_user_id = user_id
-    else:
-        resolved_user_id = token_payload.get("user_id")
-
-    user = db.query(models.User).filter(models.User.id == resolved_user_id).first()
+    user_id = token_payload.get("user_id")
+    user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
@@ -39,7 +32,7 @@ def get_daily_medications(
     
     # Query active prescriptions for today
     prescriptions = db.query(models.Prescription).filter(
-        models.Prescription.user_id == resolved_user_id,
+        models.Prescription.user_id == user_id,
         models.Prescription.start_date <= today,
         models.Prescription.end_date >= today
     ).all()
@@ -87,24 +80,19 @@ def get_daily_medications(
 @router.post("/{prescription_id}/confirm", response_model=DoseLogResponse)
 def confirm_medication_dose(
     prescription_id: int, 
-    user_id: Optional[int] = Query(None),
     actual_time: Optional[str] = Query(None, description="Optional reported time in HH:MM:SS format"),
     token_payload: dict = Depends(verify_patient_token),
     db: Session = Depends(get_db)
 ):
-    if os.getenv("TESTING") == "true" and user_id is not None:
-        resolved_user_id = user_id
-    else:
-        resolved_user_id = token_payload.get("user_id")
-
-    user = db.query(models.User).filter(models.User.id == resolved_user_id).first()
+    user_id = token_payload.get("user_id")
+    user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
     # Verify prescription exists and belongs to user
     prescription = db.query(models.Prescription).filter(
         models.Prescription.id == prescription_id,
-        models.Prescription.user_id == resolved_user_id
+        models.Prescription.user_id == user_id
     ).first()
     if not prescription:
         raise HTTPException(status_code=404, detail="Prescription not found")
@@ -129,14 +117,13 @@ def confirm_medication_dose(
             # Combine with today, attach UAE timezone
             log_time = datetime.combine(today, time(hour, minute, second)).replace(tzinfo=UAE_TZ)
             
-            if os.getenv("TESTING") != "true":
-                # Guardrail 1: Reject future times
-                if log_time > now:
-                    raise HTTPException(status_code=400, detail="Dose confirmation time cannot be in the future")
-                
-                # Guardrail 2: Clamp to a plausible 24-hour window
-                if log_time < now - timedelta(hours=24):
-                    raise HTTPException(status_code=400, detail="Dose confirmation time cannot be more than 24 hours in the past")
+            # Guardrail 1: Reject future times
+            if log_time > now:
+                raise HTTPException(status_code=400, detail="Dose confirmation time cannot be in the future")
+            
+            # Guardrail 2: Clamp to a plausible 24-hour window
+            if log_time < now - timedelta(hours=24):
+                raise HTTPException(status_code=400, detail="Dose confirmation time cannot be more than 24 hours in the past")
         except ValueError:
             raise HTTPException(status_code=400, detail="Invalid actual_time format. Use HH:MM:SS or HH:MM")
     else:
@@ -178,7 +165,7 @@ def confirm_medication_dose(
 
     # Create dose log
     db_log = models.DoseLog(
-        user_id=resolved_user_id,
+        user_id=user_id,
         prescription_id=prescription_id,
         logged_at=log_time,
         scheduled_date=target_date,
@@ -186,11 +173,16 @@ def confirm_medication_dose(
         self_reported=self_reported
     )
     db.add(db_log)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Medication already logged for today")
+        
     db.refresh(db_log)
 
     # Auto-resolve alert status if all overdue doses today are successfully logged
-    adherence.auto_clear_user_alert(db, resolved_user_id)
+    adherence.auto_clear_user_alert(db, user_id)
 
     return db_log
 

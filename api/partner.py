@@ -1,17 +1,15 @@
-from datetime import datetime, timezone, timedelta
+from datetime import datetime
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, Header, Query
+from fastapi import APIRouter, Depends, HTTPException, Header
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from db import models
 from db.session import get_db
 from services.auth import generate_token, verify_token
+from core.time import UAE_TZ
 
 router = APIRouter()
-
-# Global UAE Timezone
-UAE_TZ = timezone(timedelta(hours=4))
 
 class PartnerLoginRequest(BaseModel):
     phone: str
@@ -46,30 +44,22 @@ def partner_login(req: PartnerLoginRequest, db: Session = Depends(get_db)):
 @router.get("/dashboard")
 def get_partner_dashboard(
     authorization: Optional[str] = Header(None, description="Bearer token"),
-    partner_phone: Optional[str] = Query(None, description="Only verified during TESTING bypass"),
     db: Session = Depends(get_db)
 ):
-    import os
-    if os.getenv("TESTING") == "true" and (not authorization or partner_phone):
-        normalized_phone = "".join(c for c in partner_phone if c.isdigit() or c == "+") if partner_phone else ""
-        patient = db.query(models.User).filter(models.User.partner_phone == normalized_phone).first()
-        if not patient:
-            raise HTTPException(status_code=404, detail="No patient user has registered this number as their support partner.")
-    else:
-        if not authorization:
-            raise HTTPException(status_code=401, detail="Missing authorization header")
-        if not authorization.startswith("Bearer "):
-            raise HTTPException(status_code=401, detail="Invalid authorization header format")
+    if not authorization:
+        raise HTTPException(status_code=401, detail="Missing authorization header")
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Invalid authorization header format")
+    
+    token = authorization.split(" ")[1]
+    payload = verify_token(token)
+    if not payload or payload.get("role") != "partner":
+        raise HTTPException(status_code=401, detail="Unauthorized partner access or token expired")
         
-        token = authorization.split(" ")[1]
-        payload = verify_token(token)
-        if not payload or payload.get("role") != "partner":
-            raise HTTPException(status_code=401, detail="Unauthorized partner access or token expired")
-            
-        patient_id = payload.get("user_id")
-        patient = db.query(models.User).filter(models.User.id == patient_id).first()
-        if not patient:
-            raise HTTPException(status_code=404, detail="Patient user not found.")
+    patient_id = payload.get("user_id")
+    patient = db.query(models.User).filter(models.User.id == patient_id).first()
+    if not patient:
+        raise HTTPException(status_code=404, detail="Patient user not found.")
         
     # Health Data Law Consent Gate Check
     if not patient.partner_consent:

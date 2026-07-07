@@ -96,6 +96,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       console.error(err);
       setError(err.message || 'Failed to load user and medication data');
       localStorage.removeItem('user_id');
+      localStorage.removeItem('auth_token');
       setUser(null);
     } finally {
       setLoading(false);
@@ -113,6 +114,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const userData = await api.verifyOTP(phone, otp);
       setUser(userData);
       localStorage.setItem('user_id', userData.id.toString());
+      if (userData.token) {
+        localStorage.setItem('auth_token', userData.token);
+      }
       if (userData.onboarded) {
         const medsData = await api.fetchMedications(userData.id);
         setMedications(mergeOfflineStatus(medsData));
@@ -144,6 +148,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const logout = () => {
     localStorage.removeItem('user_id');
+    localStorage.removeItem('auth_token');
     setUser(null);
     setMedications([]);
     setTodaysMood(null);

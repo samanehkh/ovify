@@ -2,8 +2,39 @@ import type { User, MedicationStatus, DoseLog, SymptomLog } from '../types';
 
 export const API_BASE_URL = (import.meta.env.VITE_API_BASE as string) || 'http://localhost:8000';
 
+// Helper to get patient authorization headers
+function getPatientHeaders(extraHeaders: Record<string, string> = {}): HeadersInit {
+  const token = localStorage.getItem('auth_token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+    ...extraHeaders,
+  };
+}
+
+// Helper to get partner authorization headers
+function getPartnerHeaders(extraHeaders: Record<string, string> = {}): HeadersInit {
+  const token = localStorage.getItem('partner_token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+    ...extraHeaders,
+  };
+}
+
+// Helper to get clinician authorization headers
+function getClinicianHeaders(extraHeaders: Record<string, string> = {}): HeadersInit {
+  return {
+    'Content-Type': 'application/json',
+    'X-Clinician-Key': 'ovify-clinic-secret-key-2026',
+    ...extraHeaders,
+  };
+}
+
 export async function fetchUser(userId: number): Promise<User> {
-  const res = await fetch(`${API_BASE_URL}/users/${userId}`);
+  const res = await fetch(`${API_BASE_URL}/users/${userId}`, {
+    headers: getPatientHeaders(),
+  });
   if (!res.ok) {
     throw new Error('Failed to fetch user');
   }
@@ -11,7 +42,9 @@ export async function fetchUser(userId: number): Promise<User> {
 }
 
 export async function fetchMedications(userId: number): Promise<MedicationStatus[]> {
-  const res = await fetch(`${API_BASE_URL}/api/medications?user_id=${userId}`);
+  const res = await fetch(`${API_BASE_URL}/api/medications?user_id=${userId}`, {
+    headers: getPatientHeaders(),
+  });
   if (!res.ok) {
     throw new Error('Failed to fetch medications');
   }
@@ -29,9 +62,7 @@ export async function confirmDose(
   }
   const res = await fetch(url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getPatientHeaders(),
   });
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({ detail: 'Failed to confirm dose' }));
@@ -48,9 +79,7 @@ export async function logSymptom(
   const todayStr = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
   const res = await fetch(`${API_BASE_URL}/symptoms/log`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getPatientHeaders(),
     body: JSON.stringify({
       user_id: userId,
       log_date: todayStr,
@@ -65,7 +94,9 @@ export async function logSymptom(
 }
 
 export async function fetchSymptoms(userId: number, dateStr: string): Promise<SymptomLog[]> {
-  const res = await fetch(`${API_BASE_URL}/symptoms/log/${userId}?log_date=${dateStr}`);
+  const res = await fetch(`${API_BASE_URL}/symptoms/log/${userId}?log_date=${dateStr}`, {
+    headers: getPatientHeaders(),
+  });
   if (!res.ok) {
     throw new Error('Failed to fetch symptoms');
   }
@@ -109,9 +140,7 @@ export async function confirmOnboard(
 ): Promise<User> {
   const res = await fetch(`${API_BASE_URL}/users/${userId}/onboard`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getPatientHeaders(),
     body: JSON.stringify({
       sleep_time: sleepTime,
       injection_comfort: comfortLevel,
@@ -130,9 +159,7 @@ export async function updatePartnerConsent(
 ): Promise<User> {
   const res = await fetch(`${API_BASE_URL}/users/${userId}/partner-consent`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getPatientHeaders(),
     body: JSON.stringify({
       partner_phone: partnerPhone,
       partner_consent: partnerConsent,
@@ -145,6 +172,7 @@ export async function updatePartnerConsent(
 }
 
 export interface PartnerLoginResponse {
+  token: string;
   partner_phone: string;
   patient_name: string;
   patient_id: number;
@@ -182,7 +210,9 @@ export interface PartnerDashboardData {
 }
 
 export async function fetchPartnerDashboard(partnerPhone: string): Promise<PartnerDashboardData> {
-  const res = await fetch(`${API_BASE_URL}/api/partner/dashboard?partner_phone=${encodeURIComponent(partnerPhone)}`);
+  const res = await fetch(`${API_BASE_URL}/api/partner/dashboard?partner_phone=${encodeURIComponent(partnerPhone)}`, {
+    headers: getPartnerHeaders(),
+  });
   if (!res.ok) {
     if (res.status === 403) {
       throw new Error('Sharing consent revoked');
@@ -207,7 +237,9 @@ export interface TriagePatient {
 }
 
 export async function fetchTriagePatients(): Promise<TriagePatient[]> {
-  const res = await fetch(`${API_BASE_URL}/api/clinician/triage`);
+  const res = await fetch(`${API_BASE_URL}/api/clinician/triage`, {
+    headers: getClinicianHeaders(),
+  });
   if (!res.ok) {
     throw new Error('Failed to fetch triage patients');
   }
@@ -217,6 +249,7 @@ export async function fetchTriagePatients(): Promise<TriagePatient[]> {
 export async function resolveTriageAlert(userId: number): Promise<{ message: string }> {
   const res = await fetch(`${API_BASE_URL}/api/clinician/resolve-alert/${userId}`, {
     method: 'POST',
+    headers: getClinicianHeaders(),
   });
   if (!res.ok) {
     throw new Error('Failed to resolve alert');
@@ -227,9 +260,7 @@ export async function resolveTriageAlert(userId: number): Promise<{ message: str
 export async function updateCycleOutcome(userId: number, outcome: string | null): Promise<User> {
   const res = await fetch(`${API_BASE_URL}/api/clinician/update-outcome/${userId}`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getClinicianHeaders(),
     body: JSON.stringify({ cycle_outcome: outcome }),
   });
   if (!res.ok) {
@@ -257,9 +288,7 @@ export interface ParseProtocolResponse {
 export async function parseProtocolText(text: string): Promise<ParseProtocolResponse> {
   const res = await fetch(`${API_BASE_URL}/api/clinician/parse-protocol`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getClinicianHeaders(),
     body: JSON.stringify({ protocol_text: text }),
   });
   if (!res.ok) {
@@ -278,9 +307,7 @@ export async function registerPatient(patientData: {
 }): Promise<User> {
   const res = await fetch(`${API_BASE_URL}/api/clinician/register`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getClinicianHeaders(),
     body: JSON.stringify(patientData),
   });
   if (!res.ok) {

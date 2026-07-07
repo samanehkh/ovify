@@ -100,16 +100,23 @@ def test_confirm_dose_on_time(client, test_db):
     assert gonal["log_status"] == "On Time"
 
 def test_confirm_dose_late(client, test_db):
-    # Prescription 2 (Menopur) is scheduled for 20:00:00 (8:00 PM)
-    # Log at 21:30:00 (9:30 PM) -> outside 60 minutes window -> Late
-    response = client.post("/api/medications/2/confirm?user_id=1&actual_time=21:30:00")
+    now = datetime.now()
+    sched_dt = now - timedelta(hours=3)
+    p2 = test_db.query(models.Prescription).filter(models.Prescription.id == 2).first()
+    p2.scheduled_time = sched_dt.time().strftime("%H:%M:%S")
+    test_db.commit()
+    
+    actual_dt = now - timedelta(hours=1.5)
+    actual_time_str = actual_dt.time().strftime("%H:%M:%S")
+    
+    response = client.post(f"/api/medications/2/confirm?actual_time={actual_time_str}")
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "Late"
     assert data["prescription_id"] == 2
 
     # Verify status updates to Taken in GET
-    response_get = client.get("/api/medications/?user_id=1")
+    response_get = client.get("/api/medications/")
     data_get = response_get.json()
     menopur = next(m for m in data_get if m["id"] == 2)
     assert menopur["status"] == "Taken"
@@ -117,17 +124,19 @@ def test_confirm_dose_late(client, test_db):
 
 def test_double_confirm_error(client, test_db):
     # Log first time
-    response1 = client.post("/api/medications/1/confirm?user_id=1&actual_time=20:00:00")
+    response1 = client.post("/api/medications/1/confirm?actual_time=20:00:00")
     assert response1.status_code == 200
     
     # Log second time on same day -> expect 400 Bad Request
-    response2 = client.post("/api/medications/1/confirm?user_id=1&actual_time=20:10:00")
+    response2 = client.post("/api/medications/1/confirm?actual_time=20:10:00")
     assert response2.status_code == 400
     assert response2.json()["detail"] == "Medication already logged for today"
 
 def test_invalid_user_or_prescription(client):
-    # Invalid user
-    response = client.get("/api/medications/?user_id=999")
+    # Invalid user: generate real token for user 999
+    from services.auth import generate_token
+    token = generate_token(999, "patient")
+    response = client.get("/api/medications/", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 404
     
     # Invalid prescription confirmation

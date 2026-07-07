@@ -49,10 +49,9 @@ def client(test_db):
     app.dependency_overrides.clear()
 
 def test_partner_sharing_consent_flow(client, test_db):
-    # 1. Verify partner dashboard returns 404 originally (no link)
-    res = client.get("/api/partner/dashboard?partner_phone=%2B971509999999")
-    assert res.status_code == 404
-    assert "No patient user has registered this number" in res.json()["detail"]
+    # 1. Verify partner dashboard returns 401 originally (no token)
+    res = client.get("/api/partner/dashboard")
+    assert res.status_code == 401
 
     # 2. Patient registers partner phone number and grants consent
     res = client.post("/users/1/partner-consent", json={
@@ -64,16 +63,18 @@ def test_partner_sharing_consent_flow(client, test_db):
     assert user.partner_phone == "+971509999999"
     assert user.partner_consent is True
 
-    # 3. Verify partner login succeeds
+    # 3. Verify partner login succeeds and returns token
     res_login = client.post("/api/partner/login", json={
         "phone": "+971509999999",
         "otp": "123456"
     })
     assert res_login.status_code == 200
-    assert res_login.json()["patient_name"] == "Sarah Khan"
+    data_login = res_login.json()
+    assert data_login["patient_name"] == "Sarah Khan"
+    token = data_login["token"]
 
     # 4. Verify partner dashboard returns patient details with default prompt (no mood logged yet)
-    res_dash = client.get("/api/partner/dashboard?partner_phone=%2B971509999999")
+    res_dash = client.get("/api/partner/dashboard", headers={"Authorization": f"Bearer {token}"})
     assert res_dash.status_code == 200
     data = res_dash.json()
     assert data["patient_name"] == "Sarah Khan"
@@ -91,7 +92,7 @@ def test_partner_sharing_consent_flow(client, test_db):
     test_db.commit()
 
     # 6. Verify partner dashboard returns Sarah's mood and tailored prompt
-    res_dash_mood = client.get("/api/partner/dashboard?partner_phone=%2B971509999999")
+    res_dash_mood = client.get("/api/partner/dashboard", headers={"Authorization": f"Bearer {token}"})
     assert res_dash_mood.status_code == 200
     data_mood = res_dash_mood.json()
     assert data_mood["mood"] == "Anxious"
@@ -104,7 +105,7 @@ def test_partner_sharing_consent_flow(client, test_db):
     })
     
     # 8. Verify partner dashboard queries are now blocked (403 Forbidden)
-    res_blocked = client.get("/api/partner/dashboard?partner_phone=%2B971509999999")
+    res_blocked = client.get("/api/partner/dashboard", headers={"Authorization": f"Bearer {token}"})
     assert res_blocked.status_code == 403
     assert "consent is currently revoked" in res_blocked.json()["detail"]
 

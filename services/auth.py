@@ -7,7 +7,14 @@ import os
 from typing import Optional
 from fastapi import Header, HTTPException
 
-SECRET_KEY = os.getenv("AUTH_SECRET_KEY", "ovify-secure-token-signing-key-placeholder")
+# Strict fail-closed policy on startup/import
+SECRET_KEY = os.getenv("AUTH_SECRET_KEY")
+if not SECRET_KEY:
+    raise RuntimeError("Critical: AUTH_SECRET_KEY environment variable is not configured. Server must fail closed.")
+
+CLINICIAN_API_KEY = os.getenv("CLINICIAN_API_KEY")
+if not CLINICIAN_API_KEY:
+    raise RuntimeError("Critical: CLINICIAN_API_KEY environment variable is not configured. Server must fail closed.")
 
 def generate_token(user_id: int, role: str) -> str:
     """
@@ -45,15 +52,12 @@ def verify_patient_token(authorization: Optional[str] = Header(None, description
     """
     Dependency to verify a patient's authorization bearer token.
     """
-    # Bypass auth during pytest tests
-    if os.getenv("TESTING") == "true":
-        return {"user_id": 1, "role": "patient"}
-
     if not authorization:
         raise HTTPException(status_code=401, detail="Missing authorization header")
 
     if not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Invalid authorization header format")
+    
     token = authorization.split(" ")[1]
     payload = verify_token(token)
     if not payload or payload.get("role") != "patient":
@@ -64,13 +68,8 @@ def verify_clinician_key(x_clinician_key: Optional[str] = Header(None, alias="X-
     """
     Dependency to verify a clinician's custom header api key.
     """
-    # Bypass auth during pytest tests
-    if os.getenv("TESTING") == "true":
-        return
-
     if not x_clinician_key:
         raise HTTPException(status_code=401, detail="Missing clinician header API key")
 
-    expected_key = os.getenv("CLINICIAN_API_KEY", "ovify-clinic-secret-key-2026")
-    if x_clinician_key != expected_key:
+    if x_clinician_key != CLINICIAN_API_KEY:
         raise HTTPException(status_code=401, detail="Unauthorized clinician access")

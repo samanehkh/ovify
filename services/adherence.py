@@ -1,9 +1,7 @@
-from datetime import date, datetime, time, timezone, timedelta
+from datetime import date, datetime, time, timedelta
 from sqlalchemy.orm import Session
 from db import models
-
-# Global UAE Timezone
-UAE_TZ = timezone(timedelta(hours=4))
+from core.time import UAE_TZ
 
 def check_overdue_doses(db: Session) -> list[str]:
     """

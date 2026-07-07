@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-import os
 from db.session import get_db
 from db import models
 from schemas.user import UserCreate, UserResponse, UserOnboardUpdate, OTPRequest, OTPVerify, PartnerConsentUpdate, UserAuthResponse
@@ -50,8 +49,23 @@ def verify_otp(otp_ver: OTPVerify, db: Session = Depends(get_db)):
     
     # Generate secure bearer token
     token = generate_token(user.id, "patient")
-    user.token = token
-    return user
+    
+    # Return proper dict schema instead of mutating SQLAlchemy model
+    return {
+        "id": user.id,
+        "name": user.name,
+        "email": user.email,
+        "phone": user.phone,
+        "sleep_time": user.sleep_time,
+        "injection_comfort": user.injection_comfort,
+        "onboarded": user.onboarded,
+        "active_status": user.active_status,
+        "cycle_outcome": user.cycle_outcome,
+        "partner_phone": user.partner_phone,
+        "partner_consent": user.partner_consent,
+        "created_at": user.created_at,
+        "token": token
+    }
 
 @router.post("/{user_id}/onboard", response_model=UserResponse)
 def onboard_user(
@@ -64,7 +78,7 @@ def onboard_user(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
         
-    if os.getenv("TESTING") != "true" and user_id != token_payload.get("user_id"):
+    if user_id != token_payload.get("user_id"):
         raise HTTPException(status_code=403, detail="Forbidden: You cannot access another patient's data")
     
     user.sleep_time = onboard_data.sleep_time
@@ -85,7 +99,7 @@ def get_user(
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
         
-    if os.getenv("TESTING") != "true" and user_id != token_payload.get("user_id"):
+    if user_id != token_payload.get("user_id"):
         raise HTTPException(status_code=403, detail="Forbidden: You cannot access another patient's data")
         
     return db_user
@@ -101,7 +115,7 @@ def update_partner_consent(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
         
-    if os.getenv("TESTING") != "true" and user_id != token_payload.get("user_id"):
+    if user_id != token_payload.get("user_id"):
         raise HTTPException(status_code=403, detail="Forbidden: You cannot access another patient's data")
     
     # Normalize partner phone number
