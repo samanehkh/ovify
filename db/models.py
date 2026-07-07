@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Date, ForeignKey, String, TIMESTAMP, Integer, Boolean
+from sqlalchemy import Column, Date, ForeignKey, String, TIMESTAMP, Integer, Boolean, UniqueConstraint
 from sqlalchemy.sql import func
 from db.session import Base
 
@@ -52,3 +52,13 @@ class DoseLog(Base):
     logged_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
     scheduled_date = Column(Date, nullable=False)  # The date this dose was scheduled for
     status = Column(String, nullable=False)  # "On Time", "Late", or "Missed"
+    self_reported = Column(Boolean, default=False, nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint('prescription_id', 'scheduled_date', name='uq_prescription_scheduled_date'),
+    )
+
+class ProcessedDate(Base):
+    __tablename__ = "processed_dates"
+    run_date = Column(Date, primary_key=True, index=True)
+    processed_at = Column(TIMESTAMP(timezone=True), nullable=False)

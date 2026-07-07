@@ -7,43 +7,60 @@ from fastapi.staticfiles import StaticFiles
 from api import cycles, symptoms, users, medications, clinician, partner
 from db.session import Base, engine
 from db import models  # Ensure all models are registered on Base metadata
+import os
 from db.seed import seed_db
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
-seed_db()
+if os.getenv("SEED_DATABASE", "true").lower() == "true":
+    seed_db()
 
 async def adherence_background_daemon():
     """
-    Background worker loop that runs periodically to check for overdue doses
-    and log partner alerts. At the end of the day, it automatically logs
-    missed doses and flags the patient status.
+    Background worker loop that runs periodically to check for overdue doses,
+    and runs the idempotent missed-dose catch-up ledger for historical dates.
     """
     print("[BACKGROUND DAEMON] Adherence tracking worker started.")
     while True:
         try:
             from db.session import SessionLocal
             from services import adherence
-            from datetime import date, datetime
+            from datetime import timezone, timedelta, datetime
+            from db.models import ProcessedDate
+            
+            UAE_TZ = timezone(timedelta(hours=4))
+            uae_now = datetime.now(UAE_TZ)
+            today = uae_now.date()
             
             db = SessionLocal()
             try:
                 # 1. Check for overdue doses (Scenario 7)
                 adherence.check_overdue_doses(db)
                 
-                # 2. Check for end-of-day missed doses (Scenario 5)
-                now = datetime.now()
-                if now.hour == 23 and now.minute >= 50:
-                    count = adherence.process_end_of_day_missed_doses(db, date.today())
-                    if count > 0:
-                        print(f"[BACKGROUND DAEMON] Logged {count} missed doses for today.")
+                # 2. Idempotent missed-dose catch-up ledger for historical dates
+                # Check dates from 14 days ago to yesterday
+                for offset in range(14, 0, -1):
+                    target_date = today - timedelta(days=offset)
+                    
+                    # Check if already processed
+                    already_run = db.query(ProcessedDate).filter(ProcessedDate.run_date == target_date).first()
+                    if not already_run:
+                        print(f"[BACKGROUND DAEMON] Processing missed doses catch-up for date {target_date}...")
+                        count = adherence.process_end_of_day_missed_doses(db, target_date)
+                        
+                        # Save processed log
+                        log_run = ProcessedDate(run_date=target_date, processed_at=uae_now)
+                        db.add(log_run)
+                        db.commit()
+                        if count > 0:
+                            print(f"[BACKGROUND DAEMON] Caught up: Logged {count} missed doses for date {target_date}.")
             finally:
                 db.close()
         except Exception as e:
             print(f"[BACKGROUND DAEMON ERROR] {e}")
             
-        # Run check every 15 minutes
-        await asyncio.sleep(15 * 60)
+        # Check every 5 minutes
+        await asyncio.sleep(5 * 60)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

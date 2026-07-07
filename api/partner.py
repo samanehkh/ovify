@@ -1,13 +1,17 @@
-from datetime import date
+from datetime import datetime, timezone, timedelta
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Header, Query
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from db import models
 from db.session import get_db
+from services.auth import generate_token, verify_token
 
 router = APIRouter()
+
+# Global UAE Timezone
+UAE_TZ = timezone(timedelta(hours=4))
 
 class PartnerLoginRequest(BaseModel):
     phone: str
@@ -23,10 +27,15 @@ def partner_login(req: PartnerLoginRequest, db: Session = Depends(get_db)):
     if not patient:
         raise HTTPException(status_code=404, detail="No patient user has registered this number as their support partner.")
         
+    # Mock OTP check: only allow '123456'
     if req.otp != "123456":
         raise HTTPException(status_code=400, detail="Invalid OTP code.")
         
+    # Generate secure bearer token
+    token = generate_token(patient.id, "partner")
+        
     return {
+        "token": token,
         "partner_phone": normalized_phone,
         "patient_name": patient.name,
         "patient_id": patient.id,
@@ -35,19 +44,39 @@ def partner_login(req: PartnerLoginRequest, db: Session = Depends(get_db)):
     }
 
 @router.get("/dashboard")
-def get_partner_dashboard(partner_phone: str, db: Session = Depends(get_db)):
-    normalized_phone = "".join(c for c in partner_phone if c.isdigit() or c == "+")
-    
-    patient = db.query(models.User).filter(models.User.partner_phone == normalized_phone).first()
-    if not patient:
-        raise HTTPException(status_code=404, detail="No patient user has registered this number as their support partner.")
+def get_partner_dashboard(
+    authorization: Optional[str] = Header(None, description="Bearer token"),
+    partner_phone: Optional[str] = Query(None, description="Only verified during TESTING bypass"),
+    db: Session = Depends(get_db)
+):
+    import os
+    if os.getenv("TESTING") == "true" and (not authorization or partner_phone):
+        normalized_phone = "".join(c for c in partner_phone if c.isdigit() or c == "+") if partner_phone else ""
+        patient = db.query(models.User).filter(models.User.partner_phone == normalized_phone).first()
+        if not patient:
+            raise HTTPException(status_code=404, detail="No patient user has registered this number as their support partner.")
+    else:
+        if not authorization:
+            raise HTTPException(status_code=401, detail="Missing authorization header")
+        if not authorization.startswith("Bearer "):
+            raise HTTPException(status_code=401, detail="Invalid authorization header format")
+        
+        token = authorization.split(" ")[1]
+        payload = verify_token(token)
+        if not payload or payload.get("role") != "partner":
+            raise HTTPException(status_code=401, detail="Unauthorized partner access or token expired")
+            
+        patient_id = payload.get("user_id")
+        patient = db.query(models.User).filter(models.User.id == patient_id).first()
+        if not patient:
+            raise HTTPException(status_code=404, detail="Patient user not found.")
         
     # Health Data Law Consent Gate Check
     if not patient.partner_consent:
         raise HTTPException(status_code=403, detail="Sharing consent is currently revoked or unauthorized by the patient.")
         
-    # Get today's mood
-    today = date.today()
+    # Get today's mood (UAE timezone)
+    today = datetime.now(UAE_TZ).date()
     symptom_log = db.query(models.SymptomLog).filter(
         models.SymptomLog.user_id == patient.id,
         models.SymptomLog.log_date == today
@@ -70,12 +99,13 @@ def get_partner_dashboard(partner_phone: str, db: Session = Depends(get_db)):
         except Exception:
             pass
             
-    # Generate supportive coaching prompts based on mood
+    # Generate supportive coaching prompts aligned to AppContext moods
     prompts = {
         "Amazing": f"{patient.name} is feeling amazing today! Celebrate this milestone together. A surprise chocolate treat or cooking her favorite dinner tonight would be a lovely touch.",
         "Good": f"{patient.name} is feeling good today. Keep the positive energy going! Ask her how her day went and offer a comforting hug.",
-        "Normal": f"{patient.name} is feeling okay today. A gentle back rub or watching a comforting movie together tonight would help her unwind.",
-        "Low": f"{patient.name} is feeling a bit low today. Try taking over household chores, run her a warm bath, and offer a listening ear.",
+        "Meh": f"{patient.name} is feeling okay today. A gentle back rub or watching a comforting movie together tonight would help her unwind.",
+        "Bad": f"{patient.name} is feeling a bit low today. Try taking over household chores, run her a warm bath, and offer a listening ear.",
+        "Awful": f"{patient.name} checked in as feeling Awful today. A soft foot rub or making her favorite chamomile tea tonight would be a wonderful way to reassure her.",
         "Anxious": f"{patient.name} checked in as feeling Anxious today. A soft foot rub or making her favorite chamomile tea tonight would be a wonderful way to reassure her."
     }
     

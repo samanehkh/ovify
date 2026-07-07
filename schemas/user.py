@@ -35,6 +35,9 @@ class UserResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class UserAuthResponse(UserResponse):
+    token: Optional[str] = None
+
 class PartnerConsentUpdate(BaseModel):
     partner_phone: str
     partner_consent: bool

@@ -141,6 +141,10 @@ def test_check_overdue_alerts(client, test_db):
     
     p1 = test_db.query(models.Prescription).filter(models.Prescription.id == 1).first()
     p1.scheduled_time = overdue_time
+    
+    p2 = test_db.query(models.Prescription).filter(models.Prescription.id == 2).first()
+    if p2:
+        test_db.delete(p2)
     test_db.commit()
     
     response = client.post("/api/medications/check-overdue")

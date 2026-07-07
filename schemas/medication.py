@@ -27,6 +27,7 @@ class DoseLogResponse(BaseModel):
     logged_at: datetime
     scheduled_date: date
     status: str
+    self_reported: bool = False
 
     class Config:
         from_attributes = True
@@ -42,6 +43,7 @@ class MedicationStatusResponse(BaseModel):
     status: str  # "Due" or "Taken"
     log_status: Optional[str] = None  # "On Time", "Late", or None
     logged_at: Optional[datetime] = None
+    self_reported: Optional[bool] = False
 
     class Config:
         from_attributes = True

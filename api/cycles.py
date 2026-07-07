@@ -7,11 +7,19 @@ from db import models
 from db.session import get_db
 from schemas.cycle import CycleCreate, CycleResponse, CycleUpdate, CycleSummary
 from services.prediction import calculate_average_cycle_length, predict_next_period_start, predict_fertile_window
+from services.auth import verify_patient_token
 
 router = APIRouter()
 
 @router.post("/", response_model=CycleResponse)
-def create_cycle(cycle: CycleCreate, db: Session = Depends(get_db)):
+def create_cycle(
+    cycle: CycleCreate, 
+    token_payload: dict = Depends(verify_patient_token),
+    db: Session = Depends(get_db)
+):
+    if cycle.user_id != token_payload.get("user_id"):
+        raise HTTPException(status_code=403, detail="Forbidden: You cannot modify another user's cycle logs")
+        
     db_cycle = models.Cycle(**cycle.dict())
     db.add(db_cycle)
     db.commit()
@@ -19,10 +27,19 @@ def create_cycle(cycle: CycleCreate, db: Session = Depends(get_db)):
     return db_cycle
 
 @router.put("/{cycle_id}", response_model=CycleResponse)
-def update_cycle(cycle_id: int, cycle: CycleUpdate, db: Session = Depends(get_db)):
+def update_cycle(
+    cycle_id: int, 
+    cycle: CycleUpdate, 
+    token_payload: dict = Depends(verify_patient_token),
+    db: Session = Depends(get_db)
+):
     db_cycle = db.query(models.Cycle).filter(models.Cycle.id == cycle_id).first()
     if db_cycle is None:
         raise HTTPException(status_code=404, detail="Cycle not found")
+        
+    if db_cycle.user_id != token_payload.get("user_id"):
+        raise HTTPException(status_code=403, detail="Forbidden: You cannot modify another user's cycle logs")
+        
     for key, value in cycle.dict(exclude_unset=True).items():
         setattr(db_cycle, key, value)
     db.commit()
@@ -30,7 +47,14 @@ def update_cycle(cycle_id: int, cycle: CycleUpdate, db: Session = Depends(get_db
     return db_cycle
 
 @router.get("/summary/{user_id}", response_model=CycleSummary)
-def get_cycle_summary(user_id: int, db: Session = Depends(get_db)):
+def get_cycle_summary(
+    user_id: int, 
+    token_payload: dict = Depends(verify_patient_token),
+    db: Session = Depends(get_db)
+):
+    if user_id != token_payload.get("user_id"):
+        raise HTTPException(status_code=403, detail="Forbidden: You cannot access another user's cycle logs")
+        
     cycles = db.query(models.Cycle).filter(models.Cycle.user_id == user_id).order_by(models.Cycle.start_date).all()
 
     if not cycles:
@@ -57,6 +81,13 @@ def get_cycle_summary(user_id: int, db: Session = Depends(get_db)):
     )
 
 @router.get("/{user_id}", response_model=List[CycleResponse])
-def get_cycles(user_id: int, db: Session = Depends(get_db)):
+def get_cycles(
+    user_id: int, 
+    token_payload: dict = Depends(verify_patient_token),
+    db: Session = Depends(get_db)
+):
+    if user_id != token_payload.get("user_id"):
+        raise HTTPException(status_code=403, detail="Forbidden: You cannot access another user's cycle logs")
+        
     cycles = db.query(models.Cycle).filter(models.Cycle.user_id == user_id).order_by(models.Cycle.start_date).all()
     return cycles

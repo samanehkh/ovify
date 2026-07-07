@@ -3,9 +3,10 @@ from sqlalchemy.orm import Session
 from db.session import get_db
 from db import models
 from services import protocol_parser
+from services.auth import verify_clinician_key
 from schemas.clinician import ProtocolParseRequest, ProtocolParseResponse, RegisterPatientRequest, CycleOutcomeUpdate
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(verify_clinician_key)])
 
 @router.post("/parse-protocol", response_model=ProtocolParseResponse)
 def parse_protocol(req: ProtocolParseRequest):
