@@ -1,7 +1,6 @@
 import os
 
 # Set testing environment variables on startup (MUST run before importing project modules!)
-os.environ["TESTING"] = "true"
 os.environ["AUTH_SECRET_KEY"] = "test-secret-key-for-jwt-signing"
 os.environ["CLINICIAN_API_KEY"] = "test-clinician-secret-key"
 
@@ -17,12 +16,13 @@ def patched_request(self, method, url, *args, **kwargs):
         headers = {}
     else:
         headers = dict(headers)
-    
-    # Auto-inject clinician API key for clinician routes
-    if "/api/clinician" in url:
-        if "X-Clinician-Key" not in headers:
-            headers["X-Clinician-Key"] = "test-clinician-secret-key"
-            
+
+    # Auto-inject a real clinician Bearer token for clinician routes
+    # (except /login, which is the public token-issuing endpoint)
+    if "/api/clinician" in url and "/api/clinician/login" not in url:
+        if "Authorization" not in headers:
+            headers["Authorization"] = f"Bearer {generate_token(0, 'clinician')}"
+
     # Auto-inject patient Bearer token for patient routes
     elif "/users/" in url or "/api/medications" in url or "/symptoms/" in url or "/cycles/" in url:
         is_public = any(path in url for path in ["/request-otp", "/verify-otp"])

@@ -22,13 +22,46 @@ function getPartnerHeaders(extraHeaders: Record<string, string> = {}): HeadersIn
   };
 }
 
-// Helper to get clinician authorization headers
+// Helper to get clinician authorization headers.
+// The clinic access key is NEVER embedded here — the nurse enters it at login
+// and we only ever hold the short-lived bearer token issued by the server.
 function getClinicianHeaders(extraHeaders: Record<string, string> = {}): HeadersInit {
+  const token = localStorage.getItem('clinician_token');
   return {
     'Content-Type': 'application/json',
-    'X-Clinician-Key': 'ovify-clinic-secret-key-2026',
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
     ...extraHeaders,
   };
+}
+
+// Shared response guard for clinician calls: a 401 means the token expired
+// or was revoked — clear it so the portal falls back to the login screen.
+async function assertClinicianOk(res: Response, fallback: string): Promise<void> {
+  if (res.ok) return;
+  if (res.status === 401) {
+    localStorage.removeItem('clinician_token');
+    throw new Error('Clinic session expired. Please sign in again.');
+  }
+  const errorData = await res.json().catch(() => ({ detail: fallback }));
+  throw new Error(errorData.detail || fallback);
+}
+
+export interface ClinicianLoginResponse {
+  token: string;
+  clinician_name: string;
+}
+
+export async function loginClinician(accessKey: string, clinicianName?: string): Promise<ClinicianLoginResponse> {
+  const res = await fetch(`${API_BASE_URL}/api/clinician/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ access_key: accessKey, ...(clinicianName ? { clinician_name: clinicianName } : {}) }),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({ detail: 'Login failed' }));
+    throw new Error(errorData.detail || 'Invalid clinic access key');
+  }
+  return res.json();
 }
 
 export async function fetchUser(userId: number): Promise<User> {
@@ -66,7 +99,11 @@ export async function confirmDose(
   });
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({ detail: 'Failed to confirm dose' }));
-    throw new Error(errorData.detail || 'Failed to confirm dose');
+    // Carry the HTTP status so offline-sync can tell a server rejection (4xx,
+    // don't retry) apart from a transient network/server failure (retry later)
+    const err = new Error(errorData.detail || 'Failed to confirm dose') as Error & { status?: number };
+    err.status = res.status;
+    throw err;
   }
   return res.json();
 }
@@ -240,9 +277,7 @@ export async function fetchTriagePatients(): Promise<TriagePatient[]> {
   const res = await fetch(`${API_BASE_URL}/api/clinician/triage`, {
     headers: getClinicianHeaders(),
   });
-  if (!res.ok) {
-    throw new Error('Failed to fetch triage patients');
-  }
+  await assertClinicianOk(res, 'Failed to fetch triage patients');
   return res.json();
 }
 
@@ -251,9 +286,7 @@ export async function resolveTriageAlert(userId: number): Promise<{ message: str
     method: 'POST',
     headers: getClinicianHeaders(),
   });
-  if (!res.ok) {
-    throw new Error('Failed to resolve alert');
-  }
+  await assertClinicianOk(res, 'Failed to resolve alert');
   return res.json();
 }
 
@@ -263,9 +296,7 @@ export async function updateCycleOutcome(userId: number, outcome: string | null)
     headers: getClinicianHeaders(),
     body: JSON.stringify({ cycle_outcome: outcome }),
   });
-  if (!res.ok) {
-    throw new Error('Failed to update cycle outcome');
-  }
+  await assertClinicianOk(res, 'Failed to update cycle outcome');
   return res.json();
 }
 
@@ -291,9 +322,7 @@ export async function parseProtocolText(text: string): Promise<ParseProtocolResp
     headers: getClinicianHeaders(),
     body: JSON.stringify({ protocol_text: text }),
   });
-  if (!res.ok) {
-    throw new Error('Failed to parse protocol text');
-  }
+  await assertClinicianOk(res, 'Failed to parse protocol text');
   return res.json();
 }
 
@@ -310,9 +339,6 @@ export async function registerPatient(patientData: {
     headers: getClinicianHeaders(),
     body: JSON.stringify(patientData),
   });
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({ detail: 'Registration failed' }));
-    throw new Error(errorData.detail || 'Registration failed');
-  }
+  await assertClinicianOk(res, 'Registration failed');
   return res.json();
 }

@@ -64,12 +64,25 @@ def verify_patient_token(authorization: Optional[str] = Header(None, description
         raise HTTPException(status_code=401, detail="Unauthorized patient access or token expired")
     return payload
 
-def verify_clinician_key(x_clinician_key: Optional[str] = Header(None, alias="X-Clinician-Key")) -> None:
+def check_clinic_access_key(access_key: str) -> bool:
     """
-    Dependency to verify a clinician's custom header api key.
+    Server-side check of the clinic access key. Used ONLY by the clinician
+    login endpoint — the key itself must never be embedded in a client bundle.
     """
-    if not x_clinician_key:
-        raise HTTPException(status_code=401, detail="Missing clinician header API key")
+    return hmac.compare_digest(access_key.encode(), CLINICIAN_API_KEY.encode())
 
-    if x_clinician_key != CLINICIAN_API_KEY:
-        raise HTTPException(status_code=401, detail="Unauthorized clinician access")
+def verify_clinician_token(authorization: Optional[str] = Header(None, description="Bearer token")) -> dict:
+    """
+    Dependency to verify a clinician's authorization bearer token.
+    """
+    if not authorization:
+        raise HTTPException(status_code=401, detail="Missing authorization header")
+
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Invalid authorization header format")
+
+    token = authorization.split(" ")[1]
+    payload = verify_token(token)
+    if not payload or payload.get("role") != "clinician":
+        raise HTTPException(status_code=401, detail="Unauthorized clinician access or token expired")
+    return payload

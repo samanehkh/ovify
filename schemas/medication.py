@@ -1,6 +1,6 @@
 from datetime import date, datetime, time
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 class PrescriptionBase(BaseModel):
     name: str
@@ -17,8 +17,7 @@ class PrescriptionResponse(PrescriptionBase):
     id: int
     user_id: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class DoseLogResponse(BaseModel):
     id: int
@@ -29,8 +28,7 @@ class DoseLogResponse(BaseModel):
     status: str
     self_reported: bool = False
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class MedicationStatusResponse(BaseModel):
     id: int  # Prescription ID
@@ -45,5 +43,4 @@ class MedicationStatusResponse(BaseModel):
     logged_at: Optional[datetime] = None
     self_reported: Optional[bool] = False
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

@@ -1,6 +1,6 @@
 from datetime import date
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 class CycleBase(BaseModel):
     start_date: date
@@ -16,8 +16,7 @@ class CycleResponse(CycleBase):
     id: int
     user_id: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class CycleSummary(BaseModel):
     average_cycle_length: Optional[int]

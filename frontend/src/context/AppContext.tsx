@@ -49,10 +49,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const mergeOfflineStatus = useCallback((meds: MedicationStatus[]) => {
     const queueKey = 'offline_dose_queue';
     const queueData = JSON.parse(localStorage.getItem(queueKey) || '[]');
-    const queuedIds = queueData.map((item: any) => item.prescriptionId);
-    
+    // Date-scoped: only a dose queued for TODAY may mark today's card as
+    // pending — a stale item from yesterday must never paint today's dose
+    // as already taken.
+    const todayKey = new Date().toDateString();
+    const queuedTodayIds = queueData
+      .filter((item: any) => {
+        const itemDate = item.reportedAt ? new Date(item.reportedAt).toDateString() : null;
+        return itemDate === todayKey;
+      })
+      .map((item: any) => item.prescriptionId);
+
     return meds.map(m => {
-      if (queuedIds.includes(m.id)) {
+      if (queuedTodayIds.includes(m.id) && m.status === 'Due') {
         return { ...m, status: 'Taken' as const, syncPending: true };
       }
       return m;
@@ -166,7 +175,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (!user) return;
     const queueKey = 'offline_dose_queue';
     const queueData = JSON.parse(localStorage.getItem(queueKey) || '[]');
-    queueData.push({ prescriptionId, userId: user.id, actualTime: actualTime || new Date().toTimeString().split(' ')[0] });
+
+    // Store the FULL moment of injection as ISO — a bare time-of-day would be
+    // mis-dated if the queue only syncs tomorrow.
+    let reportedAt: string;
+    if (actualTime) {
+      const [h, m, s] = actualTime.split(':').map(Number);
+      const dt = new Date();
+      dt.setHours(h || 0, m || 0, s || 0, 0);
+      reportedAt = dt.toISOString();
+    } else {
+      reportedAt = new Date().toISOString();
+    }
+
+    queueData.push({ prescriptionId, userId: user.id, reportedAt });
     localStorage.setItem(queueKey, JSON.stringify(queueData));
 
     // Update state locally so the PWA updates immediately!
@@ -195,39 +217,63 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setTimeout(() => setToastMessage(null), 3000);
 
     let syncedCount = 0;
-    const failedQueue = [];
+    let rejectedCount = 0;
+    const retryQueue = [];
 
     for (const item of queueData) {
       try {
-        await api.confirmDose(item.prescriptionId, item.userId, item.actualTime);
+        // Prefer the full ISO timestamp; fall back for legacy queue items
+        await api.confirmDose(item.prescriptionId, item.userId, item.reportedAt || item.actualTime);
         syncedCount++;
-      } catch (err) {
-        console.error("Failed to sync dose offline item:", item, err);
-        failedQueue.push(item);
+      } catch (err: any) {
+        // A definitive server rejection (4xx) must NOT retry forever — the
+        // record is either already reconciled server-side or was refused.
+        if (err.status && err.status >= 400 && err.status < 500) {
+          console.warn('Offline dose rejected by server, dropping from queue:', item, err.message);
+          rejectedCount++;
+        } else {
+          // Network / 5xx: keep for a later attempt
+          console.error('Transient failure syncing offline dose, will retry:', item, err);
+          retryQueue.push(item);
+        }
       }
     }
 
-    if (failedQueue.length > 0) {
-      localStorage.setItem(queueKey, JSON.stringify(failedQueue));
+    if (retryQueue.length > 0) {
+      localStorage.setItem(queueKey, JSON.stringify(retryQueue));
     } else {
       localStorage.removeItem(queueKey);
     }
 
-    if (syncedCount > 0 && user) {
+    if ((syncedCount > 0 || rejectedCount > 0) && user) {
       const updatedMeds = await api.fetchMedications(user.id);
       setMedications(mergeOfflineStatus(updatedMeds));
-      setToastMessage(`Synchronized all offline logs.`);
+      if (syncedCount > 0) {
+        setToastMessage('Offline logs synchronized with your clinic.');
+      } else {
+        setToastMessage('Offline logs reconciled with your clinic record.');
+      }
       setTimeout(() => setToastMessage(null), 3500);
     }
-  }, [user]);
+  }, [user, mergeOfflineStatus]);
 
-  // Bind online/offline window listeners
+  // Drain the offline queue whenever connectivity could have returned:
+  // app launch (user may reopen already online — 'online' never fires),
+  // window refocus, and the browser's online event.
   useEffect(() => {
+    if (user && navigator.onLine) {
+      syncOfflineDoses();
+    }
+    const onFocus = () => {
+      if (navigator.onLine) syncOfflineDoses();
+    };
     window.addEventListener('online', syncOfflineDoses);
+    window.addEventListener('focus', onFocus);
     return () => {
       window.removeEventListener('online', syncOfflineDoses);
+      window.removeEventListener('focus', onFocus);
     };
-  }, [syncOfflineDoses]);
+  }, [syncOfflineDoses, user]);
 
   const submitDose = async (prescriptionId: number, actualTime?: string) => {
     if (!user) return;

@@ -1,14 +1,33 @@
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from db.session import get_db
 from db import models
 from services import protocol_parser
-from services.auth import verify_clinician_key
+from services.auth import check_clinic_access_key, generate_token, verify_clinician_token
 from schemas.clinician import ProtocolParseRequest, ProtocolParseResponse, RegisterPatientRequest, CycleOutcomeUpdate
 
-router = APIRouter(dependencies=[Depends(verify_clinician_key)])
+# Public sub-router: login only. All other clinician routes require a Bearer token.
+router = APIRouter()
+protected = APIRouter(dependencies=[Depends(verify_clinician_token)])
 
-@router.post("/parse-protocol", response_model=ProtocolParseResponse)
+class ClinicianLoginRequest(BaseModel):
+    access_key: str
+    clinician_name: str = "Nurse Console"
+
+@router.post("/login")
+def clinician_login(req: ClinicianLoginRequest):
+    """
+    Exchanges the clinic access key (entered by the nurse, never shipped in
+    client code) for a short-lived clinician bearer token.
+    """
+    if not req.access_key or not check_clinic_access_key(req.access_key):
+        raise HTTPException(status_code=401, detail="Invalid clinic access key.")
+
+    token = generate_token(0, "clinician")
+    return {"token": token, "clinician_name": req.clinician_name}
+
+@protected.post("/parse-protocol", response_model=ProtocolParseResponse)
 def parse_protocol(req: ProtocolParseRequest):
     """
     Parses natural language protocol description text and extracts structured medications.
@@ -19,7 +38,7 @@ def parse_protocol(req: ProtocolParseRequest):
     result = protocol_parser.parse_protocol_text(req.protocol_text)
     return result
 
-@router.post("/register")
+@protected.post("/register")
 def register_patient(patient: RegisterPatientRequest, db: Session = Depends(get_db)):
     """
     Creates a new user profile and seeds their daily prescriptions in the database.
@@ -70,7 +89,7 @@ def register_patient(patient: RegisterPatientRequest, db: Session = Depends(get_
         "user_id": db_user.id
     }
 
-@router.get("/triage")
+@protected.get("/triage")
 def get_triage_data(db: Session = Depends(get_db)):
     """
     Retrieves the clinical patient compliance triage registry.
@@ -124,7 +143,7 @@ def get_triage_data(db: Session = Depends(get_db)):
         
     return triage_list
 
-@router.post("/resolve-alert/{user_id}")
+@protected.post("/resolve-alert/{user_id}")
 def resolve_patient_alert(user_id: int, db: Session = Depends(get_db)):
     """
     Resolves patient triage alerts. Resets active status and marks missed/late doses as reviewed.
@@ -145,7 +164,7 @@ def resolve_patient_alert(user_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"message": f"Alert for {user.name} resolved successfully."}
 
-@router.post("/update-outcome/{user_id}")
+@protected.post("/update-outcome/{user_id}")
 def update_cycle_outcome(user_id: int, req: CycleOutcomeUpdate, db: Session = Depends(get_db)):
     """
     Updates the cycle outcome for a patient (e.g. "Failed", "Success", or None).
@@ -164,4 +183,5 @@ def update_cycle_outcome(user_id: int, req: CycleOutcomeUpdate, db: Session = De
     db.refresh(user)
     return {"message": f"Cycle outcome for {user.name} updated to {user.cycle_outcome}.", "cycle_outcome": user.cycle_outcome}
 
-
+# Mount the token-protected clinician routes
+router.include_router(protected)

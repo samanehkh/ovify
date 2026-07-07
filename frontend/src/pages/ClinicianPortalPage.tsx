@@ -4,7 +4,8 @@ import {
   resolveTriageAlert,
   updateCycleOutcome,
   parseProtocolText,
-  registerPatient
+  registerPatient,
+  loginClinician
 } from '../services/api';
 import type { TriagePatient } from '../services/api';
 import { Badge } from '../components/ui/Badge';
@@ -28,6 +29,33 @@ interface UnrecognizedMed {
 
 export const ClinicianPortalPage: React.FC = () => {
   const [activeSubTab, setActiveSubTab] = useState<'intake' | 'triage'>('intake');
+
+  // Clinician session state — token lives in localStorage, key is never stored
+  const [clinicianToken, setClinicianToken] = useState<string | null>(() => localStorage.getItem('clinician_token'));
+  const [accessKey, setAccessKey] = useState('');
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [loggingIn, setLoggingIn] = useState(false);
+
+  const handleClinicianLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoggingIn(true);
+    setLoginError(null);
+    try {
+      const data = await loginClinician(accessKey);
+      localStorage.setItem('clinician_token', data.token);
+      setClinicianToken(data.token);
+      setAccessKey('');
+    } catch (err: any) {
+      setLoginError(err.message || 'Invalid clinic access key.');
+    } finally {
+      setLoggingIn(false);
+    }
+  };
+
+  const handleClinicianLogout = () => {
+    localStorage.removeItem('clinician_token');
+    setClinicianToken(null);
+  };
   
   // Demographics Form State
   const [name, setName] = useState('Sarah Khan');
@@ -54,8 +82,12 @@ export const ClinicianPortalPage: React.FC = () => {
     try {
       const data = await fetchTriagePatients();
       setTriageData(data);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to fetch triage data", err);
+      // Expired/invalid session: fall back to the login screen
+      if (!localStorage.getItem('clinician_token')) {
+        setClinicianToken(null);
+      }
     }
   };
 
@@ -84,8 +116,10 @@ export const ClinicianPortalPage: React.FC = () => {
   };
 
   React.useEffect(() => {
-    fetchTriageData();
-  }, [activeSubTab]);
+    if (clinicianToken) {
+      fetchTriageData();
+    }
+  }, [activeSubTab, clinicianToken]);
 
   // NLP Parser trigger
   const handleParseProtocol = async () => {
@@ -138,9 +172,60 @@ export const ClinicianPortalPage: React.FC = () => {
     }
   };
 
+  // Login gate: no clinician session — ask for the clinic access key
+  if (!clinicianToken) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center min-h-screen bg-[#F8F5F1] px-6">
+        <div className="w-full max-w-sm bg-white border border-navy-10 rounded-3xl p-8 shadow-xl">
+          <div className="flex items-center gap-3 mb-6">
+            <img src="/static/logo.png" alt="Ovify Logo" className="w-10 h-10 object-contain rounded-xl bg-white p-1 border border-navy-10" />
+            <div>
+              <h1 className="font-heading text-lg font-bold tracking-tight text-navy">Ovify Portal</h1>
+              <span className="text-[10px] font-data font-bold text-lavender-dark tracking-wider uppercase">Clinician Console</span>
+            </div>
+          </div>
+
+          {loginError && (
+            <div className="mb-4 p-3 rounded-xl bg-blush-10 border border-blush/25 text-due text-xs font-body font-semibold" role="alert">
+              {loginError}
+            </div>
+          )}
+
+          <form onSubmit={handleClinicianLogin} className="space-y-5">
+            <div>
+              <label htmlFor="clinicAccessKey" className="block font-heading text-[10px] font-bold text-navy-55 uppercase tracking-wider mb-1.5">
+                Clinic Access Key
+              </label>
+              <input
+                id="clinicAccessKey"
+                type="password"
+                autoComplete="off"
+                value={accessKey}
+                onChange={(e) => setAccessKey(e.target.value)}
+                placeholder="Enter your clinic access key"
+                required
+                className="w-full px-4 py-3 border border-navy-10 rounded-xl text-sm text-navy bg-white font-data focus:outline-none focus:ring-2 focus:ring-lavender/10 focus:border-lavender transition-all"
+              />
+              <p className="mt-2 text-[11px] font-body text-navy-55 leading-relaxed">
+                Issued by your clinic administrator. Sessions expire after 24 hours.
+              </p>
+            </div>
+            <button
+              type="submit"
+              disabled={loggingIn}
+              className="w-full py-3.5 bg-navy hover:bg-navy-80 text-white font-heading text-sm font-semibold rounded-xl shadow-lg transition-all duration-200 disabled:opacity-50"
+            >
+              {loggingIn ? 'Signing in…' : 'Sign in to Console'}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen bg-[#F8F5F1] font-body text-navy">
-      
+
       {/* 1. Left Sidebar Navigation (Desktop/Tablet Design) */}
       <aside className="w-64 bg-navy text-white flex flex-col justify-between p-6 shrink-0 shadow-lg border-r border-navy-80">
         <div className="space-y-8">
@@ -185,12 +270,18 @@ export const ClinicianPortalPage: React.FC = () => {
         </div>
 
         {/* Sidebar Footer Info */}
-        <div className="border-t border-navy-80 pt-4 flex flex-col gap-1 text-[10px] text-navy-30 font-data uppercase">
+        <div className="border-t border-navy-80 pt-4 flex flex-col gap-2 text-[10px] text-navy-30 font-data uppercase">
           <div>Clinic ID: DXB-IVF-01</div>
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-sage animate-ping" />
             <span>Connection Secure</span>
           </div>
+          <button
+            onClick={handleClinicianLogout}
+            className="mt-1 w-full px-3 py-2 rounded-lg border border-navy-80 text-navy-30 hover:bg-navy-80 hover:text-white font-heading text-[10px] font-semibold tracking-wide transition-colors text-left"
+          >
+            Sign out
+          </button>
         </div>
       </aside>
 

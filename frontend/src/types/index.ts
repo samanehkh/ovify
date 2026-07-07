@@ -11,6 +11,8 @@ export interface User {
   partner_phone?: string;
   partner_consent?: boolean;
   created_at: string;
+  // Bearer token, present only on the /verify-otp login response
+  token?: string;
 }
 
 export interface MedicationStatus {

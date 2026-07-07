@@ -105,27 +105,40 @@ def confirm_medication_dose(
     if actual_time:
         self_reported = True
         try:
-            parts = actual_time.split(":")
-            if len(parts) == 2:
-                hour, minute = map(int, parts)
-                second = 0
-            elif len(parts) == 3:
-                hour, minute, second = map(int, parts)
+            if "T" in actual_time:
+                # Full ISO timestamp (offline queue sync carries the real
+                # moment of injection, including its date). Tolerate a '+'
+                # in the tz offset that was decoded to a space in the query.
+                iso_str = actual_time.replace("Z", "+00:00")
+                if " " in iso_str and "T" in iso_str:
+                    iso_str = iso_str.replace(" ", "+")
+                log_time = datetime.fromisoformat(iso_str)
+                if log_time.tzinfo is None:
+                    log_time = log_time.replace(tzinfo=UAE_TZ)
+                log_time = log_time.astimezone(UAE_TZ)
             else:
-                raise ValueError
-            
-            # Combine with today, attach UAE timezone
-            log_time = datetime.combine(today, time(hour, minute, second)).replace(tzinfo=UAE_TZ)
-            
-            # Guardrail 1: Reject future times
-            if log_time > now:
+                # Bare time-of-day, assumed to be today (UAE)
+                parts = actual_time.split(":")
+                if len(parts) == 2:
+                    hour, minute = map(int, parts)
+                    second = 0
+                elif len(parts) == 3:
+                    hour, minute, second = map(int, parts)
+                else:
+                    raise ValueError
+                log_time = datetime.combine(today, time(hour, minute, second)).replace(tzinfo=UAE_TZ)
+
+            # Guardrail 1: Reject future times (small tolerance for clock skew)
+            if log_time > now + timedelta(minutes=5):
                 raise HTTPException(status_code=400, detail="Dose confirmation time cannot be in the future")
-            
-            # Guardrail 2: Clamp to a plausible 24-hour window
-            if log_time < now - timedelta(hours=24):
-                raise HTTPException(status_code=400, detail="Dose confirmation time cannot be more than 24 hours in the past")
+
+            # Guardrail 2: Clamp to a plausible window. ISO timestamps from the
+            # offline queue may arrive up to 48h later; bare times stay at 24h.
+            max_age = timedelta(hours=48) if "T" in actual_time else timedelta(hours=24)
+            if log_time < now - max_age:
+                raise HTTPException(status_code=400, detail="Dose confirmation time is too far in the past to log")
         except ValueError:
-            raise HTTPException(status_code=400, detail="Invalid actual_time format. Use HH:MM:SS or HH:MM")
+            raise HTTPException(status_code=400, detail="Invalid actual_time format. Use HH:MM:SS, HH:MM, or ISO 8601")
     else:
         log_time = now
 
@@ -138,15 +151,25 @@ def confirm_medication_dose(
         else:
             s_hour, s_minute, s_second = map(int, parts)
         
-        scheduled_today = datetime.combine(today, time(s_hour, s_minute, s_second)).replace(tzinfo=UAE_TZ)
-        scheduled_prev = scheduled_today - timedelta(days=1)
-        scheduled_next = scheduled_today + timedelta(days=1)
-        
+        # Center candidates on the date the dose was actually reported for —
+        # a queued offline dose synced the next morning must resolve against
+        # its own day's schedule, not the server's "today".
+        anchor_date = log_time.date()
+        scheduled_anchor = datetime.combine(anchor_date, time(s_hour, s_minute, s_second)).replace(tzinfo=UAE_TZ)
+        scheduled_prev = scheduled_anchor - timedelta(days=1)
+        scheduled_next = scheduled_anchor + timedelta(days=1)
+
         # Select closest scheduled candidate date to log_time
-        candidates = [scheduled_prev, scheduled_today, scheduled_next]
+        candidates = [scheduled_prev, scheduled_anchor, scheduled_next]
         scheduled_dt = min(candidates, key=lambda dt: abs((log_time - dt).total_seconds()))
     except ValueError:
         raise HTTPException(status_code=500, detail="Invalid scheduled time in prescription database")
+
+    # Calculate difference in minutes (signed)
+    time_diff_mins = (log_time - scheduled_dt).total_seconds() / 60.0
+
+    # Determine status (On Time if within -15 to +60 minutes, else Late)
+    status = "On Time" if -15.0 <= time_diff_mins <= 60.0 else "Late"
 
     # Check if already logged for this resolved target date
     target_date = scheduled_dt.date()
@@ -155,13 +178,19 @@ def confirm_medication_dose(
         models.DoseLog.scheduled_date == target_date
     ).first()
     if existing_log:
+        # Reconciliation: the end-of-day daemon may have already written a
+        # "Missed" record before an offline-queued confirmation synced. The
+        # clinically truthful record is that the dose WAS taken (self-reported),
+        # so upgrade the Missed log rather than rejecting the patient's report.
+        if existing_log.status == "Missed" and self_reported:
+            existing_log.status = status if status == "On Time" else "Late"
+            existing_log.logged_at = log_time
+            existing_log.self_reported = True
+            db.commit()
+            db.refresh(existing_log)
+            adherence.auto_clear_user_alert(db, user_id)
+            return existing_log
         raise HTTPException(status_code=400, detail="Medication already logged for today")
-
-    # Calculate difference in minutes (signed)
-    time_diff_mins = (log_time - scheduled_dt).total_seconds() / 60.0
-
-    # Determine status (On Time if within -15 to +60 minutes, else Late)
-    status = "On Time" if -15.0 <= time_diff_mins <= 60.0 else "Late"
 
     # Create dose log
     db_log = models.DoseLog(
