@@ -71,3 +71,47 @@ To prevent fragmented designs across multiple screens, all future UI/UX creation
 
 * **Only the App (FastAPI backend and root-level PWA files) may be modified by autonomous agents.**
 * **CRITICAL RULE:** Do not make any edits, deletions, or additions to files in the `website/` folder. All marketing homepage elements are locked; any changes to the public website require prior explicit approval from the Product Owner.
+
+---
+
+## 7. Patient Emotional Safety & Tone Guardrails (Patient PWA)
+
+These rules govern all patient-facing copy and interaction. They are derived from
+persona **P1 (Sarah, the Patient)** in `docs/inception/personas.md` and are
+**blocking** — the UI agent's critic must fail any render that violates them.
+
+### 7.1 Tone invariant — never cheerlead, never promise
+* **Never cheerlead or promise an outcome.** Forbidden: "You've got this!",
+  "Day N of your miracle journey!", "your baby", or any relentlessly upbeat or
+  outcome-promising framing. This alienates hopeful first-time patients and can
+  re-traumatise anyone carrying a prior pregnancy loss.
+* **Calibrate warmth, not hope.** Copy is calm, warm, factual, and non-promissory.
+  Acknowledge effort and presence ("You're doing hard work today"), never predicted
+  success. This invariant applies to **all** patient states.
+
+### 7.2 Separate the two patient axes — never conflate them
+* **Guide density** is driven **only** by injection *competence* (`injection_comfort`:
+  `First time` → full guide; `Experienced` → condensed). This is a competence signal,
+  never an emotional one.
+* **Tone** would be driven by emotional / cycle history (Axis B), which is **not
+  captured today** — so tone stays uniform (warm, non-promissory) per §7.1.
+* An agent must **never** let the injection-comfort answer change emotional tone.
+
+### 7.3 Safety escalation — non-diagnostic, friction-free, no self-assessment
+Ovify is deliberately **non-SaMD** (see §2 and BRD §7.3). Patient P1's default with
+a worrying symptom is silence (fear of being a burden). Counteract this **without
+becoming a medical device**:
+* **Do NOT classify symptoms** or infer a condition/risk level. That is a device function.
+* **Do NOT build symptom checkers or self-assessment flows.** They edge toward SaMD
+  and risk false reassurance (patient infers she is fine and does not call).
+  **The app must never be the thing that decides a patient is okay.**
+* **DO make contacting the clinic frictionless and shame-free** — a standing, no-
+  justification-needed affordance framed as the good-patient action ("You will never
+  be a bother"). Reuse the persisted nurse-callback primitive.
+* **General, clinic-approved, non-diagnostic safety-net education is allowed**
+  (e.g. "Severe bloating, sudden weight gain, or trouble breathing → call your clinic
+  now") — this is education, not classification.
+
+### 7.4 Truthful status (reinforces §5 accessibility)
+* Never fabricate reassuring data (no invented "Day 5 of 12"). A pending/offline
+  state must read as pending, never as done.

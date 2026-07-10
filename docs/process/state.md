@@ -20,7 +20,7 @@ _Last updated: 2026-07-09_
 | Constitution (agent guardrails) | `docs/constitution.md` | ✅ Current |
 | Business case (BRD) | `docs/inception/business-case.md` | ✅ Current |
 | User journeys (Gherkin) | `docs/inception/user-journeys.md` | ✅ Current |
-| **Personas** | `docs/inception/personas.md` | ⬜ Not started (Step 1) |
+| **Personas** | `docs/inception/personas.md` | 🟡 P1 locked; P3/P4 pending |
 | **User stories + template** | `docs/inception/user-stories/` | ⬜ Not started (Steps 2–3) |
 | Traceability matrix | `docs/inception/traceability.md` | ⬜ Not started |
 | As-built record | `docs/construction/as-built/` | ✅ Current (6 journeys + overview) |
@@ -28,6 +28,14 @@ _Last updated: 2026-07-09_
 | ADRs | `docs/construction/decisions/` | ✅ ADR-0001 (sweep timing) |
 | Architecture | `docs/construction/architecture.md` | ✅ Current |
 | Agent swarm design | `docs/process/agent-design.md` | ✅ Current |
+
+## Known limitations (parked, deliberate)
+
+- **Axis B tone data not captured** (persona P1): the clinic does not pass cycle
+  number / prior outcome at registration, so in-cycle patient *tone* cannot adapt
+  to emotional history. MVP holds tone uniform (warm, non-promissory) for all
+  non-Recovery states. Revisit if clinic registration starts passing cycle history.
+- **English-only** for MVP persona/story scope (EN/AR i18n scaffolding exists in code).
 
 ## Current initiative
 
