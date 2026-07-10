@@ -37,4 +37,8 @@ build/
 tmp/
 scratch/
 *.db
-.spec-kit/
+
+# Agent run artifacts
+agents/output/
+docs/process/generated-*.md
+docs/process/state/

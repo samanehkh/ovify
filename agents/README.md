@@ -9,7 +9,7 @@ were running by hand.
 |---|---|---|
 | **Hands** | ability to write files | `render()` + `html_path.write_text(...)` |
 | **Eyes** | ability to *see* the render | headless-Chrome screenshot → fed to Gemini **vision** |
-| **A spec** | the brand/token rules | reads `.spec-kit/constitution.md` (per constitution §5) |
+| **A spec** | the brand/token rules | reads `docs/constitution.md` (per constitution §5) |
 | **A loop** | generate → critique → refine | the `for i in range(MAX_ITERS)` orchestrator, capped |
 
 ## How it maps to your SDLC design

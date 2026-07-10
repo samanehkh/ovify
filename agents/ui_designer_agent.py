@@ -8,7 +8,7 @@ agent the four things it actually needs to do the work:
 
     1. HANDS  — it writes real .html files.
     2. EYES   — it renders the HTML with headless Chrome and *sees* the screenshot.
-    3. A SPEC — it reads .spec-kit/constitution.md (your brand/token rules) + a brief.
+    3. A SPEC — it reads docs/constitution.md (your brand/token rules) + a brief.
     4. A LOOP — generate -> render -> critique the screenshot -> refine, capped.
 
 It maps 1:1 onto the nodes in SDLC_design/ :
@@ -48,7 +48,7 @@ from pathlib import Path
 
 # ------------------------------------------------------------------ config
 ROOT          = Path(__file__).resolve().parent.parent
-CONSTITUTION  = ROOT / ".spec-kit" / "constitution.md"
+CONSTITUTION  = ROOT / "docs" / "constitution.md"
 OUT_DIR       = Path(__file__).resolve().parent / "output"
 MODEL         = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")   # vision-capable, free tier
 MAX_ITERS     = int(os.environ.get("UI_AGENT_MAX_ITERS", "4"))       # your loop guardrail

@@ -146,8 +146,8 @@ def ui_designer_agent(state: SDLCState) -> Dict:
     """Acts as a Senior UI/UX Designer to implement high-fidelity, accessible UI mockups based on spec.md"""
     print("--- [UI/UX Designer Agent Node] Designing and writing user interfaces ---")
     
-    spec_content = read_workspace_file.invoke({"path": ".spec-kit/spec.md"})
-    constitution = read_workspace_file.invoke({"path": ".spec-kit/constitution.md"})
+    spec_content = read_workspace_file.invoke({"path": "docs/inception/user-journeys.md"})
+    constitution = read_workspace_file.invoke({"path": "docs/constitution.md"})
     
     system_prompt = f"""You are the Senior UI/UX Designer for Ovify, with 20 years of experience designing premium, accessible Digital Health and IVF applications.
 Your job is to read the spec (spec.md) and system guidelines (constitution.md), and design/update the frontend interface (usually index.html).
@@ -203,8 +203,8 @@ def architecture_agent(state: SDLCState) -> Dict:
     """Reads spec.md, index.html and generates plan.md and tasks.md"""
     print("--- [Architecture Agent Node] Designing technical plan ---")
     
-    spec_content = read_workspace_file.invoke({"path": ".spec-kit/spec.md"})
-    constitution = read_workspace_file.invoke({"path": ".spec-kit/constitution.md"})
+    spec_content = read_workspace_file.invoke({"path": "docs/inception/user-journeys.md"})
+    constitution = read_workspace_file.invoke({"path": "docs/constitution.md"})
     ui_content = read_workspace_file.invoke({"path": "index.html"})
     
     system_prompt = f"""You are the Lead Solution Architect for Ovify, with 20 years of experience in cloud architecture, AI architecture, Azure architecture, application designing, API integrations, and legacy modernization, specialized in digital health architecting.
@@ -230,8 +230,8 @@ You must strictly conform your output to the required schema structure.
     ])
     
     # Save plan and tasks to spec-kit directory
-    plan_path = ".spec-kit/plan.md"
-    tasks_path = ".spec-kit/tasks.md"
+    plan_path = "docs/process/generated-plan.md"
+    tasks_path = "docs/process/generated-tasks.md"
     
     write_workspace_file.invoke({"path": plan_path, "content": result.plan})
     
@@ -253,7 +253,7 @@ def developer_agent(state: SDLCState) -> Dict:
     
     plan_text = state.get("plan", "")
     tasks_json = json.dumps(state.get("tasks", []), indent=2)
-    constitution = read_workspace_file.invoke({"path": ".spec-kit/constitution.md"})
+    constitution = read_workspace_file.invoke({"path": "docs/constitution.md"})
     feedback_text = "\n".join(state.get("critic_feedback", []))
     
     system_prompt = f"""You are the Developer Agent. Your job is to implement the changes specified in the Technical Plan and Task List below.
@@ -443,7 +443,7 @@ if __name__ == "__main__":
     print("=== [SDLC Swarm Pipeline] Starting Orchestrator ===")
     
     # State Directory Setup
-    state_dir = ".spec-kit/state"
+    state_dir = "docs/process/state"
     state_file = os.path.join(state_dir, "sdlc_state.json")
     os.makedirs(state_dir, exist_ok=True)
     
