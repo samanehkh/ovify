@@ -17,8 +17,8 @@
 - **Preconditions:** Authenticated session; `onboarded === true`; active prescriptions found in database.
 - **Exit:**
   - Tapping a medication card marked "Due" redirects to **US-J3-01** (Confirm Dose).
-  - Tapping the top-right profile avatar slides over the Profile Settings & Support panel.
-  - Bottom tabs route to the Calendar page or Medications library.
+  - Tapping the top-right profile avatar slides open the Profile Settings.
+  - Bottom tabs route to Calendar, Medications, or Settings page.
 
 ## 3. Acceptance criteria (Gherkin)
 ```gherkin
@@ -28,16 +28,11 @@ Scenario: View active dashboard with due medications
   When she opens the PWA Home Page
   Then she sees the brand logo mark at the top left
   And she sees her Profile Avatar ("SK") at the top right
-  And she sees "Stimulation Day 5" displayed on the progress card
-  And "Today's Schedule" displays Gonal-F with a "Due" badge (Red)
-  And "Today's Schedule" displays Menopur with a "✓ Taken at 19:00" badge (Sage)
+  And she sees "Stimulation Day 5" displayed inside the SVG Circular Progress Ring
+  And "Today's Schedule" displays Gonal-F with a "Due" badge (Lavender outline)
+  And "Today's Schedule" displays Menopur with a "✓ Taken" badge (Sage)
   And the "Ask Me Anything" search bar and "CalmSeed Breathing" card are visible
   And the bottom navigation highlights the "Home" tab
-
-Scenario: Tapping a Due medication card navigates to confirmation screen
-  Given Sarah is on the active home page
-  When she taps the Gonal-F card (Status: Due)
-  Then she is redirected to the Dose Confirmation Page (US-J3-01) to log her injection
 ```
 
 ## 4. Screen Layout & States
@@ -63,19 +58,12 @@ The page is designed as a mobile-first column layout utilizing modern premium UI
     *   *Right Card: "CalmSeed Companion"* — Features an active **looping CSS breathing bubble animation** (expanding and contracting to guide breathing) to provide immediate relaxation value.
 4.  **Bottom Navigation Bar (Floating Glassmorphic Dock):**
     *   A floating navigation dock with a frosted glass backdrop (`backdrop-filter: blur(12px)`) and rounded corners (`border-radius: 24px`).
-    *   Contains three tabs: **Home** (Active), **Calendar**, and **Medications**. Active icon uses a spring-like micro-interaction scaling effect.
+    *   Contains four tabs: **Home** (Active), **Calendar**, **Medications**, and **Settings**. Active icon uses a spring-like micro-interaction scaling effect.
 
 ### Profile Slide-over Page (Triggered by Avatar)
 Slides over from the right side of the screen:
-*   **Settings Section:**
-    *   Sleep Window Dropdown (9-11 PM, 10-12 AM, 11-1 AM).
-    *   Injection Comfort Toggle (First time vs. Experienced).
-    *   Reminder Offset Dropdown (0m, 15m, 30m).
-*   **Support Section:**
-    *   **"Speak with a Clinic Nurse"** callback request button.
-    *   Direct Clinic Hotline Dial Link.
-*   **Account Actions:**
-    *   **"Sign Out"** button.
+*   Displays Sarah's profile info: **Name, Phone Number, Email**.
+*   **"Sign Out"** button.
 
 ---
 
@@ -116,18 +104,11 @@ Slides over from the right side of the screen:
   }
   ```
 
-## 6. Field-level detail
-- **Bottom Navigation Tabs:** 3 items (Home, Calendar, Medications).
-- **Profile Slide-over Inputs:** Sleep cycle select, comfort level select, reminder offset select, callback request action, sign-out action.
-
-## 7. Components
-- `TabNavigation`, `ProfileSlideOver`, `MedicationChecklistCard`, `CycleDayProgress`.
-
-## 8. Design Tokens
+## 6. Design Tokens & Layout
 - Background: Ivory `#F8F5F1`, Cards: White `#FFFFFF`, Typography: Headings in `DM Sans`, Body in `Manrope`.
-- Accents: Navy `#13233C` (Text/Borders), Lavender `#9E8CEF` (Select highlights), Sage `#3E8E6E` (Completed states), Red `#C24C57` (Alerts/Errors).
+- Accents: Navy `#13233C` (Primary buttons/borders), Lavender `#9E8CEF` (Active icons), Sage `#3E8E6E` (Success state).
 
-## 9. Copy (EN)
+## 7. Copy (EN)
 | Key | String |
 |---|---|
 | cycle_day_label | "Stimulation Day {day}" |
@@ -135,15 +116,13 @@ Slides over from the right side of the screen:
 | ask_anything_placeholder | "Search clinic guides & FAQs..." |
 | calmseed_title | "CalmSeed Somatic Breathing" |
 | schedule_title | "Today's Schedule" |
-| sign_out_btn | "Sign Out" |
-| nurse_callback_btn | "Speak with a Clinic Nurse" |
 
-## 10. Accessibility & DoD
+## 8. Accessibility & DoD
 - [x] WCAG AA contrast (navy text on white cards satisfies 4.5:1 ratio)
 - [x] Clear text labels under bottom navigation icons for screenreaders
 - [x] Screen states in §4 implemented
 
-## 11. Traceability
+## 9. Traceability
 - **Journey:** `docs/inception/user-journeys.md` → J2, J3
 - **Endpoints:** `api/users.py`
 - **Frontend:** `frontend/src/pages/DashboardPage.tsx`
