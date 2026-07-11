@@ -27,6 +27,7 @@ class User(Base):
     partner_name = Column(String, nullable=True)
     partner_relationship = Column(String, nullable=True)
     next_appointment_datetime = Column(TIMESTAMP(timezone=True), nullable=True)
+    day1_reported_at = Column(TIMESTAMP(timezone=True), nullable=True)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
 
 class SymptomLog(Base):

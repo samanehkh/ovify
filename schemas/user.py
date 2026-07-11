@@ -33,6 +33,7 @@ class UserResponse(BaseModel):
     cycle_outcome: Optional[str] = None
     partner_phone: Optional[str] = None
     partner_consent: bool
+    day1_reported_at: Optional[datetime] = None
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
@@ -43,3 +44,27 @@ class UserAuthResponse(UserResponse):
 class PartnerConsentUpdate(BaseModel):
     partner_phone: str
     partner_consent: bool
+
+class ReportDay1Request(BaseModel):
+    reported_at: Optional[str] = None
+
+class ReportDay1Response(BaseModel):
+    status: str
+    reported_date: Optional[str] = None
+    baseline_scan_status: str
+
+class DashboardMedication(BaseModel):
+    medication_id: int
+    name: str
+    dosage: str
+    route: str
+    scheduled_time: str
+    status: str
+    logged_at: Optional[datetime] = None
+
+class DashboardResponse(BaseModel):
+    cycle_day: Optional[int] = None
+    cycle_status: str  # "Pre-Cycle" or "Stimulation"
+    today_schedule: list[DashboardMedication]
+    day1_reported_at: Optional[datetime] = None
+

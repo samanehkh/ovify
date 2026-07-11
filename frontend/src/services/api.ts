@@ -373,7 +373,7 @@ export async function registerPatient(patientData: {
   partner_relationship: string;
   next_appointment_datetime: string;
   prescriptions: ParsedMedication[];
-}): Promise<User> {
+}): Promise<{ message: string; user_id: number }> {
   const res = await fetch(`${API_BASE_URL}/api/clinician/register`, {
     method: 'POST',
     headers: getClinicianHeaders(),
@@ -382,3 +382,48 @@ export async function registerPatient(patientData: {
   await assertClinicianOk(res, 'Registration failed');
   return res.json();
 }
+
+export interface DashboardMedication {
+  medication_id: number;
+  name: string;
+  dosage: string;
+  route: string;
+  scheduled_time: string;
+  status: string;
+  logged_at?: string;
+}
+
+export interface DashboardResponseData {
+  cycle_day: number | null;
+  cycle_status: 'Pre-Cycle' | 'Stimulation';
+  today_schedule: DashboardMedication[];
+  day1_reported_at: string | null;
+}
+
+export interface ReportDay1ResponseData {
+  status: string;
+  reported_date: string | null;
+  baseline_scan_status: string;
+}
+
+export async function fetchUserDashboard(userId: number): Promise<DashboardResponseData> {
+  const res = await fetch(`${API_BASE_URL}/users/${userId}/dashboard`, {
+    headers: getPatientHeaders(),
+  });
+  if (!res.ok) {
+    throw new Error('Failed to fetch user dashboard');
+  }
+  return res.json();
+}
+
+export async function reportDay1(userId: number): Promise<ReportDay1ResponseData> {
+  const res = await fetch(`${API_BASE_URL}/users/${userId}/report-day1`, {
+    method: 'POST',
+    headers: getPatientHeaders(),
+  });
+  if (!res.ok) {
+    throw new Error('Failed to report Day 1 cycle start');
+  }
+  return res.json();
+}
+

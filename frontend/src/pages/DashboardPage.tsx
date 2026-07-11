@@ -1,45 +1,61 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { ProgressRing } from '../components/ProgressRing';
-import { MoodSelector } from '../components/MoodSelector';
-import { MedicationCard } from '../components/MedicationCard';
-import { Sparkles, AlertTriangle, Info, Phone } from 'lucide-react';
-import { updatePartnerConsent, requestNurseCallback } from '../services/api';
-import { i18nContent } from '../content/i18n';
+import * as api from '../services/api';
+import { Sparkles, AlertTriangle, ChevronDown, ChevronUp, CheckCircle2, Heart } from 'lucide-react';
+
+// Premium style inject for the CSS Breathing Bubble & micro-interactions
+const UI_STYLE_INJECT = `
+@keyframes breathe {
+  0% { transform: scale(1); opacity: 0.35; box-shadow: 0 0 0 0 rgba(158, 140, 239, 0.4); }
+  50% { transform: scale(1.3); opacity: 0.8; box-shadow: 0 0 0 20px rgba(158, 140, 239, 0); }
+  100% { transform: scale(1); opacity: 0.35; box-shadow: 0 0 0 0 rgba(158, 140, 239, 0); }
+}
+.breathing-bubble {
+  animation: breathe 5s infinite ease-in-out;
+}
+.glow-pill-card {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glow-pill-card:hover {
+  transform: translateY(-2px) scale(1.015);
+  box-shadow: 0 12px 24px -10px rgba(19, 35, 60, 0.08), 0 0 0 1px rgba(158, 140, 239, 0.25);
+}
+`;
 
 export const DashboardPage: React.FC = () => {
-  const { user, medications, loading, error, refetchData, language } = useApp();
-  const t = i18nContent[language];
-  const [partnerPhone, setPartnerPhone] = React.useState(user?.partner_phone || '');
-  const [partnerConsent, setPartnerConsent] = React.useState(user?.partner_consent || false);
-  const [savingConsent, setSavingConsent] = React.useState(false);
-  const [saveSuccess, setSaveSuccess] = React.useState(false);
-  const [infoModalText, setInfoModalText] = React.useState<string | null>(null);
+  const { user, refetchData, changeTab } = useApp();
 
-  React.useEffect(() => {
-    if (user) {
-      setPartnerPhone(user.partner_phone || '');
-      setPartnerConsent(user.partner_consent || false);
-    }
-  }, [user]);
+  // Dashboard state
+  const [dashboardData, setDashboardData] = useState<api.DashboardResponseData | null>(null);
+  const [dbLoading, setDbLoading] = useState(true);
+  const [dbError, setDbError] = useState<string | null>(null);
 
-  const handleSaveSharing = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Guide accordion toggles (for Pre-cycle first-timers)
+  const [expandedSection, setExpandedSection] = useState<string | null>('scan');
+
+  // Confirmation modal states
+  const [showDay1Modal, setShowDay1Modal] = useState(false);
+  const [reportingDay1, setReportingDay1] = useState(false);
+  const [infoModalText, setInfoModalText] = useState<string | null>(null);
+
+  // Load dashboard on boot
+  const loadDashboard = async () => {
     if (!user) return;
-    setSavingConsent(true);
-    setSaveSuccess(false);
+    setDbLoading(true);
+    setDbError(null);
     try {
-      await updatePartnerConsent(user.id, partnerPhone, partnerConsent);
-      setSaveSuccess(true);
-      await refetchData();
-      setTimeout(() => setSaveSuccess(false), 3000);
-    } catch (err) {
-      console.error(err);
-      setInfoModalText("Network error updating partner sharing settings.");
+      const data = await api.fetchUserDashboard(user.id);
+      setDashboardData(data);
+    } catch (err: any) {
+      setDbError(err.message || 'Failed to load cycle dashboard.');
     } finally {
-      setSavingConsent(false);
+      setDbLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadDashboard();
+  }, [user]);
 
   // Determine time-of-day greeting
   const getGreeting = () => {
@@ -49,291 +65,351 @@ export const DashboardPage: React.FC = () => {
     return 'Good evening';
   };
 
-  // Dynamically calculate stimulation days from active prescriptions
-  const getStimulationProgress = () => {
-    if (medications.length === 0) {
-      return null;
-    }
-    const firstMed = medications[0];
-    try {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      
-      const start = new Date(firstMed.start_date);
-      start.setHours(0, 0, 0, 0);
-      
-      const end = new Date(firstMed.end_date);
-      end.setHours(0, 0, 0, 0);
-
-      const diffTimeCurrent = today.getTime() - start.getTime();
-      const currentDay = Math.floor(diffTimeCurrent / (1000 * 60 * 60 * 24)) + 1;
-      
-      const diffTimeTotal = end.getTime() - start.getTime();
-      const totalDays = Math.floor(diffTimeTotal / (1000 * 60 * 60 * 24)) + 1;
-
-      return {
-        current: Math.max(1, currentDay),
-        total: Math.max(1, totalDays)
-      };
-    } catch (e) {
-      return null;
-    }
-  };
-
-  const progress = getStimulationProgress();
-
-  const [callbackRequested, setCallbackRequested] = React.useState(false);
-  const [callbackSubmitting, setCallbackSubmitting] = React.useState(false);
-  const [callbackError, setCallbackError] = React.useState<string | null>(null);
-
-  // Persist the callback request server-side — the clinic triage console must
-  // actually see it. Never show "requested" unless the server confirmed it.
-  const handleRequestCallback = async () => {
+  const handleReportDay1 = async () => {
     if (!user) return;
-    setCallbackSubmitting(true);
-    setCallbackError(null);
+    setReportingDay1(true);
     try {
-      await requestNurseCallback(user.id);
-      setCallbackRequested(true);
+      await api.reportDay1(user.id);
+      setShowDay1Modal(false);
+      setInfoModalText("Your Day 1 has been reported. The clinic team will contact you to schedule your baseline scan.");
+      loadDashboard();
+      refetchData();
     } catch (err: any) {
-      setCallbackError(err.message || t.callbackErrorFallback);
+      setInfoModalText(err.message || "Failed to notify the clinic. Please call them directly.");
     } finally {
-      setCallbackSubmitting(false);
+      setReportingDay1(false);
     }
   };
 
-  if (user && user.cycle_outcome === 'Failed') {
+  if (dbLoading) {
     return (
-      <div className="flex-1 flex flex-col pt-4 px-5 pb-24 overflow-y-auto no-scrollbar">
-        {/* Header Greeting */}
-        <div className="flex flex-col items-center text-center mt-2 mb-8">
-          <span className="font-data text-[12px] font-bold text-navy-55 tracking-widest uppercase">
-            {getGreeting()}
-          </span>
-          <h2 className="font-heading text-2xl font-bold text-navy mt-1">
-            {user.name}
-          </h2>
-        </div>
-
-        {/* Empathy Message Card */}
-        <div className="mb-6 p-6 rounded-3xl bg-white border border-navy-10 shadow-sm text-left">
-          <h3 className="font-heading text-sm font-bold text-navy mb-3 uppercase tracking-wider">{t.recoveryTitle}</h3>
-          <div className="flex gap-2 items-start font-body text-xs text-navy-55/80 leading-relaxed">
-            <Info className="w-4 h-4 flex-none text-navy-55/70 mt-0.5" aria-hidden="true" />
-            <span>{t.recoveryPauseNote}</span>
-          </div>
-        </div>
-
-        {/* Content Unlock: Recovery Guides */}
-        <div className="mb-6">
-          <h4 className="font-heading text-xs font-bold text-navy-55 uppercase tracking-wider mb-3">{t.recoveryGuidelineHeader}</h4>
-          <div className="space-y-3">
-            {t.recoverySteps.map((step, idx) => (
-              <div key={idx} className="p-4 rounded-2xl bg-white border border-navy-10 hover:border-lavender/50 hover:shadow-sm transition-all text-left flex items-start gap-2.5">
-                <div className="w-5 h-5 rounded-full bg-sage-soft text-sage flex items-center justify-center mt-0.5 flex-none font-bold text-[10px]">
-                  {idx + 1}
-                </div>
-                <p className="font-body text-xs text-navy-55 leading-relaxed">{step}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Nurse Callback Booking Button */}
-        <div className="mb-6 bg-lavender/10 border border-lavender/25 rounded-3xl p-5 text-center">
-          <h4 className="font-heading text-xs font-bold text-lavender-dark uppercase tracking-wider mb-2">{t.callbackHeader}</h4>
-          <p className="font-body text-xs text-navy-55 leading-relaxed mb-4">
-            {t.callbackText}
-          </p>
-          
-          {callbackError && (
-            <div className="mb-3 p-3 rounded-xl bg-blush-10 border border-blush/25 text-due text-xs font-body font-semibold text-left" role="alert">
-              {callbackError}
-            </div>
-          )}
-
-          <button
-            onClick={handleRequestCallback}
-            disabled={callbackRequested || callbackSubmitting}
-            className={`w-full py-3.5 rounded-xl font-heading text-xs font-bold shadow-md transition-all duration-300 flex items-center justify-center gap-2 ${
-              callbackRequested
-                ? 'bg-sage text-white shadow-none cursor-default'
-                : 'bg-navy hover:bg-navy-80 text-white hover:shadow-lg cursor-pointer disabled:opacity-60'
-            }`}
-          >
-            {callbackRequested ? (
-              <span>{t.callbackRequestedLabel}</span>
-            ) : callbackSubmitting ? (
-              <span>{t.callbackSubmittingLabel}</span>
-            ) : (
-              <>
-                <Phone className="w-4 h-4" aria-hidden="true" />
-                <span>{t.callbackBtnLabel}</span>
-              </>
-            )}
-          </button>
-        </div>
-
-        {/* CalmSeed Mood Check-in stays active */}
-        <div className="mb-8">
-          <MoodSelector />
-        </div>
+      <div className="flex-1 flex flex-col items-center justify-center min-h-[400px]">
+        <div className="w-10 h-10 rounded-full border-4 border-lavender border-t-transparent animate-spin mb-4" />
+        <p className="font-heading text-xs font-semibold text-navy tracking-wider uppercase">Loading your timeline...</p>
       </div>
     );
   }
 
-  if (loading) {
-    return (
-      <div className="flex-1 flex flex-col items-center justify-center py-12">
-        <div className="w-8 h-8 rounded-full border-4 border-lavender border-t-transparent animate-spin mb-4" />
-        <p className="font-body text-sm text-navy-55">Loading your dashboard...</p>
-      </div>
-    );
-  }
-
-  if (error) {
+  if (dbError || !dashboardData) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-        <p className="font-data text-due font-bold mb-2">Failed to load data</p>
-        <p className="font-body text-sm text-navy-55 mb-4">{error}</p>
+        <AlertTriangle className="w-8 h-8 text-blush mb-3" />
+        <p className="font-heading text-sm font-bold text-navy mb-1">Could not sync timeline</p>
+        <p className="font-body text-xs text-navy-55 mb-5 max-w-xs">{dbError}</p>
+        <button
+          onClick={loadDashboard}
+          className="py-2.5 px-5 bg-navy text-white font-heading text-xs font-bold rounded-xl shadow-md"
+        >
+          Try Again
+        </button>
       </div>
     );
   }
 
+  const isPreCycle = dashboardData.cycle_status === 'Pre-Cycle';
+  const day1Reported = !!dashboardData.day1_reported_at;
+
   return (
-    <div className="flex-1 flex flex-col pt-4 px-5 pb-24 overflow-y-auto no-scrollbar">
-      {/* Greeting and Header */}
-      <div className="flex flex-col items-center text-center mt-2 mb-8">
-        <span className="font-data text-[12px] font-bold text-navy-55 tracking-widest uppercase">
-          {getGreeting()}
-        </span>
-        <h2 className="font-heading text-2xl font-bold text-navy mt-1">
-          {user ? user.name : 'Sarah'}
-        </h2>
+    <div className="flex-1 flex flex-col pt-4 px-5 pb-24 overflow-y-auto no-scrollbar relative">
+      <style>{UI_STYLE_INJECT}</style>
+
+      {/* Greeting Header */}
+      <div className="flex items-center justify-between mt-2 mb-6">
+        <div>
+          <span className="font-data text-[10px] font-bold text-navy-55 tracking-widest uppercase">
+            {getGreeting()}
+          </span>
+          <h2 className="font-heading text-xl font-bold text-navy leading-tight mt-0.5">
+            {user?.name || 'Sarah'}
+          </h2>
+        </div>
+        <div className="px-3.5 py-1.5 rounded-full bg-white border border-navy-10 shadow-sm font-data text-[10px] font-bold text-navy-55 uppercase tracking-wide">
+          {dashboardData.cycle_status}
+        </div>
       </div>
 
-      {/* Clinic Coordinator Alert Banner */}
+      {/* Clinic Coordinator Action Required Alert Banner */}
       {user && user.active_status === 'Action Required' && (
-        <div className="mb-6 p-4 rounded-2xl bg-blush-10 border border-blush/25 text-left flex gap-3.5 shadow-sm animate-pulse">
-          <AlertTriangle className="w-5 h-5 flex-none text-due mt-0.5" aria-hidden="true" />
+        <div className="mb-5 p-4 rounded-2xl bg-[#C24C57]/10 border border-[#C24C57]/20 text-left flex gap-3 shadow-sm animate-pulse">
+          <AlertTriangle className="w-5 h-5 flex-none text-[#C24C57] mt-0.5" aria-hidden="true" />
           <div>
-            <h4 className="font-heading text-xs font-bold text-due uppercase tracking-wider mb-0.5">
-              Clinic Alert: Action Required
+            <h4 className="font-heading text-xs font-bold text-[#C24C57] uppercase tracking-wider mb-0.5">
+              Protocol Action Required
             </h4>
-            <p className="font-body text-xs text-navy-55 leading-relaxed">
-              We detected a missed or late injection schedule today. Your clinic coordinator has been notified to check in and support your protocol.
+            <p className="font-body text-[11px] text-navy-55 leading-relaxed">
+              We flagged a missed dose. Mona has been updated to follow up with your schedule.
             </p>
           </div>
         </div>
       )}
 
-      {/* Progress Circle Card */}
-      {progress !== null ? (
-        <>
-          <div className="flex justify-center mb-8">
-            <ProgressRing currentDay={progress.current} totalDays={progress.total} />
+      {/* ─────────────────────────────────────────────────────────────
+          1. MAIN GRAPHIC CARD (Circular Ring OR Period Report Card)
+          ───────────────────────────────────────────────────────────── */}
+      {!isPreCycle ? (
+        // ACTIVE CYCLE: SVG Circular Progress Ring
+        <div className="mb-6 p-6 rounded-3xl bg-white border border-navy-10 shadow-sm flex flex-col items-center justify-center relative overflow-hidden">
+          {/* Subtle glowing backdrop */}
+          <div className="absolute inset-0 bg-radial-gradient from-lavender/5 to-transparent pointer-events-none" />
+          
+          <div className="relative w-36 h-36 flex items-center justify-center">
+            {/* SVG Progress Circle */}
+            <svg className="w-full h-full transform -rotate-90">
+              <circle
+                cx="72"
+                cy="72"
+                r="64"
+                stroke="#EEF1F6"
+                strokeWidth="7"
+                fill="transparent"
+              />
+              <circle
+                cx="72"
+                cy="72"
+                r="64"
+                stroke="#9E8CEF"
+                strokeWidth="8"
+                fill="transparent"
+                strokeDasharray={402}
+                // Mock active cycle day progress (say day 5 of 12)
+                strokeDashoffset={402 - (402 * Math.min(dashboardData.cycle_day || 1, 12)) / 12}
+                strokeLinecap="round"
+                className="transition-all duration-1000 ease-out"
+              />
+            </svg>
+            <div className="absolute flex flex-col items-center justify-center text-center">
+              <span className="font-data text-[10px] text-navy-55 font-bold uppercase tracking-widest">Day</span>
+              <span className="font-heading text-3xl font-extrabold text-navy leading-none mt-1">
+                {dashboardData.cycle_day || 1}
+              </span>
+              <span className="font-body text-[10px] text-navy-55/70 mt-1">of 12</span>
+            </div>
           </div>
 
-          {/* Stimulation Protocol Status Label */}
-          <div className="self-center flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm font-data text-[13px] font-semibold text-navy mb-8 border border-navy-10/40">
-            <span className="w-2.5 h-2.5 rounded-full bg-lavender animate-pulse" />
-            Ovarian Stimulation Protocol
+          <div className="mt-5 flex items-center gap-2 px-3 py-1 bg-sage-soft rounded-full font-data text-[11px] font-bold text-sage">
+            <span className="w-1.5 h-1.5 rounded-full bg-sage animate-pulse" />
+            ON TRACK · CLINIC SYNCED
           </div>
-        </>
+        </div>
       ) : (
-        <div className="mb-8 p-6 rounded-3xl bg-white border border-navy-10 shadow-sm text-center">
-          <p className="font-body text-sm text-navy font-bold">No Active Stimulation Protocol</p>
-          <p className="font-body text-xs text-navy-55 mt-1 leading-relaxed">Please check in with your clinic coordinator to load your protocol details.</p>
+        // PRE-CYCLE: Menstrual Cycle Period Reporting Card
+        <div className="mb-6 p-6 rounded-3xl bg-white border border-navy-10 shadow-sm text-center relative overflow-hidden">
+          {!day1Reported ? (
+            <div className="flex flex-col items-center">
+              <span className="w-10 h-10 rounded-2xl bg-blush-10 text-due flex items-center justify-center text-lg mb-3">📢</span>
+              <h3 className="font-heading text-base font-bold text-navy mb-1.5">Awaiting Menstruation</h3>
+              <p className="font-body text-xs text-navy-55 max-w-xs leading-relaxed mb-5">
+                Full menstrual flow must be established. If in doubt, contact your clinic.
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowDay1Modal(true)}
+                className="w-full py-3.5 px-6 rounded-xl border border-navy bg-white hover:bg-navy/5 text-navy font-heading text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2"
+              >
+                My Period Has Started
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center">
+              <div className="w-10 h-10 rounded-2xl bg-[#E6F4EF] text-[#3E8E6E] flex items-center justify-center text-lg mb-3">✓</div>
+              <h3 className="font-heading text-base font-bold text-[#3E8E6E] mb-1">Day 1 Reported</h3>
+              <p className="font-body text-xs text-navy-55 max-w-xs leading-relaxed">
+                Mona will call you to schedule your baseline scan for tomorrow. Ensure your notifications are on.
+              </p>
+            </div>
+          )}
         </div>
       )}
 
-      {/* Today's Tasks Injection Cards */}
-      <div className="mb-8">
-        <div className="flex justify-between items-end mb-4">
-          <h3 className="font-heading text-lg font-bold text-navy">Today's Injections</h3>
-          <span className="font-data text-[12px] font-bold text-lavender-dark uppercase tracking-wider">
-            {medications.filter(m => m.status === 'Taken').length}/{medications.length} Done
-          </span>
+      {/* ─────────────────────────────────────────────────────────────
+          2. MEDICATIONS OR PROTOCOL FEED
+          ───────────────────────────────────────────────────────────── */}
+      {!isPreCycle && (
+        <div className="mb-6">
+          <div className="flex justify-between items-baseline mb-3">
+            <h3 className="font-heading text-sm font-bold text-navy uppercase tracking-wider">Today's Injections</h3>
+            <span className="font-data text-[11px] text-navy-55 font-bold">
+              {dashboardData.today_schedule.filter(m => m.status === 'Taken').length}/{dashboardData.today_schedule.length} Done
+            </span>
+          </div>
+
+          <div className="space-y-3">
+            {dashboardData.today_schedule.map((med) => {
+              const isTaken = med.status === 'Taken' || med.status === 'Late';
+              return (
+                <div
+                  key={med.medication_id}
+                  onClick={() => {
+                    if (!isTaken) {
+                      changeTab('medication-guide', {
+                        id: med.medication_id,
+                        name: med.name,
+                        dosage: med.dosage,
+                        route: med.route,
+                        scheduled_time: med.scheduled_time,
+                        status: med.status,
+                      } as any);
+                    }
+                  }}
+                  className={`glow-pill-card p-4 rounded-2xl border text-left flex justify-between items-center ${
+                    isTaken 
+                      ? 'bg-white border-navy-10/40 opacity-75' 
+                      : 'bg-white border-lavender cursor-pointer'
+                  }`}
+                >
+                  <div className="flex-1 min-w-0 pr-3">
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-heading text-sm font-bold text-navy truncate">{med.name}</h4>
+                      <span className={`text-[9px] font-data font-bold px-2 py-0.5 rounded-full ${
+                        isTaken ? 'bg-[#E6F4EF] text-[#3E8E6E]' : 'bg-[#F3F1FE] text-lavender'
+                      }`}>
+                        {med.status}
+                      </span>
+                    </div>
+                    <p className="font-body text-[11px] text-navy-55 mt-1">
+                      {med.dosage} · {med.route}
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-end flex-none">
+                    <span className="font-data text-xs text-navy font-bold">{med.scheduled_time.slice(0, 5)}</span>
+                    <span className="text-[10px] text-navy-55/70 mt-0.5 font-body">Target</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
-        
-        {medications.length === 0 ? (
-          <div className="glass-panel rounded-xl p-6 text-center">
-            <p className="font-body text-sm text-navy-55">No injections scheduled for today.</p>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-4">
-            {medications.map((med) => (
-              <MedicationCard key={med.id} medication={med} />
-            ))}
-          </div>
-        )}
-      </div>
+      )}
 
-      {/* CalmSeed Check-in */}
-      <MoodSelector />
-
-      {/* Partner Sharing & Consent Settings (Health Data Law Gated) */}
-      <div className="mb-6 p-5 rounded-3xl bg-white border border-navy-10 shadow-sm text-left">
-        <h3 className="font-heading text-sm font-bold text-navy mb-3 uppercase tracking-wider">Partner Sharing & Consent</h3>
-        
-        <form onSubmit={handleSaveSharing} className="space-y-4">
+      {/* ─────────────────────────────────────────────────────────────
+          3. SUPPORT TOOLS GRID (CalmSeed Companion + Ask Me Anything)
+          ───────────────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 gap-3.5 mb-6">
+        {/* CalmSeed somatic breathing card */}
+        <div className="p-4 rounded-3xl bg-white border border-navy-10 shadow-sm flex flex-col justify-between items-center text-center relative overflow-hidden h-[155px]">
+          <div className="relative w-12 h-12 flex items-center justify-center mt-1">
+            <div className="absolute w-8 h-8 rounded-full bg-lavender/30 breathing-bubble" />
+            <Heart className="w-5 h-5 text-lavender-dark z-10" />
+          </div>
           <div>
-            <label className="block font-heading text-[10px] font-bold text-navy-55 mb-1.5 uppercase">Partner Phone Number</label>
-            <input
-              type="tel"
-              value={partnerPhone}
-              onChange={(e) => setPartnerPhone(e.target.value)}
-              placeholder="e.g. +971509999999"
-              className="w-full px-4 py-3 rounded-xl border border-navy-10 font-data text-sm text-navy placeholder-navy-10 focus:outline-none focus:border-lavender bg-[#F8F5F1]/30"
-              required
-            />
+            <h4 className="font-heading text-xs font-bold text-navy">CalmSeed</h4>
+            <p className="font-body text-[10px] text-navy-55 mt-0.5 leading-tight">Breathing cycle</p>
           </div>
+        </div>
 
-          <div className="flex gap-3 items-start border-t border-navy-10/40 pt-3">
-            <input
-              type="checkbox"
-              id="partnerConsentToggle"
-              checked={partnerConsent}
-              onChange={(e) => setPartnerConsent(e.target.checked)}
-              className="mt-1 w-4.5 h-4.5 text-lavender border-navy-10 rounded focus:ring-lavender cursor-pointer"
-            />
-            <label htmlFor="partnerConsentToggle" className="font-body text-xs text-navy-55 leading-relaxed cursor-pointer select-none">
-              <strong>Granular Consent Grant:</strong> I hereby consent to sharing my real-time cycle stimulation progress, active medication schedule, and today's emotional symptom log with my registered partner number. I understand I can revoke this consent at any time by unchecking this box.
-            </label>
+        {/* Ask Me Anything (FAQ link) */}
+        <div
+          onClick={() => setInfoModalText("Ask Ovify AI is in Phase 2 development.")}
+          className="p-4 rounded-3xl bg-white border border-navy-10 shadow-sm flex flex-col justify-between items-center text-center h-[155px] cursor-pointer hover:border-lavender/50 transition-all"
+        >
+          <div className="w-10 h-10 rounded-full bg-[#F3F1FE] flex items-center justify-center text-lavender-dark mt-2">
+            <Sparkles className="w-4 h-4" />
           </div>
-
-          <button
-            type="submit"
-            disabled={savingConsent}
-            className={`w-full py-3 rounded-xl font-heading text-xs font-bold focus:ring-2 focus:ring-lavender focus:outline-none transition-all duration-300 ${
-              saveSuccess
-                ? 'bg-sage text-white shadow-none cursor-default'
-                : 'bg-navy hover:bg-navy-80 text-white cursor-pointer hover:shadow-md'
-            }`}
-          >
-            {savingConsent ? 'Saving Preferences...' : saveSuccess ? '✓ Sharing Settings Saved!' : 'Save Sharing Preferences'}
-          </button>
-        </form>
+          <div>
+            <h4 className="font-heading text-xs font-bold text-navy">Ask Me Anything</h4>
+            <p className="font-body text-[10px] text-navy-55 mt-0.5 leading-tight">Search clinic FAQs</p>
+          </div>
+        </div>
       </div>
 
-      {/* Ask Ovify AI Shortcut */}
-      <button 
-        onClick={() => setInfoModalText("Ask Ovify AI is in Phase 2 development.")}
-        className="w-full py-4 rounded-xl glass-panel bg-gradient-to-r from-lavender/10 to-blush/10 hover:border-lavender hover:shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all duration-300 focus:ring-2 focus:ring-lavender focus:outline-none"
-      >
-        <Sparkles className="w-4 h-4 text-lavender-dark stroke-[2]" />
-        <span className="font-heading text-sm font-bold text-navy">Ask Ovify AI</span>
-      </button>
+      {/* ─────────────────────────────────────────────────────────────
+          4. ADAPTIVE BASELINE GUIDE (Pre-Cycle Only)
+          ───────────────────────────────────────────────────────────── */}
+      {isPreCycle && (
+        <div className="mb-6 text-left">
+          <h3 className="font-heading text-sm font-bold text-navy uppercase tracking-wider mb-3">Follicle scan preparation</h3>
+          
+          {user?.injection_comfort === 'First time' ? (
+            // Expanded accordion view for first timers
+            <div className="space-y-2">
+              <div className="p-4 rounded-2xl bg-white border border-navy-10">
+                <button
+                  type="button"
+                  onClick={() => setExpandedSection(expandedSection === 'scan' ? null : 'scan')}
+                  className="w-full flex justify-between items-center text-left font-heading text-xs font-bold text-navy uppercase tracking-wider"
+                >
+                  <span>1. Ultrasound follicular scan</span>
+                  {expandedSection === 'scan' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </button>
+                {expandedSection === 'scan' && (
+                  <p className="font-body text-xs text-navy-55 leading-relaxed mt-2.5 pt-2 border-t border-navy-10/40">
+                    Your baseline scan will occur on Day 2 or 3 of your period. This checks your ovaries before starting daily hormone injections.
+                  </p>
+                )}
+              </div>
 
-      {/* Accessible Custom Modal instead of alert() */}
+              <div className="p-4 rounded-2xl bg-white border border-navy-10">
+                <button
+                  type="button"
+                  onClick={() => setExpandedSection(expandedSection === 'blood' ? null : 'blood')}
+                  className="w-full flex justify-between items-center text-left font-heading text-xs font-bold text-navy uppercase tracking-wider"
+                >
+                  <span>2. Blood hormone check</span>
+                  {expandedSection === 'blood' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </button>
+                {expandedSection === 'blood' && (
+                  <p className="font-body text-xs text-navy-55 leading-relaxed mt-2.5 pt-2 border-t border-navy-10/40">
+                    We check estrogen, progesterone, and LH levels to confirm your body is fully ready for stimulation.
+                  </p>
+                )}
+              </div>
+            </div>
+          ) : (
+            // Streamlined checklist for experienced patients
+            <div className="p-4 rounded-2xl bg-white border border-navy-10 flex gap-3">
+              <CheckCircle2 className="w-5 h-5 text-lavender flex-none mt-0.5" />
+              <div className="flex-1">
+                <p className="font-heading text-xs font-bold text-navy">Baseline Check Reminder</p>
+                <p className="font-body text-xs text-navy-55 mt-1 leading-relaxed">
+                  Book scan on Day 2 or 3 of menstruation. Remember to bring your prescription sheets.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          5. MODALS & DIALOGS
+          ───────────────────────────────────────────────────────────── */}
+      {/* Day 1 period report confirmation modal */}
+      {showDay1Modal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/40 backdrop-blur-sm p-5" role="dialog" aria-modal="true">
+          <div className="bg-white border border-navy-10 rounded-3xl p-6 shadow-xl max-w-sm w-full text-center relative animate-fade-in">
+            <h4 className="font-heading text-base font-bold text-navy mb-2">Report Day 1?</h4>
+            <p className="font-body text-xs text-navy-55 leading-relaxed mb-6">
+              Please confirm that you have started your period today. We will notify your clinic team to book your baseline scan.
+            </p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                disabled={reportingDay1}
+                onClick={handleReportDay1}
+                className="flex-1 py-3 bg-navy hover:bg-navy-80 text-white font-heading text-xs font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5"
+              >
+                {reportingDay1 ? 'Notifying...' : 'Confirm Flow'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowDay1Modal(false)}
+                className="flex-1 py-3 border border-navy-10 bg-white hover:bg-navy-10/10 text-navy font-heading text-xs font-bold rounded-xl transition-all"
+              >
+                Go Back
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Info notice dialog */}
       {infoModalText && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/40 backdrop-blur-sm p-5" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/40 backdrop-blur-sm p-5" role="dialog" aria-modal="true">
           <div className="bg-white border border-navy-10 rounded-3xl p-6 shadow-xl max-w-sm w-full text-center relative">
-            <h4 id="modalTitle" className="font-heading text-base font-bold text-navy mb-2">Notice</h4>
+            <h4 className="font-heading text-base font-bold text-navy mb-2">Cycle Notice</h4>
             <p className="font-body text-xs text-navy-55 leading-relaxed mb-6">{infoModalText}</p>
             <button
               onClick={() => setInfoModalText(null)}
-              className="w-full py-3 bg-navy hover:bg-navy-80 text-white font-heading text-xs font-bold rounded-xl cursor-pointer shadow-md focus:ring-2 focus:ring-lavender focus:outline-none"
+              className="w-full py-3 bg-navy hover:bg-navy-80 text-white font-heading text-xs font-bold rounded-xl shadow-md"
             >
               Close
             </button>

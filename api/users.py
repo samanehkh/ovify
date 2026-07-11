@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from db.session import get_db
 from db import models
-from schemas.user import UserCreate, UserResponse, UserOnboardUpdate, OTPRequest, OTPVerify, PartnerConsentUpdate, UserAuthResponse
+from schemas.user import UserCreate, UserResponse, UserOnboardUpdate, OTPRequest, OTPVerify, PartnerConsentUpdate, UserAuthResponse, ReportDay1Response, DashboardResponse
 from services.auth import verify_patient_token, generate_token
 from core.phone import normalize_phone
 
@@ -64,6 +64,7 @@ def verify_otp(otp_ver: OTPVerify, db: Session = Depends(get_db)):
         "cycle_outcome": user.cycle_outcome,
         "partner_phone": user.partner_phone,
         "partner_consent": user.partner_consent,
+        "day1_reported_at": user.day1_reported_at,
         "created_at": user.created_at,
         "token": token
     }
@@ -163,3 +164,84 @@ def request_nurse_callback(
     db.refresh(callback)
     return {"message": "Callback requested. A clinic coordinator will call you within 24 hours.",
             "callback_id": callback.id, "status": callback.status}
+
+@router.post("/{user_id}/report-day1", response_model=ReportDay1Response)
+def report_day1(
+    user_id: int,
+    token_payload: dict = Depends(verify_patient_token),
+    db: Session = Depends(get_db)
+):
+    if user_id != token_payload.get("user_id"):
+        raise HTTPException(status_code=403, detail="Forbidden: You cannot access another patient's data")
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    from datetime import datetime, timezone
+    user.day1_reported_at = datetime.now(timezone.utc)
+    db.commit()
+    db.refresh(user)
+    
+    return {
+        "status": "Day 1 Reported",
+        "reported_date": user.day1_reported_at.date().isoformat() if user.day1_reported_at else None,
+        "baseline_scan_status": "Pending Booking"
+    }
+
+@router.get("/{user_id}/dashboard", response_model=DashboardResponse)
+def get_user_dashboard(
+    user_id: int,
+    token_payload: dict = Depends(verify_patient_token),
+    db: Session = Depends(get_db)
+):
+    if user_id != token_payload.get("user_id"):
+        raise HTTPException(status_code=403, detail="Forbidden: You cannot access another patient's data")
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    from datetime import date
+    today = date.today()
+    
+    # Check if there are any prescriptions
+    prescriptions = db.query(models.Prescription).filter(models.Prescription.user_id == user_id).all()
+    
+    cycle_status = "Pre-Cycle"
+    cycle_day = None
+    if prescriptions:
+        cycle_status = "Stimulation"
+        if user.cycle_start_date:
+            cycle_day = (today - user.cycle_start_date).days + 1
+            if cycle_day <= 0:
+                cycle_day = 1
+        else:
+            cycle_day = 1
+
+    # Build today's schedule
+    today_schedule = []
+    for p in prescriptions:
+        # Check if today is within prescription range
+        if p.start_date <= today <= p.end_date:
+            # Check if there is a DoseLog for today
+            log = db.query(models.DoseLog).filter(
+                models.DoseLog.prescription_id == p.id,
+                models.DoseLog.scheduled_date == today
+            ).first()
+            
+            today_schedule.append({
+                "medication_id": p.id,
+                "name": p.name,
+                "dosage": p.dosage,
+                "route": p.route,
+                "scheduled_time": p.scheduled_time,
+                "status": log.status if log else "Due",
+                "logged_at": log.logged_at if log else None
+            })
+            
+    return {
+        "cycle_day": cycle_day,
+        "cycle_status": cycle_status,
+        "today_schedule": today_schedule,
+        "day1_reported_at": user.day1_reported_at
+    }
+
