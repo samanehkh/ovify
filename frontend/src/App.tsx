@@ -145,13 +145,11 @@ const AppContent: React.FC = () => {
                 </button>
 
                 <button
-                  onClick={() => medications.length > 0 && changeTab('medications')}
-                  disabled={medications.length === 0}
-                  aria-label="Navigate to Medications Checklist"
+                  onClick={() => {}}
+                  disabled={true}
+                  aria-label="Navigate to Medications Checklist (Disabled)"
                   aria-current={activeTab === 'medications' ? 'page' : undefined}
-                  className={`flex flex-col items-center gap-1 font-heading text-[10px] font-bold transition-colors p-1 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed ${
-                    activeTab === 'medications' ? 'text-lavender-dark' : 'text-navy-55 hover:text-navy'
-                  }`}
+                  className="flex flex-col items-center gap-1 font-heading text-[10px] font-bold text-navy-55 opacity-40 cursor-not-allowed p-1 rounded-lg"
                 >
                   <Pill className="w-5 h-5" />
                   <span>Medications</span>
