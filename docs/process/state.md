@@ -21,7 +21,7 @@ _Last updated: 2026-07-09_
 | Business case (BRD) | `docs/inception/business-case.md` | ✅ Current |
 | User journeys (Gherkin) | `docs/inception/user-journeys.md` | ✅ Current |
 | **Personas** | `docs/inception/personas.md` | 🟡 P1 & P3 locked; P4 pending |
-| **User stories + template** | `docs/inception/user-stories/` | 🟡 US-J1-00, US-J1-01, US-J3-01, US-J3-02 locked/drafted |
+| **User stories + template** | `docs/inception/user-stories/` | 🟡 US-J1-00, US-J1-01, US-J1-02, US-J3-01, US-J3-02 locked/drafted |
 | Traceability matrix | `docs/inception/traceability.md` | ⬜ Not started |
 | As-built record | `docs/construction/as-built/` | ✅ Current (6 journeys + overview) |
 | Defect register | `docs/construction/defect-register.md` | ✅ D1–D12 all closed |
