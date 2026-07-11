@@ -3,10 +3,8 @@ export interface LanguageContent {
   textAlign: string;
   moodReassurance: Record<string, string>;
   recoveryTitle: string;
-  recoveryText: string;
   recoveryGuidelineHeader: string;
   recoverySteps: string[];
-  recoveryGreeting: string;
   recoveryPauseNote: string;
   callbackHeader: string;
   callbackText: string;
@@ -44,7 +42,6 @@ export const i18nContent: Record<'en' | 'ar', LanguageContent> = {
       Anxious: "Anxiety is common during cycles. Your companion phone line is open, and your partner is notified."
     },
     recoveryTitle: "Active Recovery Plan",
-    recoveryText: "We recognize this cycle did not result in a pregnancy. This is emotionally and physically challenging. Focus on gentle recovery guidelines below, and reach out to your clinical support line anytime.",
     recoveryGuidelineHeader: "Recommended Recovery Walkthrough",
     recoverySteps: [
       "Hydrate and eat warm, nourishing meals.",
@@ -52,7 +49,6 @@ export const i18nContent: Record<'en' | 'ar', LanguageContent> = {
       "Schedule follow-up review with your coordinator.",
       "Allow yourself space to feel and process emotions."
     ],
-    recoveryGreeting: "Thinking of you",
     recoveryPauseNote: "All injection alarms and daily schedules have been automatically paused. No protocol actions are required of you today.",
     callbackHeader: "Speak with a Clinic Nurse",
     callbackText: "If you need supportive advice or want to coordinate cycle logs, click below. A clinic coordinator will call you back.",
@@ -88,7 +84,6 @@ export const i18nContent: Record<'en' | 'ar', LanguageContent> = {
       Anxious: "القلق أمر شائع أثناء الدورات العلاجية. خط الاتصال الهاتفي مفتوح، وتم إخطار شريكك."
     },
     recoveryTitle: "خطة التعافي النشطة",
-    recoveryText: "نحن ندرك أن هذه الدورة لم تؤدِ إلى الحمل. هذا تحدٍ جسدي ونفسي كبير. ركزي على إرشادات التعافي اللطيفة أدناه، وتواصلي مع خط الدعم الطبي في أي وقت.",
     recoveryGuidelineHeader: "خطوات التعافي الموصى بها",
     recoverySteps: [
       "شرب السوائل وتناول وجبات دافئة ومغذية.",
@@ -96,7 +91,6 @@ export const i18nContent: Record<'en' | 'ar', LanguageContent> = {
       "جدولة موعد مراجعة للمتابعة مع منسق الحالة الخاص بك.",
       "امنحي نفسك المساحة الكافية للشعور بالمشاعر ومعالجتها."
     ],
-    recoveryGreeting: "نفكر فيكِ",
     recoveryPauseNote: "تم إيقاف جميع تنبيهات الحقن والجداول اليومية تلقائياً. لا يُطلب منكِ أي إجراءات علاجية اليوم.",
     callbackHeader: "التحدث مع ممرضة العيادة",
     callbackText: "إذا كنتِ بحاجة إلى نصيحة داعمة أو تنسيق سجلات الدورة، اضغطي أدناه. سيتصل بكِ منسق العيادة.",

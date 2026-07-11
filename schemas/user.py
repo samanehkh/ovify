@@ -10,6 +10,7 @@ class UserCreate(BaseModel):
 class UserOnboardUpdate(BaseModel):
     sleep_time: str
     injection_comfort: str
+    reminder_offset_minutes: int
 
 class OTPRequest(BaseModel):
     phone: str
@@ -26,6 +27,7 @@ class UserResponse(BaseModel):
     dob: Optional[date] = None
     sleep_time: Optional[str] = None
     injection_comfort: Optional[str] = None
+    reminder_offset_minutes: int = 30
     onboarded: bool
     active_status: str
     cycle_outcome: Optional[str] = None

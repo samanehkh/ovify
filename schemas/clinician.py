@@ -23,12 +23,21 @@ class ProtocolParseResponse(BaseModel):
     unrecognized_medications: List[UnrecognizedMedication]
 
 class RegisterPatientRequest(BaseModel):
-    name: str
+    first_name: str
+    last_name: str
     phone: str
     email: str
     dob: date
-    cycle_type: str
+    cycle_start_date: date
+    current_cycle_number: int
+    treatment_package: str
+    custom_package_name: Optional[str] = None
+    partner_name: str
+    partner_phone: str
+    partner_relationship: str
+    next_appointment_datetime: str
     prescriptions: List[ParsedMedication]
+
 
 class CycleOutcomeUpdate(BaseModel):
     cycle_outcome: Optional[str] = None

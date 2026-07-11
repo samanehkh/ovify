@@ -7,7 +7,7 @@ from core.phone import normalize_phone
 from db.session import get_db
 from db import models
 from services import protocol_parser
-from services.auth import check_clinic_access_key, generate_token, verify_clinician_token
+from services.auth import check_clinic_access_key, generate_token, verify_clinician_token, verify_password
 from schemas.clinician import ProtocolParseRequest, ProtocolParseResponse, RegisterPatientRequest, CycleOutcomeUpdate
 
 # Triage alerts only consider unresolved logs within this rolling window —
@@ -20,26 +20,23 @@ router = APIRouter()
 protected = APIRouter(dependencies=[Depends(verify_clinician_token)])
 
 class ClinicianLoginRequest(BaseModel):
-    access_key: str
-    clinician_name: str = ""
+    email: str
+    password: str
 
 @router.post("/login")
-def clinician_login(req: ClinicianLoginRequest):
+def clinician_login(req: ClinicianLoginRequest, db: Session = Depends(get_db)):
     """
-    Exchanges the clinic access key (entered by the nurse, never shipped in
-    client code) for a short-lived clinician bearer token. The nurse's name is
-    REQUIRED and embedded in the token so every clinical action is attributable
-    (UAE Health Data Law auditability).
+    Validates individual clinician credentials and returns a secure JWT bearer token.
+    Nurse name is embedded in the token for audit trail compliance.
     """
-    if not req.access_key or not check_clinic_access_key(req.access_key):
-        raise HTTPException(status_code=401, detail="Invalid clinic access key.")
+    email_clean = req.email.strip().lower()
+    clinician = db.query(models.Clinician).filter(models.Clinician.email == email_clean).first()
+    if not clinician or not verify_password(req.password, clinician.hashed_password):
+        raise HTTPException(status_code=401, detail="Invalid email or password. Please try again.")
 
-    clinician_name = req.clinician_name.strip()
-    if not clinician_name:
-        raise HTTPException(status_code=400, detail="Clinician name is required for the audit trail.")
+    token = generate_token(clinician.id, "clinician", name=clinician.name)
+    return {"token": token, "clinician_name": clinician.name}
 
-    token = generate_token(0, "clinician", name=clinician_name)
-    return {"token": token, "clinician_name": clinician_name}
 
 def _actor_name(token_payload: dict) -> str:
     return token_payload.get("name") or "Unknown Clinician"
@@ -70,6 +67,7 @@ def register_patient(
     """
     # Normalize phone number input
     phone_normalized = normalize_phone(patient.phone)
+    partner_phone_normalized = normalize_phone(patient.partner_phone)
     
     # Check if phone number is already registered
     existing_phone = db.query(models.User).filter(models.User.phone == phone_normalized).first()
@@ -96,15 +94,41 @@ def register_patient(
                    "Please correct the protocol before registering."
         )
 
+    # Parse next appointment datetime
+    try:
+        dt_str = patient.next_appointment_datetime
+        # normalize trailing 'Z' if present
+        if dt_str.endswith("Z"):
+            dt_str = dt_str[:-1] + "+00:00"
+        next_app_dt = datetime.fromisoformat(dt_str)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid date format for next appointment.")
+
+    # Determine display package name for compatibility with cycle_type column
+    package_name = patient.treatment_package
+    if package_name == "Other (Custom)" and patient.custom_package_name:
+        package_name = patient.custom_package_name
+
     # Create the patient User
     db_user = models.User(
-        name=patient.name,
+        first_name=patient.first_name,
+        last_name=patient.last_name,
+        name=f"{patient.first_name} {patient.last_name}",
         email=patient.email,
         phone=phone_normalized,
         dob=patient.dob,
         onboarded=False,
         active_status="On Track",
-        cycle_type=patient.cycle_type
+        cycle_type=package_name,
+        cycle_start_date=patient.cycle_start_date,
+        current_cycle_number=patient.current_cycle_number,
+        treatment_package=patient.treatment_package,
+        custom_package_name=patient.custom_package_name,
+        partner_name=patient.partner_name,
+        partner_phone=partner_phone_normalized,
+        partner_relationship=patient.partner_relationship,
+        next_appointment_datetime=next_app_dt,
+        partner_consent=False
     )
     db.add(db_user)
     db.commit()
@@ -131,6 +155,7 @@ def register_patient(
         "message": f"{db_user.name} registered successfully. SMS invite sent.",
         "user_id": db_user.id
     }
+
 
 @protected.get("/triage")
 def get_triage_data(db: Session = Depends(get_db)):

@@ -13,6 +13,7 @@ export const SettingsPage: React.FC = () => {
   // Onboarding States
   const [sleepTime, setSleepTime] = useState(user?.sleep_time || '10:00 PM - 12:00 AM');
   const [comfortLevel, setComfortLevel] = useState(user?.injection_comfort || 'First time');
+  const [reminderOffset, setReminderOffset] = useState<number>((user as any)?.reminder_offset_minutes ?? 30);
   const [savingPreferences, setSavingPreferences] = useState(false);
 
   // Partner Consent States
@@ -28,7 +29,7 @@ export const SettingsPage: React.FC = () => {
     e.preventDefault();
     setSavingPreferences(true);
     try {
-      await onboard(sleepTime, comfortLevel);
+      await onboard(sleepTime, comfortLevel, reminderOffset);
       setToastMessage('Preferences updated successfully.');
       setTimeout(() => setToastMessage(null), 3000);
     } catch (err) {
@@ -102,10 +103,9 @@ export const SettingsPage: React.FC = () => {
                 onChange={(e) => setSleepTime(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-navy-10 font-data text-sm text-navy focus:outline-none focus:border-lavender focus:ring-2 focus:ring-lavender/50 bg-[#F8F5F1]/30 cursor-pointer"
               >
-                <option value="9:00 PM - 11:00 PM">9:00 PM - 11:00 PM</option>
-                <option value="10:00 PM - 12:00 AM">10:00 PM - 12:00 AM</option>
-                <option value="11:00 PM - 1:00 AM">11:00 PM - 1:00 AM</option>
-                <option value="Other / Dynamic">Other / Dynamic</option>
+                <option value="9:00 PM - 11:00 PM">Early Bird · 9:00 PM – 11:00 PM</option>
+                <option value="10:00 PM - 12:00 AM">Standard · 10:00 PM – 12:00 AM</option>
+                <option value="11:00 PM - 1:00 AM">Night Owl · 11:00 PM – 1:00 AM</option>
               </select>
             </div>
 
@@ -118,6 +118,19 @@ export const SettingsPage: React.FC = () => {
               >
                 <option value="First time">First time (Show full walkthroughs)</option>
                 <option value="Experienced">Experienced (Show minimal checklists)</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block font-heading text-[10px] font-bold text-navy-55 mb-1.5 uppercase">Injection Reminder</label>
+              <select
+                value={reminderOffset}
+                onChange={(e) => setReminderOffset(Number(e.target.value))}
+                className="w-full px-4 py-3 rounded-xl border border-navy-10 font-data text-sm text-navy focus:outline-none focus:border-lavender focus:ring-2 focus:ring-lavender/50 bg-[#F8F5F1]/30 cursor-pointer"
+              >
+                <option value={0}>At scheduled time</option>
+                <option value={15}>15 minutes before</option>
+                <option value={30}>30 minutes before</option>
               </select>
             </div>
 

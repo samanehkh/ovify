@@ -43,7 +43,20 @@ async function assertClinicianOk(res: Response, fallback: string): Promise<void>
     throw new Error('Clinic session expired. Please sign in again.');
   }
   const errorData = await res.json().catch(() => ({ detail: fallback }));
-  throw new Error(errorData.detail || fallback);
+  let detailStr = fallback;
+  if (errorData && errorData.detail) {
+    if (Array.isArray(errorData.detail)) {
+      detailStr = errorData.detail.map((err: any) => {
+        const fieldName = err.loc ? err.loc[err.loc.length - 1] : 'field';
+        return `${fieldName}: ${err.msg}`;
+      }).join(', ');
+    } else if (typeof errorData.detail === 'string') {
+      detailStr = errorData.detail;
+    } else {
+      detailStr = JSON.stringify(errorData.detail);
+    }
+  }
+  throw new Error(detailStr);
 }
 
 export interface ClinicianLoginResponse {
@@ -51,19 +64,19 @@ export interface ClinicianLoginResponse {
   clinician_name: string;
 }
 
-export async function loginClinician(accessKey: string, clinicianName: string): Promise<ClinicianLoginResponse> {
+export async function loginClinician(email: string, password: string): Promise<ClinicianLoginResponse> {
   const res = await fetch(`${API_BASE_URL}/api/clinician/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    // clinician_name is required — it becomes the actor identity on the audit trail
-    body: JSON.stringify({ access_key: accessKey, clinician_name: clinicianName }),
+    body: JSON.stringify({ email, password }),
   });
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({ detail: 'Login failed' }));
-    throw new Error(errorData.detail || 'Invalid clinic access key');
+    throw new Error(errorData.detail || 'Invalid email or password');
   }
   return res.json();
 }
+
 
 export async function fetchUser(userId: number): Promise<User> {
   const res = await fetch(`${API_BASE_URL}/users/${userId}`, {
@@ -174,7 +187,8 @@ export async function verifyOTP(phone: string, otp: string): Promise<User> {
 export async function confirmOnboard(
   userId: number,
   sleepTime: string,
-  comfortLevel: string
+  comfortLevel: string,
+  reminderOffsetMinutes: number
 ): Promise<User> {
   const res = await fetch(`${API_BASE_URL}/users/${userId}/onboard`, {
     method: 'POST',
@@ -182,6 +196,7 @@ export async function confirmOnboard(
     body: JSON.stringify({
       sleep_time: sleepTime,
       injection_comfort: comfortLevel,
+      reminder_offset_minutes: reminderOffsetMinutes,
     }),
   });
   if (!res.ok) {
@@ -344,11 +359,19 @@ export async function parseProtocolText(text: string): Promise<ParseProtocolResp
 }
 
 export async function registerPatient(patientData: {
-  name: string;
+  first_name: string;
+  last_name: string;
   phone: string;
   email: string;
   dob: string;
-  cycle_type: string;
+  cycle_start_date: string;
+  current_cycle_number: number;
+  treatment_package: string;
+  custom_package_name?: string;
+  partner_name: string;
+  partner_phone: string;
+  partner_relationship: string;
+  next_appointment_datetime: string;
   prescriptions: ParsedMedication[];
 }): Promise<User> {
   const res = await fetch(`${API_BASE_URL}/api/clinician/register`, {

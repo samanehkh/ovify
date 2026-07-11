@@ -75,7 +75,8 @@ def test_confirm_onboarding_success(client, test_db):
         "/users/1/onboard", 
         json={
             "sleep_time": "10:00 PM - 12:00 AM",
-            "injection_comfort": "First time"
+            "injection_comfort": "First time",
+            "reminder_offset_minutes": 30
         }
     )
     assert response.status_code == 200
@@ -83,6 +84,7 @@ def test_confirm_onboarding_success(client, test_db):
     assert data["onboarded"] is True
     assert data["sleep_time"] == "10:00 PM - 12:00 AM"
     assert data["injection_comfort"] == "First time"
+    assert data["reminder_offset_minutes"] == 30
     assert data["active_status"] == "On Track"
 
     # Verify changes are persisted in database
@@ -97,7 +99,8 @@ def test_confirm_onboarding_user_not_found(client):
         "/users/999/onboard",
         json={
             "sleep_time": "10:00 PM - 12:00 AM",
-            "injection_comfort": "First time"
+            "injection_comfort": "First time",
+            "reminder_offset_minutes": 30
         }
     )
     assert response.status_code == 404

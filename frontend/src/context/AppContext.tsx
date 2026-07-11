@@ -18,7 +18,7 @@ interface AppContextType {
   submitDose: (prescriptionId: number, actualTime?: string) => Promise<void>;
   submitMood: (mood: string) => Promise<void>;
   login: (phone: string, otp: string) => Promise<void>;
-  onboard: (sleepTime: string, comfortLevel: string) => Promise<void>;
+  onboard: (sleepTime: string, comfortLevel: string, reminderOffsetMinutes: number) => Promise<void>;
   logout: () => void;
   setToastMessage: (msg: string | null) => void;
   language: 'en' | 'ar';
@@ -138,12 +138,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const onboard = async (sleepTime: string, comfortLevel: string) => {
+  const onboard = async (sleepTime: string, comfortLevel: string, reminderOffsetMinutes: number) => {
     if (!user) return;
     setLoading(true);
     setError(null);
     try {
-      const updatedUser = await api.confirmOnboard(user.id, sleepTime, comfortLevel);
+      const updatedUser = await api.confirmOnboard(user.id, sleepTime, comfortLevel, reminderOffsetMinutes);
       setUser(updatedUser);
       const medsData = await api.fetchMedications(user.id);
       setMedications(mergeOfflineStatus(medsData));

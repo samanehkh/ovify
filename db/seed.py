@@ -2,6 +2,7 @@ from datetime import date, timedelta
 from sqlalchemy.orm import Session
 from db.session import SessionLocal
 from db import models
+from services.auth import hash_password
 
 def seed_db():
     db = SessionLocal()
@@ -53,7 +54,21 @@ def seed_db():
             )
             db.add_all([p1, p2])
             db.commit()
-            print("Database seeded successfully.")
+            print("Database prescriptions seeded successfully.")
+
+        # Seed clinician Mona for US-J1-00
+        clinician = db.query(models.Clinician).filter(models.Clinician.email == "mona.nurse@clinic.ae").first()
+        if not clinician:
+            print("Seeding database: creating clinician Mona...")
+            clinician = models.Clinician(
+                name="Mona",
+                email="mona.nurse@clinic.ae",
+                hashed_password=hash_password("SecurePassword123"),
+                role="coordinator"
+            )
+            db.add(clinician)
+            db.commit()
+            print("Default clinician seeded successfully.")
     except Exception as e:
         print(f"Error seeding database: {e}")
         db.rollback()
@@ -62,3 +77,4 @@ def seed_db():
 
 if __name__ == "__main__":
     seed_db()
+

@@ -108,7 +108,7 @@ export const DashboardPage: React.FC = () => {
         {/* Header Greeting */}
         <div className="flex flex-col items-center text-center mt-2 mb-8">
           <span className="font-data text-[12px] font-bold text-navy-55 tracking-widest uppercase">
-            {t.recoveryGreeting}
+            {getGreeting()}
           </span>
           <h2 className="font-heading text-2xl font-bold text-navy mt-1">
             {user.name}
@@ -118,10 +118,7 @@ export const DashboardPage: React.FC = () => {
         {/* Empathy Message Card */}
         <div className="mb-6 p-6 rounded-3xl bg-white border border-navy-10 shadow-sm text-left">
           <h3 className="font-heading text-sm font-bold text-navy mb-3 uppercase tracking-wider">{t.recoveryTitle}</h3>
-          <p className="font-body text-sm text-navy-55 leading-relaxed mb-4">
-            {t.recoveryText}
-          </p>
-          <div className="flex gap-2 items-start border-t border-navy-10/40 pt-3 font-body text-xs text-navy-55/80 leading-relaxed">
+          <div className="flex gap-2 items-start font-body text-xs text-navy-55/80 leading-relaxed">
             <Info className="w-4 h-4 flex-none text-navy-55/70 mt-0.5" aria-hidden="true" />
             <span>{t.recoveryPauseNote}</span>
           </div>

@@ -29,6 +29,16 @@ def test_db():
     db.add(user)
     db.commit()
 
+    from services.auth import hash_password
+    clinician = models.Clinician(
+        name="Nurse Amina",
+        email="amina.nurse@clinic.ae",
+        hashed_password=hash_password("SecurePassword123"),
+        role="coordinator"
+    )
+    db.add(clinician)
+    db.commit()
+
     try:
         yield db
     finally:
@@ -51,8 +61,8 @@ def client(test_db):
 
 # ── Clinician login token flow ──────────────────────────────────────────────
 
-def test_clinician_login_valid_key_issues_token(client):
-    response = client.post("/api/clinician/login", json={"access_key": "test-clinician-secret-key", "clinician_name": "Nurse Amina"})
+def test_clinician_login_valid_credentials_issues_token(client):
+    response = client.post("/api/clinician/login", json={"email": "amina.nurse@clinic.ae", "password": "SecurePassword123"})
     assert response.status_code == 200
     data = response.json()
     assert "token" in data and data["token"]
@@ -62,9 +72,10 @@ def test_clinician_login_valid_key_issues_token(client):
     assert triage.status_code == 200
 
 
-def test_clinician_login_invalid_key_rejected(client):
-    response = client.post("/api/clinician/login", json={"access_key": "wrong-key", "clinician_name": "Nurse Amina"})
+def test_clinician_login_invalid_credentials_rejected(client):
+    response = client.post("/api/clinician/login", json={"email": "amina.nurse@clinic.ae", "password": "wrong-password"})
     assert response.status_code == 401
+
 
 
 def test_clinician_route_rejects_invalid_token(client):
@@ -148,11 +159,11 @@ def test_iso_timestamp_rejected_if_in_future(client, test_db):
     assert response.status_code == 400
 
 
-def test_clinician_login_requires_name(client):
-    # Attribution is mandatory: a valid key with no name is rejected
-    response = client.post("/api/clinician/login",
-                           json={"access_key": "test-clinician-secret-key", "clinician_name": "  "})
-    assert response.status_code == 400
+def test_clinician_login_missing_fields_rejected(client):
+    # Missing email or password returns validation error (HTTP 422)
+    response = client.post("/api/clinician/login", json={"email": "amina.nurse@clinic.ae"})
+    assert response.status_code == 422
+
 
 
 def test_sweep_endpoints_require_clinician_auth(client):

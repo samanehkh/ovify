@@ -90,3 +90,24 @@ def verify_clinician_token(authorization: Optional[str] = Header(None, descripti
     if not payload or payload.get("role") != "clinician":
         raise HTTPException(status_code=401, detail="Unauthorized clinician access or token expired")
     return payload
+
+def hash_password(password: str) -> str:
+    """Hashes a password using PBKDF2-HMAC-SHA256 (US-J1-00)."""
+    salt = os.urandom(16)
+    key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000)
+    return f"{salt.hex()}:{key.hex()}"
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Verifies a password against its PBKDF2-HMAC-SHA256 hash (US-J1-00)."""
+    try:
+        parts = hashed_password.split(":")
+        if len(parts) != 2:
+            return False
+        salt_hex, key_hex = parts
+        salt = bytes.fromhex(salt_hex)
+        key = bytes.fromhex(key_hex)
+        new_key = hashlib.pbkdf2_hmac('sha256', plain_password.encode('utf-8'), salt, 100000)
+        return hmac.compare_digest(new_key, key)
+    except Exception:
+        return False
+

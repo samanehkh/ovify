@@ -8,6 +8,7 @@ export interface User {
   onboarded: boolean;
   active_status: string;
   cycle_outcome?: string;
+  partner_name?: string;
   partner_phone?: string;
   partner_consent?: boolean;
   created_at: string;

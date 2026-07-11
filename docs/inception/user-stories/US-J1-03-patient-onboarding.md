@@ -1,8 +1,8 @@
-# US-J2-01: Onboarding Personalization Wizard (PWA)
+# US-J1-03: Onboarding Personalization Wizard (PWA)
 
 | Field | Value |
 |---|---|
-| **Journey** | J2 — Patient Onboarding & Personalization |
+| **Journey** | J1 — Clinic Patient Registration |
 | **Persona(s)** | P1 Sarah (primary) |
 | **Primary intent** | Select sleep cycle offsets, configure notification lead-time, authorize partner data-sharing consent, and grant push permissions. |
 | **Scope** | ✅ MVP · SaMD: 🟢 Non-SaMD |
@@ -148,7 +148,7 @@ The wizard is rendered as a clean, single-card layout with a **3-step progress b
 | submit_btn | "Start My Cycle" |
 
 ## 10. Interaction & motion
-- Fade-in card layouts. Wizard slides left-to-right when Mona taps "Next".
+- Fade-in card layouts. Wizard slides left-to-right when Sarah taps "Next".
 
 ## 11. Accessibility & Definition of Done
 - [x] WCAG AA contrast (navy text on white cards satisfies 4.5:1 ratio)
@@ -167,6 +167,6 @@ Q1. Can Sarah change these selections later?
 ```
 
 ## 14. Traceability
-- **Journey:** `docs/inception/user-journeys.md` → J2
+- **Journey:** `docs/inception/user-journeys.md` → J1
 - **Endpoints:** `api/users.py` (`onboard_user`, `update_partner_consent`)
 - **Frontend:** `frontend/src/pages/OnboardingWizardPage.tsx`

@@ -84,6 +84,7 @@ def onboard_user(
     
     user.sleep_time = onboard_data.sleep_time
     user.injection_comfort = onboard_data.injection_comfort
+    user.reminder_offset_minutes = onboard_data.reminder_offset_minutes
     user.onboarded = True
     user.active_status = "On Track"
     db.commit()

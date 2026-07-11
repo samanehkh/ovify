@@ -10,7 +10,7 @@ import { SettingsPage } from './pages/SettingsPage';
 import { Home, BookOpen, Settings } from 'lucide-react';
 import { Modal } from './components/ui/Modal';
 import { Button } from './components/ui/Button';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 const AppContent: React.FC = () => {
   const { activeTab, user, loading, toastMessage, logout, changeTab } = useApp();
@@ -38,6 +38,20 @@ const AppContent: React.FC = () => {
 
       {/* Partner route */}
       <Route path="/partner" element={<PartnerSupportPage />} />
+
+      {/* Patient Login route */}
+      <Route
+        path="/login"
+        element={
+          user ? (
+            <Navigate to="/" replace />
+          ) : (
+            <div className="mobile-pwa-frame">
+              <LoginPage />
+            </div>
+          )
+        }
+      />
 
       {/* Patient / Main App route */}
       <Route

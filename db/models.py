@@ -11,13 +11,23 @@ class User(Base):
     dob = Column(Date, nullable=True)  # captured at clinic registration (J1)
     sleep_time = Column(String, nullable=True)
     injection_comfort = Column(String, nullable=True)
+    reminder_offset_minutes = Column(Integer, default=30, nullable=False)
     onboarded = Column(Boolean, default=False, nullable=False)
     active_status = Column(String, default="On Track", nullable=False)  # e.g., "On Track" or "Action Required"
     cycle_type = Column(String, nullable=True)
     cycle_outcome = Column(String, nullable=True)
     partner_phone = Column(String, nullable=True)
     partner_consent = Column(Boolean, default=False, nullable=False)
-    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    first_name = Column(String, nullable=True)
+    last_name = Column(String, nullable=True)
+    cycle_start_date = Column(Date, nullable=True)
+    current_cycle_number = Column(Integer, default=1, nullable=False)
+    treatment_package = Column(String, nullable=True)
+    custom_package_name = Column(String, nullable=True)
+    partner_name = Column(String, nullable=True)
+    partner_relationship = Column(String, nullable=True)
+    next_appointment_datetime = Column(TIMESTAMP(timezone=True), nullable=True)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
 
 class SymptomLog(Base):
     __tablename__ = "symptom_logs"
@@ -85,3 +95,14 @@ class AuditLog(Base):
     target_user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     detail = Column(String, nullable=True)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
+
+class Clinician(Base):
+    """Individual clinician accounts for secure login (US-J1-00)."""
+    __tablename__ = "clinicians"
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    name = Column(String, nullable=False)
+    email = Column(String, unique=True, nullable=False, index=True)
+    hashed_password = Column(String, nullable=False)
+    role = Column(String, default="coordinator", nullable=False)  # coordinator / admin
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
+

@@ -72,11 +72,18 @@ def test_register_patient_success(client, test_db):
     end_date = (date.today() + timedelta(days=12)).isoformat()
     
     payload = {
-        "name": "Sarah Khan",
+        "first_name": "Sarah",
+        "last_name": "Khan",
         "phone": "+971 50 123 4567",
         "email": "sarah.khan@example.com",
         "dob": "1992-05-15",
-        "cycle_type": "Fresh IVF",
+        "cycle_start_date": tomorrow,
+        "current_cycle_number": 1,
+        "treatment_package": "3-Cycle Egg/Embryo Accumulation",
+        "partner_name": "Ahmed Khan",
+        "partner_phone": "+971 50 999 9999",
+        "partner_relationship": "Spouse/Partner",
+        "next_appointment_datetime": (date.today() + timedelta(days=3)).isoformat() + "T09:00:00Z",
         "prescriptions": [
             {
                 "name": "Gonal-F",
@@ -91,7 +98,7 @@ def test_register_patient_success(client, test_db):
     }
     
     response = client.post("/api/clinician/register", json=payload)
-    assert response.status_code == 200
+    assert response.status_code == 200, response.text
     data = response.json()
     assert "registered successfully" in data["message"]
     user_id = data["user_id"]
@@ -102,6 +109,8 @@ def test_register_patient_success(client, test_db):
     assert user.name == "Sarah Khan"
     assert user.phone == "+971501234567" # normalized
     assert user.onboarded is False
+    assert user.partner_phone == "+971509999999"
+    assert user.treatment_package == "3-Cycle Egg/Embryo Accumulation"
     
     # Verify Prescription exists in database
     presc = test_db.query(models.Prescription).filter(models.Prescription.user_id == user_id).first()
@@ -117,11 +126,18 @@ def test_register_patient_duplicate_phone(client, test_db):
     test_db.commit()
     
     payload = {
-        "name": "Sarah Khan Duplicate",
+        "first_name": "Sarah",
+        "last_name": "Khan Duplicate",
         "phone": "+971 50 123 4567",
         "email": "sarah2@example.com",
         "dob": "1992-05-15",
-        "cycle_type": "Fresh IVF",
+        "cycle_start_date": tomorrow,
+        "current_cycle_number": 1,
+        "treatment_package": "3-Cycle Egg/Embryo Accumulation",
+        "partner_name": "Ahmed Khan",
+        "partner_phone": "+971 50 999 9999",
+        "partner_relationship": "Spouse/Partner",
+        "next_appointment_datetime": (date.today() + timedelta(days=3)).isoformat() + "T09:00:00Z",
         "prescriptions": []
     }
     response = client.post("/api/clinician/register", json=payload)
@@ -129,16 +145,24 @@ def test_register_patient_duplicate_phone(client, test_db):
     assert "Phone number already registered" in response.json()["detail"]
 
 def test_register_patient_duplicate_email(client, test_db):
+    tomorrow = (date.today() + timedelta(days=1)).isoformat()
     user = models.User(name="Sarah", email="sarah@example.com", phone="+971500000000")
     test_db.add(user)
     test_db.commit()
     
     payload = {
-        "name": "Sarah Khan Duplicate Email",
+        "first_name": "Sarah",
+        "last_name": "Khan Duplicate Email",
         "phone": "+971501234567",
         "email": "sarah@example.com",
         "dob": "1992-05-15",
-        "cycle_type": "Fresh IVF",
+        "cycle_start_date": tomorrow,
+        "current_cycle_number": 1,
+        "treatment_package": "3-Cycle Egg/Embryo Accumulation",
+        "partner_name": "Ahmed Khan",
+        "partner_phone": "+971 50 999 9999",
+        "partner_relationship": "Spouse/Partner",
+        "next_appointment_datetime": (date.today() + timedelta(days=3)).isoformat() + "T09:00:00Z",
         "prescriptions": []
     }
     response = client.post("/api/clinician/register", json=payload)
@@ -156,11 +180,18 @@ def _base_payload(**overrides):
     tomorrow = (date.today() + timedelta(days=1)).isoformat()
     end_date = (date.today() + timedelta(days=12)).isoformat()
     payload = {
-        "name": "Sarah Khan",
+        "first_name": "Sarah",
+        "last_name": "Khan",
         "phone": "+971 50 123 4567",
         "email": "sarah.khan@example.com",
         "dob": "1992-05-15",
-        "cycle_type": "Fresh IVF",
+        "cycle_start_date": tomorrow,
+        "current_cycle_number": 1,
+        "treatment_package": "3-Cycle Egg/Embryo Accumulation",
+        "partner_name": "Ahmed Khan",
+        "partner_phone": "+971 50 999 9999",
+        "partner_relationship": "Spouse/Partner",
+        "next_appointment_datetime": (date.today() + timedelta(days=3)).isoformat() + "T09:00:00Z",
         "prescriptions": [
             {
                 "name": "Gonal-F",
@@ -200,3 +231,4 @@ def test_register_rejects_unapproved_medication(client, test_db):
 
     # Nothing was persisted
     assert test_db.query(models.User).filter(models.User.email == "sarah.khan@example.com").first() is None
+

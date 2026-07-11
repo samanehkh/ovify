@@ -16,7 +16,7 @@
 - **Entry point:** Taps the deep link inside the registration SMS:
   `https://patient.ovify.app/login?invite=true&phone=%2B971501234567`
 - **Preconditions:** Patient was registered on the clinic tablet (`US-J1-01`); internet connection active.
-- **Exit:** Launches the PWA from the home screen, loading the Onboarding Personalization Wizard (`US-J2-01` / `US-J2-02`).
+- **Exit:** Launches the PWA from the home screen, loading the Onboarding Personalization Wizard (`US-J1-03`).
 
 ## 3. Acceptance criteria (Gherkin)
 ```gherkin

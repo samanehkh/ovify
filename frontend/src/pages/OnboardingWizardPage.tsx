@@ -1,224 +1,355 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Smartphone } from 'lucide-react';
+import * as api from '../services/api';
+import { Bell, BellOff, CheckCircle2 } from 'lucide-react';
+
+// Step labels (US-J1-03 §4)
+const SLEEP_OPTIONS = [
+  { label: 'Early Bird', value: '9:00 PM - 11:00 PM', time: '9:00 PM – 11:00 PM' },
+  { label: 'Standard',   value: '10:00 PM - 12:00 AM', time: '10:00 PM – 12:00 AM' },
+  { label: 'Night Owl',  value: '11:00 PM - 1:00 AM',  time: '11:00 PM – 1:00 AM' },
+];
+
+const COMFORT_OPTIONS = [
+  { value: 'First time',  label: 'First time', desc: 'Show me detailed video guides' },
+  { value: 'Experienced', label: 'Experienced', desc: 'Show me quick checklists' },
+];
+
+const OFFSET_OPTIONS = [
+  { value: 0,  label: 'At scheduled time' },
+  { value: 15, label: '15 minutes before' },
+  { value: 30, label: '30 minutes before' },
+];
 
 export const OnboardingWizardPage: React.FC = () => {
   const { user, onboard } = useApp();
-  const [step, setStep] = useState(1);
+
+  // Step 1 — Sleep window (US-J1-03 §4 Step 1)
   const [sleepTime, setSleepTime] = useState('10:00 PM - 12:00 AM');
+
+  // Step 2 — Comfort & reminder offset (US-J1-03 §4 Step 2)
   const [comfortLevel, setComfortLevel] = useState('First time');
-  const [consentAccepted, setConsentAccepted] = useState(false);
+  const [reminderOffset, setReminderOffset] = useState(30);
+
+  // Step 3 — Consent & notifications (US-J1-03 §4 Step 3)
+  const [partnerConsent, setPartnerConsent] = useState(true);
+  const [notifStatus, setNotifStatus] = useState<'idle' | 'granted' | 'denied'>('idle');
+
+  // UI state
+  const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleNextStep = () => {
-    setStep((prev) => prev + 1);
+  if (!user) return null;
+
+  // ── Helpers ──────────────────────────────────────────────────
+  const handleRequestNotifications = async () => {
+    if (!('Notification' in window)) {
+      setNotifStatus('granted'); // silently pass on unsupported browsers
+      return;
+    }
+    const result = await Notification.requestPermission();
+    setNotifStatus(result === 'granted' ? 'granted' : 'denied');
   };
 
-  const handlePrevStep = () => {
-    setStep((prev) => prev - 1);
-  };
-
-  const handleCompleteOnboarding = async () => {
+  const handleStartCycle = async () => {
     setLoading(true);
     setError(null);
     try {
-      await onboard(sleepTime, comfortLevel);
+      // 1. Save preferences  (US-J1-03 §5 endpoint 1)
+      await onboard(sleepTime, comfortLevel, reminderOffset);
+
+      // 2. Save partner consent  (US-J1-03 §5 endpoint 2)
+      if (user.partner_phone) {
+        await api.updatePartnerConsent(user.id, user.partner_phone, partnerConsent);
+      }
     } catch (err: any) {
-      setError(err.message || 'Failed to complete onboarding. Please try again.');
-    } finally {
+      setError(err.message || "We couldn't save your preferences. Please check your connection and try again.");
       setLoading(false);
     }
   };
 
-  if (!user) return null;
+  // ── Progress bar ─────────────────────────────────────────────
+  const ProgressBar = () => (
+    <div className="w-full flex items-center gap-2 mb-8">
+      {[1, 2, 3].map((s) => (
+        <div
+          key={s}
+          className={`flex-1 h-1.5 rounded-full transition-all duration-500 ${
+            s <= step ? 'bg-lavender' : 'bg-navy-10'
+          }`}
+        />
+      ))}
+    </div>
+  );
 
+  // ── Selection button shared styles ───────────────────────────
+  const selBtn = (active: boolean) =>
+    `w-full text-left px-5 py-4 rounded-xl border transition-all duration-200 flex items-center justify-between ${
+      active
+        ? 'border-lavender bg-[#F3F1FE] text-navy font-semibold ring-2 ring-lavender/20'
+        : 'border-navy-10 bg-white hover:border-lavender/40 text-navy-55'
+    }`;
+
+  // ─────────────────────────────────────────────────────────────
   return (
-    <div className="flex-1 flex flex-col justify-center px-6 py-8 bg-gradient-to-b from-bg-ivory via-bg-ivory/80 to-bg-ivory/40 min-h-screen">
+    <div className="flex-1 flex flex-col justify-center px-6 py-10 bg-gradient-to-b from-[#F8F5F1] via-[#F8F5F1]/80 to-[#F8F5F1]/40 min-h-screen">
       <div className="w-full max-w-sm mx-auto flex flex-col items-center">
-        {/* Progress Tracker dots */}
-        <div className="flex justify-center gap-2 mb-8">
-          {[1, 2, 3].map((s) => (
-            <div
-              key={s}
-              className={`h-2.5 rounded-full transition-all duration-300 ${
-                s === step ? 'w-8 bg-lavender' : 'w-2.5 bg-navy-10'
-              }`}
-            />
-          ))}
-        </div>
 
-        {/* Wizard Card */}
-        <div className="w-full bg-white/70 backdrop-blur-md rounded-3xl p-8 border border-navy-10 shadow-xl relative overflow-hidden transition-all duration-300 min-h-[420px] flex flex-col justify-between">
-          
-          {error && (
-            <div className="mb-4 p-3 rounded-lg bg-blush-10 border border-blush/25 text-blush text-xs font-body">
-              {error}
-            </div>
-          )}
+        {/* Logo */}
+        <img
+          src="/static/logo.png"
+          alt="Ovify"
+          className="w-10 h-10 object-contain rounded-2xl shadow-sm mb-6"
+          onError={(e) => { e.currentTarget.style.display = 'none'; }}
+        />
 
-          {step === 1 && (
-            <div className="flex-1 flex flex-col justify-between">
-              <div>
-                <h2 className="font-heading text-xl font-bold text-navy tracking-tight mb-2">
-                  Welcome, {user.name}!
-                </h2>
-                <p className="font-body text-sm text-navy-55 mb-6 leading-relaxed">
-                  Let's personalize your care companion. First, what is your typical sleep window? We use this to timing-optimize your medication notifications.
-                </p>
+        <ProgressBar />
 
-                <div className="space-y-3">
-                  {[
-                    '9:00 PM - 11:00 PM',
-                    '10:00 PM - 12:00 AM',
-                    '11:00 PM - 1:00 AM',
-                    'Other / Dynamic',
-                  ].map((option) => (
-                    <button
-                      key={option}
-                      type="button"
-                      onClick={() => setSleepTime(option)}
-                      className={`w-full text-left px-5 py-4 rounded-xl border font-body text-sm transition-all duration-200 flex items-center justify-between ${
-                        sleepTime === option
-                          ? 'border-lavender bg-lavender-10 text-navy font-semibold ring-2 ring-lavender/5'
-                          : 'border-navy-10 bg-white hover:border-navy-20 text-navy-55'
-                      }`}
-                    >
-                      <span>{option}</span>
-                      {sleepTime === option && <span className="text-lavender text-base">✓</span>}
-                    </button>
-                  ))}
+        {/* Card */}
+        <div className="w-full bg-white/80 backdrop-blur-md rounded-3xl border border-navy-10 shadow-xl overflow-hidden">
+          <div className="p-7 flex flex-col gap-6">
+
+            {/* Error banner */}
+            {error && (
+              <div className="p-3.5 rounded-xl bg-[#C24C57]/10 border border-[#C24C57]/25 text-[#C24C57] text-xs font-body leading-relaxed">
+                ⚠️ {error}
+              </div>
+            )}
+
+            {/* ── STEP 1: Sleep Window ─────────────────────────── */}
+            {step === 1 && (
+              <div className="flex flex-col gap-5 animate-fade-in">
+                <div>
+                  <span className="font-data text-[10px] font-bold text-lavender tracking-widest uppercase">
+                    Step 1 of 3 · Customise your schedule
+                  </span>
+                  <h2 className="font-heading text-xl font-bold text-navy mt-1">
+                    When do you usually go to bed?
+                  </h2>
+                  <p className="font-body text-xs text-navy-55 mt-1 leading-relaxed">
+                    We use this to schedule your daily injection reminders outside your sleep window.
+                  </p>
                 </div>
-              </div>
 
-              <div className="mt-8 flex justify-end">
-                <button
-                  type="button"
-                  onClick={handleNextStep}
-                  className="py-3.5 px-6 bg-navy hover:bg-navy-80 text-white font-heading text-xs font-bold rounded-xl shadow-md transition-all duration-200"
-                >
-                  Continue
-                </button>
-              </div>
-            </div>
-          )}
-
-          {step === 2 && (
-            <div className="flex-1 flex flex-col justify-between">
-              <div>
-                <h2 className="font-heading text-xl font-bold text-navy tracking-tight mb-2">
-                  Injection Comfort
-                </h2>
-                <p className="font-body text-sm text-navy-55 mb-6 leading-relaxed">
-                  Have you self-administered hormone injection devices (like Gonal-F or Menopur pens) before?
-                </p>
-
-                <div className="space-y-3">
-                  {[
-                    { label: 'First time', desc: 'I would like detailed guides and reassurance.' },
-                    { label: 'Experienced', desc: 'I know the drill, just show me minimal instructions.' },
-                  ].map((option) => (
+                <div className="space-y-2.5">
+                  {SLEEP_OPTIONS.map((opt) => (
                     <button
-                      key={option.label}
+                      key={opt.value}
                       type="button"
-                      onClick={() => setComfortLevel(option.label)}
-                      className={`w-full text-left px-5 py-4 rounded-xl border font-body text-sm transition-all duration-200 flex flex-col gap-0.5 ${
-                        comfortLevel === option.label
-                          ? 'border-lavender bg-lavender-10 text-navy font-semibold ring-2 ring-lavender/5'
-                          : 'border-navy-10 bg-white hover:border-navy-20 text-navy-55'
-                      }`}
+                      onClick={() => setSleepTime(opt.value)}
+                      className={selBtn(sleepTime === opt.value)}
                     >
-                      <div className="flex justify-between w-full items-center">
-                        <span className="font-semibold text-navy">{option.label}</span>
-                        {comfortLevel === option.label && <span className="text-lavender text-base">✓</span>}
+                      <div>
+                        <span className="block font-semibold text-sm text-navy">{opt.label}</span>
+                        <span className="block text-[11px] text-navy-55 font-normal font-data mt-0.5">{opt.time}</span>
                       </div>
-                      <span className="text-xs text-navy-55 font-normal">{option.desc}</span>
+                      {sleepTime === opt.value && (
+                        <CheckCircle2 className="w-5 h-5 text-lavender flex-none" />
+                      )}
                     </button>
                   ))}
                 </div>
+
+                <div className="flex justify-end pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setStep(2)}
+                    className="py-3.5 px-7 bg-navy hover:bg-navy/85 text-white font-heading text-xs font-bold rounded-xl shadow-md transition-all"
+                  >
+                    Next →
+                  </button>
+                </div>
               </div>
+            )}
 
-              <div className="mt-8 flex justify-between items-center">
-                <button
-                  type="button"
-                  onClick={handlePrevStep}
-                  className="font-heading text-xs font-bold text-navy hover:underline"
-                >
-                  Back
-                </button>
-                <button
-                  type="button"
-                  onClick={handleNextStep}
-                  className="py-3.5 px-6 bg-navy hover:bg-navy-80 text-white font-heading text-xs font-bold rounded-xl shadow-md transition-all duration-200"
-                >
-                  Continue
-                </button>
-              </div>
-            </div>
-          )}
+            {/* ── STEP 2: Comfort & Reminder Offset ───────────── */}
+            {step === 2 && (
+              <div className="flex flex-col gap-5 animate-fade-in">
+                <div>
+                  <span className="font-data text-[10px] font-bold text-lavender tracking-widest uppercase">
+                    Step 2 of 3 · Injection guidelines
+                  </span>
+                  <h2 className="font-heading text-xl font-bold text-navy mt-1">
+                    Is this your first IVF cycle?
+                  </h2>
+                </div>
 
-          {step === 3 && (
-            <div className="flex-1 flex flex-col justify-between">
-              <div>
-                <h2 className="font-heading text-xl font-bold text-navy tracking-tight mb-2">
-                  Install Companion App
-                </h2>
-                <p className="font-body text-sm text-navy-55 mb-5 leading-relaxed">
-                  For daily reminder pings and fast logs, install Ovify on your phone:
-                </p>
+                <div className="space-y-2.5">
+                  {COMFORT_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setComfortLevel(opt.value)}
+                      className={selBtn(comfortLevel === opt.value)}
+                    >
+                      <div>
+                        <span className="block font-semibold text-sm text-navy">{opt.label}</span>
+                        <span className="block text-[11px] text-navy-55 font-normal mt-0.5">{opt.desc}</span>
+                      </div>
+                      {comfortLevel === opt.value && (
+                        <CheckCircle2 className="w-5 h-5 text-lavender flex-none" />
+                      )}
+                    </button>
+                  ))}
+                </div>
 
-                <div className="p-4 rounded-2xl bg-sage-10 border border-sage/20 flex gap-3.5 mb-5">
-                  <div className="w-9 h-9 rounded-xl bg-sage/15 flex items-center justify-center text-sage">
-                    <Smartphone className="w-5 h-5" aria-hidden="true" />
+                <div>
+                  <p className="font-heading text-xs font-bold text-navy uppercase tracking-wider mb-2.5">
+                    When should we remind you before an injection?
+                  </p>
+                  <div className="flex gap-2">
+                    {OFFSET_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setReminderOffset(opt.value)}
+                        className={`flex-1 py-3 rounded-xl border text-center text-xs font-heading font-bold transition-all duration-200 ${
+                          reminderOffset === opt.value
+                            ? 'border-lavender bg-[#F3F1FE] text-lavender ring-2 ring-lavender/20'
+                            : 'border-navy-10 bg-white text-navy-55 hover:border-lavender/40'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
                   </div>
-                  <div className="flex-1">
-                    <h4 className="font-heading text-xs font-bold text-navy mb-0.5">Quick PWA Installation</h4>
-                    <p className="font-body text-xs text-navy-55 leading-relaxed">
-                      Tap your browser's share icon <span className="font-semibold">Share</span> and select <span className="font-semibold">Add to Home Screen</span> to download instantly.
+                </div>
+
+                <div className="flex justify-between items-center pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setStep(1)}
+                    className="font-heading text-xs font-bold text-navy-55 hover:text-navy transition-colors"
+                  >
+                    ← Back
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setStep(3)}
+                    className="py-3.5 px-7 bg-navy hover:bg-navy/85 text-white font-heading text-xs font-bold rounded-xl shadow-md transition-all"
+                  >
+                    Next →
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ── STEP 3: Consent & Push Notifications ─────────── */}
+            {step === 3 && (
+              <div className="flex flex-col gap-5 animate-fade-in">
+                <div>
+                  <span className="font-data text-[10px] font-bold text-lavender tracking-widest uppercase">
+                    Step 3 of 3 · Secure data sharing &amp; notifications
+                  </span>
+                  <h2 className="font-heading text-xl font-bold text-navy mt-1">
+                    Stay connected
+                  </h2>
+                </div>
+
+                {/* Partner consent toggle */}
+                {user.partner_phone && (
+                  <div className="p-4 rounded-2xl bg-[#F8F5F1] border border-navy-10">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1">
+                        <p className="font-heading text-xs font-bold text-navy mb-1">Share my progress</p>
+                        <p className="font-body text-[11px] text-navy-55 leading-relaxed">
+                          Share my cycle compliance logs and support prompts with{' '}
+                          <span className="font-semibold text-navy">
+                            {user.partner_name || 'my partner'}
+                          </span>{' '}
+                          ({user.partner_phone})
+                        </p>
+                        <p className="font-body text-[10px] text-navy-55/70 mt-1.5 leading-relaxed">
+                          We only share your daily injection check-in status and support tips. We never share raw clinical files or doctors' notes.
+                        </p>
+                      </div>
+                      {/* Toggle switch */}
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={partnerConsent}
+                        onClick={() => setPartnerConsent((v) => !v)}
+                        className={`relative inline-flex h-6 w-11 flex-none cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-lavender focus:ring-offset-2 ${
+                          partnerConsent ? 'bg-lavender' : 'bg-navy-20'
+                        }`}
+                      >
+                        <span
+                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                            partnerConsent ? 'translate-x-5' : 'translate-x-0'
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Push notifications pre-permission card */}
+                <div className="p-4 rounded-2xl border border-navy-10 bg-white">
+                  <div className="flex items-start gap-3">
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-none ${
+                      notifStatus === 'granted' ? 'bg-[#E6F4EF]' : 'bg-[#EEF1F6]'
+                    }`}>
+                      {notifStatus === 'granted'
+                        ? <Bell className="w-4 h-4 text-[#3E8E6E]" />
+                        : <BellOff className="w-4 h-4 text-navy-55" />
+                      }
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-heading text-xs font-bold text-navy mb-0.5">Enable notifications</p>
+                      <p className="font-body text-[11px] text-navy-55 leading-relaxed">
+                        Ovify needs your permission to send daily injection alarms. Missed alarms may lead to cycle cancellation.
+                      </p>
+                    </div>
+                  </div>
+
+                  {notifStatus === 'granted' ? (
+                    <div className="mt-3 flex items-center gap-1.5 text-[#3E8E6E] text-xs font-heading font-bold">
+                      <CheckCircle2 className="w-4 h-4" /> Notifications enabled
+                    </div>
+                  ) : notifStatus === 'denied' ? (
+                    <p className="mt-3 text-[11px] text-[#C24C57] font-body">
+                      Permission denied. You can enable notifications in your browser settings.
                     </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-2.5 items-start mt-6 border-t border-navy-10/40 pt-4 text-left">
-                  <input
-                    type="checkbox"
-                    id="healthConsentCheckbox"
-                    checked={consentAccepted}
-                    onChange={(e) => setConsentAccepted(e.target.checked)}
-                    className="mt-0.5 w-4.5 h-4.5 text-lavender border-navy-10 rounded focus:ring-lavender cursor-pointer"
-                  />
-                  <label htmlFor="healthConsentCheckbox" className="font-body text-xs text-navy-55 leading-relaxed cursor-pointer select-none">
-                    <strong>Health Data Law Consent:</strong> I explicitly authorize the storage of my health data on secure servers within the UAE in compliance with UAE Decree-Law No. 2 of 2019, and consent to sharing my cycle compliance logs with my clinic coordinator.
-                  </label>
-                </div>
-              </div>
-
-              <div className="mt-8 flex justify-between items-center w-full">
-                <button
-                  type="button"
-                  onClick={handlePrevStep}
-                  className="font-heading text-xs font-bold text-navy hover:underline"
-                >
-                  Back
-                </button>
-                <button
-                  type="button"
-                  disabled={loading || !consentAccepted}
-                  onClick={handleCompleteOnboarding}
-                  className="py-3.5 px-6 bg-navy hover:bg-navy-80 text-white font-heading text-xs font-bold rounded-xl shadow-md transition-all duration-200 flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  {loading ? (
-                    <>
-                      <div className="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                      <span>Saving...</span>
-                    </>
                   ) : (
-                    <span>Launch Companion</span>
+                    <button
+                      type="button"
+                      onClick={handleRequestNotifications}
+                      className="mt-3 w-full py-2.5 rounded-xl border border-lavender text-lavender font-heading text-xs font-bold hover:bg-lavender/5 transition-all"
+                    >
+                      Enable Notifications
+                    </button>
                   )}
-                </button>
+                </div>
+
+                <div className="flex justify-between items-center pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setStep(2)}
+                    className="font-heading text-xs font-bold text-navy-55 hover:text-navy transition-colors"
+                  >
+                    ← Back
+                  </button>
+                  <button
+                    type="button"
+                    disabled={loading || notifStatus === 'idle'}
+                    onClick={handleStartCycle}
+                    className="py-3.5 px-7 bg-navy hover:bg-navy/85 text-white font-heading text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    {loading ? (
+                      <>
+                        <div className="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                        <span>Personalising…</span>
+                      </>
+                    ) : (
+                      <span>Start My Cycle →</span>
+                    )}
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+
+          </div>
         </div>
       </div>
     </div>
