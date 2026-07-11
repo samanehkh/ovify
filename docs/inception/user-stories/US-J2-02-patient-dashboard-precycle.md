@@ -47,21 +47,23 @@ Scenario: Sarah reports Day 1 start
 The screen enforces a mobile-first column layout matching the official brand rules:
 
 ### Header Area
-*   **Logo mark:** Official logo from `/static/logo.png` centered or aligned top-left.
-*   **Profile Avatar Button:** Top-right corner (48x48px tap target) displaying her initials ("SK"). Tapping opens the slide-over settings/logout page.
+*   **Logo mark:** Official logo from `/static/logo.png` aligned top-left.
+*   **Profile Avatar Button:** Top-right corner (48x48px tap target) displaying initials "SK". Tapping opens settings.
 
-### Main Content Area (Scrollable)
-1.  **Period Reporting Card:**
-    *   *Default State:* A large white card containing the button **"📢 My Period Has Started"** (Navy outline, bold text) and a note: *"Full flow must be established. If in doubt, contact your clinic."*
-    *   *Reported State:* Replaced by a Sage green card: **"✓ Day 1 Reported"** with subtext: *"Awaiting clinic booking. Mona will call you to schedule your baseline scan for tomorrow."*
+### Main Content Area (Scrollable Feed)
+1.  **Menstrual Cycle Reporting Card:**
+    *   *Default State:* A spacious card containing the action button **"📢 My Period Has Started"** (Navy outline, bold text) with a status tip: *"Full flow must be established. If in doubt, contact your clinic."*
+    *   *Confirmation Step:* Tapping the button opens a modal requesting a simple confirmation: *"Has full menstrual flow (not just spotting) started today? [Confirm Flow Started] [Go Back]"* to avoid false starts.
+    *   *Reported State:* Replaced by an organic Sage-green card: **"✓ Day 1 Reported"** with subtext: *"Awaiting clinic booking. Mona will call you to schedule your baseline scan."*
 2.  **Support Tools (Side-by-Side Cards):**
-    *   *Left Card:* **"Ask Me Anything"** — Links to the RAG AI FAQ page.
-    *   *Right Card:* **"CalmSeed Companion"** — Launches breathing relaxation guides.
+    *   *Left Card: "Ask Me Anything" (RAG FAQ Link)* — Integrated search-pill input styling.
+    *   *Right Card: "CalmSeed Companion"* — Features an active **looping CSS breathing bubble animation** to provide immediate relaxation value.
 3.  **Adaptive Baseline Guide (Axis A):**
-    *   *First-Timer:* Shows detailed steps of the baseline appointment (ultrasound scan, blood tests, why cysts are checked).
-    *   *Experienced:* Displays a simple checklist: *"Baseline check: Day 2 or 3 of menstruation. Ensure you bring your prescription sheets."*
-4.  **Bottom Navigation Bar (Frosted Glass Overlay):**
-    *   Contains exactly three tabs: **Home** (Active), **Calendar** (Disabled - no active cycle), **Medications** (Disabled - no active cycle).
+    *   *First-Timer:* Shows detailed step-by-step accordion/toggle guides explaining the baseline appointment (ultrasound scan details, blood tests, why cysts are checked).
+    *   *Experienced:* Displays a simple check-list: *"Baseline check: Day 2 or 3 of menstruation. Ensure you bring your prescription sheets."*
+4.  **Bottom Navigation Bar (Floating Glassmorphic Dock):**
+    *   A floating navigation dock with a frosted glass backdrop (`backdrop-filter: blur(12px)`) and rounded corners (`border-radius: 24px`).
+    *   Contains three tabs: **Home** (Active), **Calendar** (Disabled - no active cycle), and **Medications** (Disabled - no active cycle).
 
 ---
 

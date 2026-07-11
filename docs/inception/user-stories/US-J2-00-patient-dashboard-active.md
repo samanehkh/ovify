@@ -42,45 +42,47 @@ Scenario: Tapping a Due medication card navigates to confirmation screen
 
 ## 4. Screen Layout & States
 
-The page is designed as a mobile-first column layout optimized for touch targets:
+The page is designed as a mobile-first column layout utilizing modern premium UI patterns:
 
 ### Header Area
-*   **Logo mark:** Official logo from `/static/logo.png` centered or aligned top-left.
-*   **Profile Avatar Button:** Top-right corner (48x48px target, displaying initials "SK"). Tapping opens the slide-over settings page.
+*   **Logo mark:** Official logo from `/static/logo.png` aligned top-left.
+*   **Profile Avatar Button:** Top-right corner (48x48px target, initials "SK"). Tapping slides open the Profile Settings.
 
-### Main Content Area (Scrollable)
-1.  **Cycle Day Tracker Card:**
-    *   Displays `Stimulation Day X` using a visual progress arc.
-    *   Subtext: *"On Track · Clinic Synchronized"* (Sage badge).
-2.  **Today's Medication checklist:**
-    *   A list of cards for all medications scheduled for the current date.
-    *   *Due State:* Red outline/badge, lists name, dose (e.g. 150 IU), route (Subcutaneous), and scheduled time. Tappable to open log view.
-    *   *Taken State:* Sage background/checkmark, displays logged timestamp (e.g. *"✓ Logged 19:05"*). Disabled.
-    *   *Sync Pending State:* Amber badge, indicates logged offline and awaiting server sync.
+### Main Content Area (Scrollable Feed)
+1.  **Cycle Day Tracker (Circular SVG Progress Ring):**
+    *   A centered circular SVG indicator showing progress through the stimulation cycle.
+    *   Features a soft glowing radial backdrop to give a modern depth effect.
+    *   Displays `Day X` in the center using a premium high-contrast font weight.
+    *   Subtext: *"On Track · Clinic Sync"* in a pill badge (Sage color).
+2.  **Today's Schedule Checklist (Interactive Glow-Pill Cards):**
+    *   *Due/Upcoming State:* Soft terracotta or warm lavender border/badge (avoiding harsh warning red unless overdue). Subtle hover scaling (`scale-[1.02]`) and soft interactive shadows.
+    *   *Taken State:* Sage background/checkmark with logged timestamp. Disabled from further interaction.
+    *   *Sync Pending State:* Amber badge, indicates logs saved offline and awaiting auto-sync.
 3.  **Support Tools (Side-by-Side Cards):**
-    *   *Left Card:* **"Ask Me Anything"** — Styled as a search-input FAQ link. Launches the RAG AI text chat.
-    *   *Right Card:* **"CalmSeed Companion"** — Launches breathing relaxation guides.
-4.  **Bottom Navigation Bar (Frosted Glass Overlay):**
-    *   Contains exactly three tabs: **Home** (Active), **Calendar** (active link), **Medications** (active link).
+    *   *Left Card: "Ask Me Anything" (RAG FAQ Link)* — Integrated search-pill input styling.
+    *   *Right Card: "CalmSeed Companion"* — Features an active **looping CSS breathing bubble animation** (expanding and contracting to guide breathing) to provide immediate relaxation value.
+4.  **Bottom Navigation Bar (Floating Glassmorphic Dock):**
+    *   A floating navigation dock with a frosted glass backdrop (`backdrop-filter: blur(12px)`) and rounded corners (`border-radius: 24px`).
+    *   Contains three tabs: **Home** (Active), **Calendar**, and **Medications**. Active icon uses a spring-like micro-interaction scaling effect.
 
 ### Profile Slide-over Page (Triggered by Avatar)
 Slides over from the right side of the screen:
 *   **Settings Section:**
-    *   Sleep Window Dropdown (Early Bird, Standard, Night Owl).
+    *   Sleep Window Dropdown (9-11 PM, 10-12 AM, 11-1 AM).
     *   Injection Comfort Toggle (First time vs. Experienced).
-    *   Reminder Offset Dropdown (At scheduled time, 15m before, 30m before).
+    *   Reminder Offset Dropdown (0m, 15m, 30m).
 *   **Support Section:**
     *   **"Speak with a Clinic Nurse"** callback request button.
     *   Direct Clinic Hotline Dial Link.
 *   **Account Actions:**
-    *   **"Sign Out"** button (logs out, clears local storage, and redirects to Login page).
+    *   **"Sign Out"** button.
 
 ---
 
 | State | Trigger | What the user sees |
 |---|---|---|
-| **ready** | Default load | Home feed displaying daily checklist and launchers. |
-| **profile-open** | Avatar tapped | Slide-over panel containing settings, support, and logout. |
+| **ready** | Default load | Home feed displaying circular progress ring, breathing indicator, and checklist cards. |
+| **profile-open** | Avatar tapped | Slide-over settings panel containing settings, support, and logout. |
 | **submitting-logout**| Sign Out tapped | Session cleared, page redirects back to Login. |
 | **offline** | Wi-Fi lost | Dashboard remains functional; offline banner displayed at top: "Offline Mode — Logs will sync when reconnected." |
 
