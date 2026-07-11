@@ -1,7 +1,7 @@
 import React from 'react';
 import type { MedicationStatus } from '../types';
 import { useApp } from '../context/AppContext';
-import { Calendar, ChevronRight } from 'lucide-react';
+import { Calendar, ChevronRight, Syringe } from 'lucide-react';
 import { Badge } from './ui/Badge';
 
 interface MedicationCardProps {
@@ -34,11 +34,9 @@ export const MedicationCard: React.FC<MedicationCardProps> = ({ medication }) =>
       }`}
     >
       <div className="flex items-center gap-4 text-left w-full">
-        {/* Medication visual representation (fallback or generic placeholder colored circle) */}
-        <div className="w-[56px] h-[56px] rounded-lg bg-navy-10 flex items-center justify-center overflow-hidden flex-none">
-          <span className="text-xl font-heading font-bold text-lavender-dark">
-            {medication.name.charAt(0)}
-          </span>
+        {/* Medication visual representation (Syringe icon) */}
+        <div className="w-[56px] h-[56px] rounded-xl bg-lavender-soft flex items-center justify-center overflow-hidden flex-none text-lavender-dark">
+          <Syringe className="w-6 h-6 stroke-[1.8]" />
         </div>
 
         <div className="flex-1 min-w-0">
