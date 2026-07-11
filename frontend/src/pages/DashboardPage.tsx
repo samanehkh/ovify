@@ -146,50 +146,78 @@ export const DashboardPage: React.FC = () => {
           1. MAIN GRAPHIC CARD (Circular Ring OR Period Report Card)
           ───────────────────────────────────────────────────────────── */}
       {!isPreCycle ? (
-        // ACTIVE CYCLE: SVG Circular Progress Ring
-        <div className="mb-6 p-6 rounded-3xl bg-white border border-navy-10 shadow-sm flex flex-col items-center justify-center relative overflow-hidden">
-          {/* Subtle glowing backdrop */}
-          <div className="absolute inset-0 bg-radial-gradient from-lavender/5 to-transparent pointer-events-none" />
-          
-          <div className="relative w-36 h-36 flex items-center justify-center">
-            {/* SVG Progress Circle */}
-            <svg className="w-full h-full transform -rotate-90">
-              <circle
-                cx="72"
-                cy="72"
-                r="64"
-                stroke="#EEF1F6"
-                strokeWidth="7"
-                fill="transparent"
-              />
-              <circle
-                cx="72"
-                cy="72"
-                r="64"
-                stroke="#9E8CEF"
-                strokeWidth="8"
-                fill="transparent"
-                strokeDasharray={402}
-                // Mock active cycle day progress (say day 5 of 12)
-                strokeDashoffset={402 - (402 * Math.min(dashboardData.cycle_day || 1, 12)) / 12}
-                strokeLinecap="round"
-                className="transition-all duration-1000 ease-out"
-              />
-            </svg>
-            <div className="absolute flex flex-col items-center justify-center text-center">
-              <span className="font-data text-[10px] text-navy-55 font-bold uppercase tracking-widest">Day</span>
-              <span className="font-heading text-3xl font-extrabold text-navy leading-none mt-1">
-                {dashboardData.cycle_day || 1}
-              </span>
-              <span className="font-body text-[10px] text-navy-55/70 mt-1">of 12</span>
+        <>
+          {/* ACTIVE CYCLE: SVG Circular Progress Ring */}
+          <div className="mb-6 p-6 rounded-3xl bg-white border border-navy-10 shadow-sm flex flex-col items-center justify-center relative overflow-hidden">
+            {/* Subtle glowing backdrop */}
+            <div className="absolute inset-0 bg-radial-gradient from-lavender/5 to-transparent pointer-events-none" />
+            
+            <div className="relative w-36 h-36 flex items-center justify-center">
+              {/* SVG Progress Circle */}
+              <svg className="w-full h-full transform -rotate-90">
+                <circle
+                  cx="72"
+                  cy="72"
+                  r="64"
+                  stroke="#EEF1F6"
+                  strokeWidth="7"
+                  fill="transparent"
+                />
+                <circle
+                  cx="72"
+                  cy="72"
+                  r="64"
+                  stroke="#9E8CEF"
+                  strokeWidth="8"
+                  fill="transparent"
+                  strokeDasharray={402}
+                  // Mock active cycle day progress (say day 5 of 12)
+                  strokeDashoffset={402 - (402 * Math.min(dashboardData.cycle_day || 1, 12)) / 12}
+                  strokeLinecap="round"
+                  className="transition-all duration-1000 ease-out"
+                />
+              </svg>
+              <div className="absolute flex flex-col items-center justify-center text-center">
+                <span className="font-data text-[10px] text-navy-55 font-bold uppercase tracking-widest">Day</span>
+                <span className="font-heading text-3xl font-extrabold text-navy leading-none mt-1">
+                  {dashboardData.cycle_day || 1}
+                </span>
+                <span className="font-body text-[10px] text-navy-55/70 mt-1">of 12</span>
+              </div>
+            </div>
+
+            <div className="mt-5 flex items-center gap-2 px-3 py-1 bg-sage-soft rounded-full font-data text-[11px] font-bold text-sage">
+              <span className="w-1.5 h-1.5 rounded-full bg-sage animate-pulse" />
+              ON TRACK · CLINIC SYNCED
             </div>
           </div>
 
-          <div className="mt-5 flex items-center gap-2 px-3 py-1 bg-sage-soft rounded-full font-data text-[11px] font-bold text-sage">
-            <span className="w-1.5 h-1.5 rounded-full bg-sage animate-pulse" />
-            ON TRACK · CLINIC SYNCED
-          </div>
-        </div>
+          {/* Next Scan Appointment Card */}
+          {dashboardData.next_appointment_datetime && (
+            <div className="mb-6 p-5 rounded-2xl bg-white border border-navy-10 shadow-sm flex items-start gap-3 text-left">
+              <div className="w-9 h-9 rounded-xl bg-[#F3F1FE] flex items-center justify-center text-lavender-mid flex-none">
+                <Calendar className="w-4 h-4" />
+              </div>
+              <div className="flex-1">
+                <span className="block text-[10px] font-bold text-navy-55 uppercase tracking-wider">Scheduled Check</span>
+                <p className="font-heading text-xs font-bold text-navy mt-1">
+                  Next scan appointment: {(() => {
+                    try {
+                      const d = new Date(dashboardData.next_appointment_datetime!);
+                      const dayName = d.toLocaleDateString('en-US', { weekday: 'long' });
+                      const dayNum = d.getDate();
+                      const monthName = d.toLocaleDateString('en-US', { month: 'long' });
+                      const timeStr = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+                      return `${dayName}, ${dayNum} ${monthName} at ${timeStr}`;
+                    } catch (e) {
+                      return dashboardData.next_appointment_datetime;
+                    }
+                  })()}
+                </p>
+              </div>
+            </div>
+          )}
+        </>
       ) : (
         // PRE-CYCLE: Awaiting Cycle Start and Next Scan cards
         <div className="space-y-4 mb-6 text-left">

@@ -25,10 +25,12 @@
 Scenario: View active dashboard with due medications
   Given Sarah is an active patient on Stimulation Day 5
   And she has Gonal-F (Status: Due) and Menopur (Status: Taken) scheduled for today
+  And her next_appointment_datetime in the database is "2026-07-15 09:00:00"
   When she opens the PWA Home Page
   Then she sees the brand logo mark at the top left
   And she sees her Profile Avatar ("SK") at the top right
   And she sees "Stimulation Day 5" displayed inside the SVG Circular Progress Ring
+  And she sees a card displaying: "Next scan appointment: Tuesday, 15 July at 09:00"
   And "Today's Schedule" displays Gonal-F with a "Due" badge (Lavender outline)
   And "Today's Schedule" displays Menopur with a "✓ Taken" badge (Sage)
   And the "Ask Me Anything" search bar and "CalmSeed Breathing" card are visible
@@ -49,14 +51,17 @@ The page is designed as a mobile-first column layout utilizing modern premium UI
     *   Features a soft glowing radial backdrop to give a modern depth effect.
     *   Displays `Day X` in the center using a premium high-contrast font weight.
     *   Subtext: *"On Track · Clinic Sync"* in a pill badge (Sage color).
-2.  **Today's Schedule Checklist (Interactive Glow-Pill Cards):**
+2.  **Next Scan Appointment Card:**
+    *   Displays her next scheduled follicle scan check date and time (e.g. *"Next scan appointment: Tuesday, 15 July at 09:00"*).
+    *   Features a calendar-check icon.
+3.  **Today's Schedule Checklist (Interactive Glow-Pill Cards):**
     *   *Due/Upcoming State:* Soft terracotta or warm lavender border/badge (avoiding harsh warning red unless overdue). Subtle hover scaling (`scale-[1.02]`) and soft interactive shadows.
     *   *Taken State:* Sage background/checkmark with logged timestamp. Disabled from further interaction.
     *   *Sync Pending State:* Amber badge, indicates logs saved offline and awaiting auto-sync.
-3.  **Support Tools (Side-by-Side Cards):**
+4.  **Support Tools (Side-by-Side Cards):**
     *   *Left Card: "Ask Me Anything" (RAG FAQ Link)* — Integrated search-pill input styling.
     *   *Right Card: "CalmSeed Companion"* — Features an active **looping CSS breathing bubble animation** (expanding and contracting to guide breathing) to provide immediate relaxation value.
-4.  **Bottom Navigation Bar (Floating Glassmorphic Dock):**
+5.  **Bottom Navigation Bar (Floating Glassmorphic Dock):**
     *   A floating navigation dock with a frosted glass backdrop (`backdrop-filter: blur(12px)`) and rounded corners (`border-radius: 24px`).
     *   Contains four tabs: **Home** (Active), **Calendar**, **Medications**, and **Settings**. Active icon uses a spring-like micro-interaction scaling effect.
 
