@@ -168,8 +168,48 @@ her default **without becoming a medical device.**
 
 ---
 
-## P3 — Nurse / Coordinator *(pending — not yet challenged)*
-_Drafted in discussion; to be locked in a later pass._
+## P3 — Mona · The Clinic Nurse / Coordinator
+
+**One line:** A busy, highly-interrupted clinic nurse managing 30–50 active patient cycles, using a clinic-provided tablet to register patients, review daily alerts on rounds, and coordinate care.
+
+### Who
+- 38 years old, IVF Coordinator at a clinic in Dubai.
+- **Primary device:** Clinic-provided **Tablet** (e.g., iPad, used in-hand during patient consultations, on desk, or carried during clinic rounds).
+- **Environment:** Fast-paced, high mobility. Frequently walking between reception, consultation rooms, and the recovery ward.
+- **Language:** English (MVP scope).
+
+### Context of use
+- **On-the-go registration:** Setting up a patient's profile directly on the tablet while sitting next to the patient during their exit consultation.
+- **Triage on rounds:** Reviewing patient alert lists while walking through the ward or discussing patient statuses with doctors.
+
+### Emotional state
+- Overworked and protective of her patients.
+- Constantly fighting "cognitive overload" from tracking multiple schedules.
+- Feels the weight of responsibility — she knows one patient mistake can cancel a cycle.
+
+### Goals
+- Register a patient and set up their medications in under 60 seconds using only touch controls.
+- Clearly see red alerts (missed doses) and tap to call or resolve them while on the move.
+- Show the patient the screen to confirm their details before finalizing registration.
+
+### Fears
+- Dropping the tablet or fat-fingering input fields (e.g., entering the wrong dosage due to small touch targets).
+- Losing internet connection while walking between clinic rooms.
+- Clunky virtual keyboard overlays blocking half the screen during data entry.
+
+### "Done" feels like
+- "✓ Patient registered, protocol saved, SMS invitation sent to patient's phone."
+
+---
+
+### Design implications (consolidated — B2B Tablet Surface)
+1. **Touch-Optimized Targets:** Dropdowns, date selectors, and buttons must be large (minimum 48x48px tap target) to prevent fat-finger entry errors.
+2. **Smart Form Layouts:** Position forms so the virtual screen keyboard does not cover active input fields or the primary action buttons when it pops up.
+3. **Landscape & Portrait Support:** The interface must transition gracefully between landscape (table-friendly overview) and portrait (easy to hold in one hand during rounds).
+4. **Audit Logs:** Track and log the specific nurse credentials active on the shared tablet session for every transaction.
+5. **Formulary Validation:** Use search-as-you-type dropdowns for medications to prevent typos or unapproved drug entry.
+
+---
 
 ## P4 — Partner / Supporter *(pending — not yet challenged)*
 _Drafted in discussion; to be locked in a later pass._
