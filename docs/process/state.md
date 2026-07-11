@@ -46,12 +46,7 @@ on one story → journey-by-journey.
 
 ## Verification baseline
 
-- Backend: `pytest` — 44/46. The 2 failures (`test_confirm_dose_on_time`,
-  `test_double_confirm_error`) are **time-of-day flaky**: they hardcode
-  `actual_time=20:00:00`, which the future-time guardrail correctly rejects when
-  the suite runs before 20:00 UAE. Not a code regression — genuine test debt
-  (tests must use times relative to `now`, not wall-clock literals). Fix in the
-  field-level pass.
+- Backend: `pytest` — 46/46 green (all time-of-day test flakiness resolved dynamically)
 - Frontend: `tsc -b && vite build` green
 - Agents: `agents/orchestrator.py` compiles; `ui_designer_agent.py` resolves
   `docs/constitution.md`.

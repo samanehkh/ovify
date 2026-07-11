@@ -84,16 +84,25 @@ def test_get_daily_medications(client):
     assert all(status == "Due" for status in statuses)
 
 def test_confirm_dose_on_time(client, test_db):
-    # Prescription 1 (Gonal-F) is scheduled for 20:00:00 (8:00 PM)
-    # Log at 20:15:00 (8:15 PM) -> within 60 minutes window -> On Time
-    response = client.post("/api/medications/1/confirm?user_id=1&actual_time=20:15:00")
+    now = datetime.now()
+    # Set Gonal-F (id 1) scheduled time to be 1 hour in the past
+    sched_dt = now - timedelta(hours=1)
+    p1 = test_db.query(models.Prescription).filter(models.Prescription.id == 1).first()
+    p1.scheduled_time = sched_dt.time().strftime("%H:%M:%S")
+    test_db.commit()
+    
+    # Log at 45 minutes in the past -> within 60 minutes window -> On Time
+    actual_dt = now - timedelta(minutes=45)
+    actual_time_str = actual_dt.time().strftime("%H:%M:%S")
+    
+    response = client.post(f"/api/medications/1/confirm?actual_time={actual_time_str}")
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "On Time"
     assert data["prescription_id"] == 1
 
     # Verify status updates to Taken in GET
-    response_get = client.get("/api/medications/?user_id=1")
+    response_get = client.get("/api/medications/")
     data_get = response_get.json()
     gonal = next(m for m in data_get if m["id"] == 1)
     assert gonal["status"] == "Taken"
@@ -123,12 +132,23 @@ def test_confirm_dose_late(client, test_db):
     assert menopur["log_status"] == "Late"
 
 def test_double_confirm_error(client, test_db):
-    # Log first time
-    response1 = client.post("/api/medications/1/confirm?actual_time=20:00:00")
+    now = datetime.now()
+    # Set Gonal-F (id 1) scheduled time to be 1 hour in the past
+    sched_dt = now - timedelta(hours=1)
+    p1 = test_db.query(models.Prescription).filter(models.Prescription.id == 1).first()
+    p1.scheduled_time = sched_dt.time().strftime("%H:%M:%S")
+    test_db.commit()
+    
+    # Log first time (45 minutes in the past)
+    actual_dt = now - timedelta(minutes=45)
+    actual_time_str = actual_dt.time().strftime("%H:%M:%S")
+    response1 = client.post(f"/api/medications/1/confirm?actual_time={actual_time_str}")
     assert response1.status_code == 200
     
     # Log second time on same day -> expect 400 Bad Request
-    response2 = client.post("/api/medications/1/confirm?actual_time=20:10:00")
+    actual_dt2 = now - timedelta(minutes=40)
+    actual_time_str2 = actual_dt2.time().strftime("%H:%M:%S")
+    response2 = client.post(f"/api/medications/1/confirm?actual_time={actual_time_str2}")
     assert response2.status_code == 400
     assert response2.json()["detail"] == "Medication already logged for today"
 
