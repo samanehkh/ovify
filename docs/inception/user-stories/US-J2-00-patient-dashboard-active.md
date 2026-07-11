@@ -55,8 +55,8 @@ The page is designed as a mobile-first column layout utilizing modern premium UI
     *   Displays her next scheduled follicle scan check date and time (e.g. *"Next scan appointment: Tuesday, 15 July at 09:00"*).
     *   Features a calendar-check icon.
 3.  **Today's Schedule Checklist (Interactive Glow-Pill Cards):**
-    *   *Due/Upcoming State:* Soft terracotta or warm lavender border/badge (avoiding harsh warning red unless overdue). Subtle hover scaling (`scale-[1.02]`) and soft interactive shadows.
-    *   *Taken State:* Sage background/checkmark with logged timestamp. Disabled from further interaction.
+    *   *Due/Upcoming State:* Soft terracotta or warm lavender border/badge (avoiding harsh warning red unless overdue). Tappable to open step-by-step log guide.
+    *   *Taken/Logged State (On Time / Late):* Sage green background (`bg-[#E6F4EF]`), soft green border, and reduced opacity to visual greyout. Displays checkmark badge (e.g., *"✓ On Time"* in green). **Completely non-clickable and pointer events disabled.**
     *   *Sync Pending State:* Amber badge, indicates logs saved offline and awaiting auto-sync.
 4.  **Support Tools (Side-by-Side Cards):**
     *   *Left Card: "Ask Me Anything" (RAG FAQ Link)* — Integrated search-pill input styling.

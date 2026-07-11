@@ -269,13 +269,13 @@ export const DashboardPage: React.FC = () => {
           <div className="flex justify-between items-baseline mb-3">
             <h3 className="font-heading text-sm font-bold text-navy uppercase tracking-wider">Today's Injections</h3>
             <span className="font-data text-[11px] text-navy-55 font-bold">
-              {dashboardData.today_schedule.filter(m => m.status === 'Taken').length}/{dashboardData.today_schedule.length} Done
+              {dashboardData.today_schedule.filter(m => m.status !== 'Due').length}/{dashboardData.today_schedule.length} Done
             </span>
           </div>
 
           <div className="space-y-3">
             {dashboardData.today_schedule.map((med) => {
-              const isTaken = med.status === 'Taken' || med.status === 'Late';
+              const isTaken = med.status !== 'Due';
               return (
                 <div
                   key={med.medication_id}
@@ -291,19 +291,19 @@ export const DashboardPage: React.FC = () => {
                       } as any);
                     }
                   }}
-                  className={`glow-pill-card p-4 rounded-2xl border text-left flex justify-between items-center ${
+                  className={`p-4 rounded-2xl border text-left flex justify-between items-center transition-all ${
                     isTaken 
-                      ? 'bg-white border-navy-10/40 opacity-75' 
-                      : 'bg-white border-lavender cursor-pointer'
+                      ? 'bg-[#E6F4EF] border-sage/35 opacity-60 pointer-events-none select-none' 
+                      : 'glow-pill-card bg-white border-lavender cursor-pointer'
                   }`}
                 >
                   <div className="flex-1 min-w-0 pr-3">
                     <div className="flex items-center gap-2">
                       <h4 className="font-heading text-sm font-bold text-navy truncate">{med.name}</h4>
                       <span className={`text-[9px] font-data font-bold px-2 py-0.5 rounded-full ${
-                        isTaken ? 'bg-[#E6F4EF] text-[#3E8E6E]' : 'bg-[#F3F1FE] text-lavender'
+                        isTaken ? 'bg-sage-soft text-sage' : 'bg-[#F3F1FE] text-lavender'
                       }`}>
-                        {med.status}
+                        {isTaken ? `✓ ${med.status}` : med.status}
                       </span>
                     </div>
                     <p className="font-body text-[11px] text-navy-55 mt-1">
