@@ -7,7 +7,7 @@ import { OnboardingWizardPage } from './pages/OnboardingWizardPage';
 import { ClinicianPortalPage } from './pages/ClinicianPortalPage';
 import { PartnerSupportPage } from './pages/PartnerSupportPage';
 import { SettingsPage } from './pages/SettingsPage';
-import { Home, BookOpen, Settings } from 'lucide-react';
+import { Home, Settings, Pill, Calendar } from 'lucide-react';
 import { Button } from './components/ui/Button';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
@@ -140,7 +140,7 @@ const AppContent: React.FC = () => {
                     activeTab === 'calendar' ? 'text-lavender-dark' : 'text-navy-55 hover:text-navy'
                   }`}
                 >
-                  <BookOpen className="w-5 h-5" />
+                  <Calendar className="w-5 h-5" />
                   <span>Calendar</span>
                 </button>
 
@@ -153,7 +153,7 @@ const AppContent: React.FC = () => {
                     activeTab === 'medications' ? 'text-lavender-dark' : 'text-navy-55 hover:text-navy'
                   }`}
                 >
-                  <Settings className="w-5 h-5" />
+                  <Pill className="w-5 h-5" />
                   <span>Medications</span>
                 </button>
 

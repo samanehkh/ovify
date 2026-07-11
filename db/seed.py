@@ -16,7 +16,8 @@ def seed_db():
                 name="Sarah", 
                 email="sarah@example.com",
                 phone="+971501234567",
-                onboarded=False
+                onboarded=False,
+                cycle_start_date=date.today() - timedelta(days=4)
             )
             db.add(user)
             db.commit()
