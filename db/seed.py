@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date, datetime, timezone, timedelta
 from sqlalchemy.orm import Session
 from db.session import SessionLocal
 from db import models
@@ -17,7 +17,8 @@ def seed_db():
                 email="sarah@example.com",
                 phone="+971501234567",
                 onboarded=False,
-                cycle_start_date=date.today() - timedelta(days=4)
+                cycle_start_date=date.today() - timedelta(days=4),
+                next_appointment_datetime=datetime.now(timezone.utc) + timedelta(days=3)
             )
             db.add(user)
             db.commit()
