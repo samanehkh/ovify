@@ -166,18 +166,34 @@ PASS only if score >= 85 and there are no serious hierarchy/contrast/brand viola
 
 
 # ------------------------------------------------------------------ the loop (ORCHESTRATOR)
-def run(brief: str, dry_run: bool):
+def run(brief: str, dry_run: bool, story_path: str = None):
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     constitution = CONSTITUTION.read_text() if CONSTITUTION.exists() else "(no constitution found)"
+
+    # If a user-story file is given, it BECOMES the brief. The story already carries
+    # screen states, copy, data contract, and DoD — far richer than a one-line brief.
+    # (Step-4 preview: the agent now consumes the story template.)
+    source = "brief"
+    if story_path:
+        p = Path(story_path)
+        if not p.exists():
+            sys.exit(f"Story file not found: {story_path}")
+        brief = (
+            "Build the single screen described by this Ovify user story. Honour every "
+            "Screen state, the exact Copy strings, and the Definition of Done. Do not "
+            "invent data or states not in the story.\n\n" + p.read_text()
+        )
+        source = f"story: {p.relative_to(ROOT) if p.is_absolute() else p}"
 
     print(f"\n🎨 Ovify UI/UX Designer Agent")
     print(f"   model: {MODEL} | max_iterations: {MAX_ITERS} | render: {RENDER_WIDTH}px")
     print(f"   spec:  {CONSTITUTION.relative_to(ROOT) if CONSTITUTION.exists() else 'MISSING'}")
-    print(f"   brief: {brief}\n")
+    print(f"   input: {source}\n")
 
     if dry_run:
         print("DRY RUN — pipeline wiring (no API calls):")
-        print("  Architect  → loaded constitution + brief")
+        print(f"  Architect  → loaded constitution ({len(constitution)} chars) + {source}")
+        print(f"  Architect  → brief is {len(brief)} chars")
         print("  Developer  → would call Gemini to generate HTML")
         print("  render()   → would screenshot it with headless Chrome  (EYES)")
         print("  Critic     → would call Gemini VISION on the screenshot")
@@ -230,6 +246,8 @@ if __name__ == "__main__":
                     "greeting, cycle-day progress ring, today's medications, an optional "
                     "emotional check-in, and a bottom tab bar.",
                     help="What screen to design.")
+    ap.add_argument("--story", default=None,
+                    help="Path to a user-story .md file — becomes the brief (richer than --brief).")
     ap.add_argument("--dry-run", action="store_true", help="Show the wiring without calling the API.")
     args = ap.parse_args()
-    run(args.brief, args.dry_run)
+    run(args.brief, args.dry_run, args.story)
