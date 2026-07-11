@@ -242,6 +242,7 @@ def get_user_dashboard(
         "cycle_day": cycle_day,
         "cycle_status": cycle_status,
         "today_schedule": today_schedule,
-        "day1_reported_at": user.day1_reported_at
+        "day1_reported_at": user.day1_reported_at,
+        "next_appointment_datetime": user.next_appointment_datetime
     }
 

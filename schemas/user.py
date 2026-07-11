@@ -67,4 +67,5 @@ class DashboardResponse(BaseModel):
     cycle_status: str  # "Pre-Cycle" or "Stimulation"
     today_schedule: list[DashboardMedication]
     day1_reported_at: Optional[datetime] = None
+    next_appointment_datetime: Optional[datetime] = None
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import * as api from '../services/api';
-import { Sparkles, AlertTriangle, ChevronDown, ChevronUp, CheckCircle2, Heart } from 'lucide-react';
+import { Sparkles, AlertTriangle, ChevronDown, ChevronUp, CheckCircle2, Heart, Calendar } from 'lucide-react';
 
 // Premium style inject for the CSS Breathing Bubble & micro-interactions
 const UI_STYLE_INJECT = `
@@ -107,7 +107,6 @@ export const DashboardPage: React.FC = () => {
   }
 
   const isPreCycle = dashboardData.cycle_status === 'Pre-Cycle';
-  const day1Reported = !!dashboardData.day1_reported_at;
 
   return (
     <div className="flex-1 flex flex-col pt-4 px-5 pb-24 overflow-y-auto no-scrollbar relative">
@@ -192,30 +191,43 @@ export const DashboardPage: React.FC = () => {
           </div>
         </div>
       ) : (
-        // PRE-CYCLE: Menstrual Cycle Period Reporting Card
-        <div className="mb-6 p-6 rounded-3xl bg-white border border-navy-10 shadow-sm text-center relative overflow-hidden">
-          {!day1Reported ? (
-            <div className="flex flex-col items-center">
-              <span className="w-10 h-10 rounded-2xl bg-blush-10 text-due flex items-center justify-center text-lg mb-3">📢</span>
-              <h3 className="font-heading text-base font-bold text-navy mb-1.5">Awaiting Menstruation</h3>
-              <p className="font-body text-xs text-navy-55 max-w-xs leading-relaxed mb-5">
-                Full menstrual flow must be established. If in doubt, contact your clinic.
-              </p>
-              <button
-                type="button"
-                onClick={() => setShowDay1Modal(true)}
-                className="w-full py-3.5 px-6 rounded-xl border border-navy bg-white hover:bg-navy/5 text-navy font-heading text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2"
-              >
-                My Period Has Started
-              </button>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center">
-              <div className="w-10 h-10 rounded-2xl bg-[#E6F4EF] text-[#3E8E6E] flex items-center justify-center text-lg mb-3">✓</div>
-              <h3 className="font-heading text-base font-bold text-[#3E8E6E] mb-1">Day 1 Reported</h3>
-              <p className="font-body text-xs text-navy-55 max-w-xs leading-relaxed">
-                Mona will call you to schedule your baseline scan for tomorrow. Ensure your notifications are on.
-              </p>
+        // PRE-CYCLE: Awaiting Cycle Start and Next Scan cards
+        <div className="space-y-4 mb-6 text-left">
+          {/* Awaiting Cycle Start Card */}
+          <div className="p-6 rounded-3xl bg-white border border-lavender shadow-md relative overflow-hidden">
+            <div className="absolute inset-0 bg-radial-gradient from-lavender/5 to-transparent pointer-events-none" />
+            <h3 className="font-heading text-base font-extrabold text-navy flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-lavender animate-pulse" />
+              Awaiting Cycle Start
+            </h3>
+            <p className="font-body text-xs text-navy-55 mt-2.5 leading-relaxed">
+              Your clinic has registered your profile. Your daily medication timeline will go live here once your cycle starts.
+            </p>
+          </div>
+
+          {/* Next Scan Appointment Card */}
+          {dashboardData.next_appointment_datetime && (
+            <div className="p-5 rounded-2xl bg-white border border-navy-10 shadow-sm flex items-start gap-3">
+              <div className="w-9 h-9 rounded-xl bg-[#F3F1FE] flex items-center justify-center text-lavender-mid flex-none">
+                <Calendar className="w-4 h-4" />
+              </div>
+              <div className="flex-1">
+                <span className="block text-[10px] font-bold text-navy-55 uppercase tracking-wider">Scheduled Check</span>
+                <p className="font-heading text-xs font-bold text-navy mt-1">
+                  Next scan appointment: {(() => {
+                    try {
+                      const d = new Date(dashboardData.next_appointment_datetime!);
+                      const dayName = d.toLocaleDateString('en-US', { weekday: 'long' });
+                      const dayNum = d.getDate();
+                      const monthName = d.toLocaleDateString('en-US', { month: 'long' });
+                      const timeStr = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+                      return `${dayName}, ${dayNum} ${monthName} at ${timeStr}`;
+                    } catch (e) {
+                      return dashboardData.next_appointment_datetime;
+                    }
+                  })()}
+                </p>
+              </div>
             </div>
           )}
         </div>
@@ -241,7 +253,7 @@ export const DashboardPage: React.FC = () => {
                   key={med.medication_id}
                   onClick={() => {
                     if (!isTaken) {
-                      changeTab('medication-guide', {
+                      changeTab('medications', {
                         id: med.medication_id,
                         name: med.name,
                         dosage: med.dosage,

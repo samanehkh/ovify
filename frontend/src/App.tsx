@@ -8,12 +8,11 @@ import { ClinicianPortalPage } from './pages/ClinicianPortalPage';
 import { PartnerSupportPage } from './pages/PartnerSupportPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { Home, BookOpen, Settings } from 'lucide-react';
-import { Modal } from './components/ui/Modal';
 import { Button } from './components/ui/Button';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 const AppContent: React.FC = () => {
-  const { activeTab, user, loading, toastMessage, logout, changeTab } = useApp();
+  const { activeTab, user, loading, toastMessage, logout, changeTab, medications } = useApp();
   const [showLogoutConfirm, setShowLogoutConfirm] = React.useState(false);
 
   // Get user initials
@@ -106,8 +105,10 @@ const AppContent: React.FC = () => {
               <main className="flex-1 flex flex-col relative overflow-hidden">
                 {activeTab === 'dashboard' ? (
                   <DashboardPage />
-                ) : activeTab === 'medication-guide' ? (
+                ) : activeTab === 'medications' ? (
                   <MedicationLogPage />
+                ) : activeTab === 'calendar' ? (
+                  <div className="flex-1 flex items-center justify-center font-body text-xs text-navy-55">Calendar View (Phase 2)</div>
                 ) : (
                   <SettingsPage />
                 )}
@@ -131,15 +132,29 @@ const AppContent: React.FC = () => {
                 </button>
 
                 <button
-                  onClick={() => changeTab('medication-guide')}
-                  aria-label="Navigate to Medication Guides"
-                  aria-current={activeTab === 'medication-guide' ? 'page' : undefined}
-                  className={`flex flex-col items-center gap-1 font-heading text-[10px] font-bold transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-lavender p-1 rounded-lg ${
-                    activeTab === 'medication-guide' ? 'text-lavender-dark' : 'text-navy-55 hover:text-navy'
+                  onClick={() => medications.length > 0 && changeTab('calendar')}
+                  disabled={medications.length === 0}
+                  aria-label="Navigate to Calendar"
+                  aria-current={activeTab === 'calendar' ? 'page' : undefined}
+                  className={`flex flex-col items-center gap-1 font-heading text-[10px] font-bold transition-colors p-1 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed ${
+                    activeTab === 'calendar' ? 'text-lavender-dark' : 'text-navy-55 hover:text-navy'
                   }`}
                 >
                   <BookOpen className="w-5 h-5" />
-                  <span>Guides</span>
+                  <span>Calendar</span>
+                </button>
+
+                <button
+                  onClick={() => medications.length > 0 && changeTab('medications')}
+                  disabled={medications.length === 0}
+                  aria-label="Navigate to Medications Checklist"
+                  aria-current={activeTab === 'medications' ? 'page' : undefined}
+                  className={`flex flex-col items-center gap-1 font-heading text-[10px] font-bold transition-colors p-1 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed ${
+                    activeTab === 'medications' ? 'text-lavender-dark' : 'text-navy-55 hover:text-navy'
+                  }`}
+                >
+                  <Settings className="w-5 h-5" />
+                  <span>Medications</span>
                 </button>
 
                 <button
@@ -155,32 +170,58 @@ const AppContent: React.FC = () => {
                 </button>
               </nav>
 
-              <Modal
-                isOpen={showLogoutConfirm}
-                onClose={() => setShowLogoutConfirm(false)}
-                title="Log Out"
-              >
-                <p className="font-body text-xs text-navy-55 leading-relaxed mb-6">Are you sure you want to log out of your session?</p>
-                <div className="flex gap-3">
-                  <Button
-                    variant="due"
-                    fullWidth
-                    onClick={() => {
-                      logout();
-                      setShowLogoutConfirm(false);
-                    }}
+              {/* Slide-over Profile Settings Drawer */}
+              {showLogoutConfirm && (
+                <div 
+                  className="fixed inset-0 z-50 flex justify-end bg-navy/30 backdrop-blur-sm transition-opacity duration-300"
+                  onClick={() => setShowLogoutConfirm(false)}
+                >
+                  <div 
+                    className="w-72 max-w-full h-full bg-white shadow-2xl p-6 flex flex-col justify-between animate-slide-in relative"
+                    onClick={(e) => e.stopPropagation()}
                   >
-                    Log Out
-                  </Button>
-                  <Button
-                    variant="outline"
-                    fullWidth
-                    onClick={() => setShowLogoutConfirm(false)}
-                  >
-                    Cancel
-                  </Button>
+                    <div>
+                      <div className="flex justify-between items-center mb-6">
+                        <h3 className="font-heading text-lg font-bold text-navy">Profile Details</h3>
+                        <button 
+                          onClick={() => setShowLogoutConfirm(false)}
+                          className="text-navy-55 hover:text-navy font-bold text-lg p-1"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <div className="p-4 rounded-2xl bg-bg-ivory border border-navy-10/40">
+                          <span className="block text-[10px] font-bold text-navy-55 uppercase tracking-wider">Full Name</span>
+                          <span className="font-heading text-sm font-semibold text-navy">{user.name}</span>
+                        </div>
+                        <div className="p-4 rounded-2xl bg-bg-ivory border border-navy-10/40">
+                          <span className="block text-[10px] font-bold text-navy-55 uppercase tracking-wider">Phone Number</span>
+                          <span className="font-data text-xs text-navy">{user.phone || 'N/A'}</span>
+                        </div>
+                        <div className="p-4 rounded-2xl bg-bg-ivory border border-navy-10/40">
+                          <span className="block text-[10px] font-bold text-navy-55 uppercase tracking-wider">Email Address</span>
+                          <span className="font-body text-xs text-navy break-all">{user.email}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-6 border-t border-navy-10/40">
+                      <Button
+                        variant="due"
+                        fullWidth
+                        onClick={() => {
+                          logout();
+                          setShowLogoutConfirm(false);
+                        }}
+                      >
+                        Sign Out
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-              </Modal>
+              )}
             </div>
           )
         }

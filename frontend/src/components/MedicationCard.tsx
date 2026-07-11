@@ -27,7 +27,7 @@ export const MedicationCard: React.FC<MedicationCardProps> = ({ medication }) =>
   return (
     <button
       type="button"
-      onClick={() => changeTab('medication-guide', medication)}
+      onClick={() => changeTab('medications', medication)}
       aria-label={`View step-by-step injection guide for ${medication.name}, dosage ${medication.dosage}, currently ${medication.status}`}
       className={`w-full text-left glass-panel rounded-xl p-[18px] cursor-pointer flex flex-col justify-between focus:outline-none focus:ring-2 focus:ring-lavender ${
         isTaken ? 'opacity-85 border-sage-soft bg-gradient-to-b from-white to-sage/5' : ''

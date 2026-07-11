@@ -398,6 +398,7 @@ export interface DashboardResponseData {
   cycle_status: 'Pre-Cycle' | 'Stimulation';
   today_schedule: DashboardMedication[];
   day1_reported_at: string | null;
+  next_appointment_datetime: string | null;
 }
 
 export interface ReportDay1ResponseData {

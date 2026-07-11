@@ -11,10 +11,10 @@ interface AppContextType {
   loading: boolean;
   error: string | null;
   toastMessage: string | null;
-  activeTab: 'dashboard' | 'medication-guide' | 'settings';
+  activeTab: 'dashboard' | 'calendar' | 'medications' | 'settings';
   selectedMedication: MedicationStatus | null;
   refetchData: () => Promise<void>;
-  changeTab: (tab: 'dashboard' | 'medication-guide' | 'settings', selectedMed?: MedicationStatus | null) => void;
+  changeTab: (tab: 'dashboard' | 'calendar' | 'medications' | 'settings', selectedMed?: MedicationStatus | null) => void;
   submitDose: (prescriptionId: number, actualTime?: string) => Promise<void>;
   submitMood: (mood: string) => Promise<void>;
   login: (phone: string, otp: string) => Promise<void>;
@@ -37,7 +37,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'medication-guide' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'calendar' | 'medications' | 'settings'>('dashboard');
   const [selectedMedication, setSelectedMedication] = useState<MedicationStatus | null>(null);
   const [language, setLanguage] = useState<'en' | 'ar'>('en');
 
@@ -164,7 +164,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setMoodReassurance(null);
   };
 
-  const changeTab = (tab: 'dashboard' | 'medication-guide' | 'settings', selectedMed: MedicationStatus | null = null) => {
+  const changeTab = (tab: 'dashboard' | 'calendar' | 'medications' | 'settings', selectedMed: MedicationStatus | null = null) => {
     setActiveTab(tab);
     if (selectedMed) {
       setSelectedMedication(selectedMed);
