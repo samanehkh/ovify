@@ -29,7 +29,7 @@ describe('US-J3-01: Injection Guide & Dose Confirmation API client', () => {
     };
     
     const fetchSpy = mockFetch(200, responsePayload);
-    const result = await confirmDose(12);
+    const result = await confirmDose(12, 1);
 
     expect(fetchSpy).toHaveBeenCalledWith(
       expect.stringContaining('/api/medications/12/confirm'),
@@ -47,6 +47,6 @@ describe('US-J3-01: Injection Guide & Dose Confirmation API client', () => {
 
   it('Handles failed log response with error rejection', async () => {
     mockFetch(400, { detail: 'Dose confirmation time cannot be in the future' });
-    await expect(confirmDose(12)).rejects.toThrow();
+    await expect(confirmDose(12, 1)).rejects.toThrow();
   });
 });

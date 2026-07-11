@@ -37,30 +37,31 @@ Scenario: View unified guide and confirm Gonal-F dose
 
 ## 4. Screen Layout & States
 
-The screen is rendered as a clean, mobile-first scrollable page with the following sections:
+The screen is rendered as a clean, mobile-first scrollable page with modern design components:
 
 ### Top Navigation Bar
 *   **Back Trigger:** `←` back arrow icon button (top-left) returning to Home dashboard.
-*   **Title:** *"Step-by-step Guide: [Medication Name]"*.
+*   **Title:** *"Step-by-step Guide: [Medication Name]"* (DM Sans, medium weight).
 
-### 1. Device Graphic Header
-*   A high-contrast photo/drawing of the specific injection device (Gonal-F pen, Menopur vial, etc.) customized per selected medication.
-*   **Dosage Overlay:** A stylized badge block overlaid on top of the device photo displaying: **"Dosage: [Prescribed Dosage]"** (e.g. *"Dosage: 150 IU"*).
+### 1. Device Graphic Header (Glassmorphic Container)
+*   A premium card container featuring a high-contrast photo of the specific injection device.
+*   **Dosage Overlay:** A stylized glass-pill badge overlaid at the bottom-right of the image container displaying: **"Dosage: [Prescribed Dosage]"** (e.g. *"Dosage: 150 IU"*) with a frosted background (`backdrop-filter: blur(8px)`) and a thin border.
 
-### 2. Video Demonstration Block
-*   A premium, rounded video player frame containing the demo clip.
-*   **Visual Overlay:** A prominent, translucent **Play Icon Button** is centered on top of the video container to indicate interactive guide playback.
+### 2. Video Demonstration Block (Interactive Glow Player)
+*   A rounded video player frame containing the demo clip preview with a dark overlay.
+*   **Visual Overlay:** A prominent, translucent **Play Icon Button** is centered on top. Features a soft lavender glow-pulse animation to invite interaction.
+*   **Duration Pill:** A tiny badge in the bottom-left showing duration (e.g., *"1:45 mins"*).
 
-### 3. Preparation Guidelines List
-A text container titled *"Preparation guidelines"* containing the three standard instructions:
-1.  **Wash your hands:** *"1. Wash your hands thoroughly with soap and water."*
-2.  **Clean site:** *"2. Clean the injection site with an alcohol swab and let it air dry."*
-3.  **Select dose:** *"3. Prepare the injection device and select your prescribed dose."*
-*   *Design Note:* Decorative checkmark icons (non-interactive/static) are placed next to each step to assist visual flow.
+### 3. Preparation Guidelines List (Visual Timeline Cards)
+Instead of a simple list, steps are displayed as individual **Timeline Cards** to ease cognitive load:
+1.  **Step 1:** *"1. Wash your hands thoroughly with soap and water."*
+2.  **Step 2:** *"2. Clean the injection site with an alcohol swab and let it air dry."*
+3.  **Step 3:** *"3. Prepare the injection device and select your prescribed dose."*
+*   *Design:* Each card features a left accent border and is accompanied by a custom-designed circle containing a checkmark in Sage green to guide the user's flow.
 
 ### 4. Bottom Action Panel
-*   **Primary Button:** A wide, touch-friendly primary button: **`[Confirm Injection Completed]`** (Navy color).
-*   *Interaction:* Disables and shows a loading spinner when clicked. Saves log and redirects back to Home.
+*   **Primary Button:** A wide, touch-friendly primary button: **`[Confirm Injection Completed]`** (Midnight Navy to Deep Indigo gradient).
+*   *Micro-interaction:* Hovering/pressing scales the button down slightly (`scale-[0.98]`) for tactile feedback, showing a spinner and disabling on tap.
 
 ---
 
@@ -69,7 +70,6 @@ A text container titled *"Preparation guidelines"* containing the three standard
 | **ready** | Default load | Page displays back button, device photo, play-button video, checklist, and enabled confirm button. |
 | **submitting** | Confirm tapped | Button disabled, shows spinner "Logging injection...". |
 | **success** | 200 OK saved | Returns to Home page; target medication card transitions to deactivated state with green checkmark. |
-| **offline / queue** | Network lost | Device registers log in local queue, redirects to Home showing "Sync Pending" badge on checklist item. |
 
 ## 5. Data Contract
 - **Endpoint:** `POST /api/medications/{prescription_id}/confirm` — auth: **patient Bearer token**.

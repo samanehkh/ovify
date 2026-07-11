@@ -3,6 +3,31 @@ import { useApp } from '../context/AppContext';
 import { ArrowLeft, Check, Play, Loader2, AlertCircle } from 'lucide-react';
 import { API_BASE_URL } from '../services/api';
 
+// Premium style inject for guide interactions
+const UI_STYLE_INJECT = `
+@keyframes pulseGlow {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(158, 140, 239, 0.4); }
+  70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(158, 140, 239, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(158, 140, 239, 0); }
+}
+.play-btn-glow {
+  animation: pulseGlow 2.5s infinite;
+}
+.timeline-card {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.timeline-card:hover {
+  transform: translateX(4px);
+  border-color: rgba(158, 140, 239, 0.4);
+}
+.btn-spring {
+  transition: transform 0.1s ease;
+}
+.btn-spring:active {
+  transform: scale(0.98);
+}
+`;
+
 export const MedicationLogPage: React.FC = () => {
   const { selectedMedication, changeTab, submitDose } = useApp();
   const [submitting, setSubmitting] = useState(false);
@@ -24,7 +49,6 @@ export const MedicationLogPage: React.FC = () => {
 
   const isTaken = selectedMedication.status === 'Taken';
 
-  // Map medication name to image asset path on backend
   const getMedicationImage = (name: string) => {
     const cleanName = name.toLowerCase();
     if (cleanName.includes('gonal')) {
@@ -50,7 +74,9 @@ export const MedicationLogPage: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col pt-4 px-5 pb-24 overflow-y-auto no-scrollbar">
+    <div className="flex-1 flex flex-col pt-4 px-5 pb-24 overflow-y-auto no-scrollbar relative">
+      <style>{UI_STYLE_INJECT}</style>
+
       {/* Top Navigation Bar */}
       <div className="flex items-center gap-3 mb-6">
         <button 
@@ -67,8 +93,8 @@ export const MedicationLogPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 1. Device Graphic Header */}
-      <div className="w-full h-44 rounded-xl overflow-hidden mb-6 border border-navy-10/50 bg-white flex items-center justify-center relative shadow-sm">
+      {/* 1. Device Graphic Header (Glassmorphic Container) */}
+      <div className="w-full h-44 rounded-2xl overflow-hidden mb-6 border border-navy-10/50 bg-white flex items-center justify-center relative shadow-sm">
         <img 
           src={getMedicationImage(selectedMedication.name)} 
           alt={`${selectedMedication.name} device`} 
@@ -77,65 +103,70 @@ export const MedicationLogPage: React.FC = () => {
             e.currentTarget.src = `${API_BASE_URL}/static/injection_guide.png`;
           }}
         />
-        {/* Dosage Overlay Badge */}
-        <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-xs font-bold font-data text-navy shadow-sm border border-navy-10/40">
+        {/* Stylized Glass-Pill Badge */}
+        <div className="absolute bottom-3 right-3 bg-white/70 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-bold font-data text-navy shadow-sm border border-white/40">
           Dosage: {selectedMedication.dosage}
         </div>
       </div>
 
-      {/* 2. Video Demonstration Block */}
+      {/* 2. Video Demonstration Block (Interactive Glow Player) */}
       <div className="mb-6">
-        <div className="w-full h-40 rounded-xl bg-navy/90 relative overflow-hidden flex items-center justify-center shadow-inner">
+        <div className="w-full h-40 rounded-2xl bg-navy/90 relative overflow-hidden flex items-center justify-center shadow-inner border border-navy-10/30">
           <img 
             src={`${API_BASE_URL}/static/video_poster.jpg`} 
             alt="Video Demonstration Guide Preview" 
             className="absolute inset-0 w-full h-full object-cover opacity-60"
           />
-          {/* Visual Play Icon Button Overlay */}
+          {/* Centered Translucent Play Button with pulse glow */}
           <button 
             type="button"
             aria-label="Play demonstration video guide"
-            className="w-14 h-14 rounded-full bg-white/30 backdrop-blur-md hover:bg-white/40 flex items-center justify-center text-white cursor-pointer transform hover:scale-105 transition-all duration-300 shadow-lg z-10 border border-white/20"
+            className="w-14 h-14 rounded-full bg-lavender flex items-center justify-center text-white cursor-pointer play-btn-glow shadow-lg z-10 border border-white/20 transition-transform duration-300 active:scale-95"
           >
-            <Play className="w-6 h-6 stroke-[2.5] fill-current translate-x-0.5" />
+            <Play className="w-5 h-5 stroke-[2.5] fill-current translate-x-0.5" />
           </button>
+          
+          {/* Duration Pill */}
+          <span className="absolute bottom-3 left-3 bg-navy/65 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-bold font-data text-white">
+            1:45 mins
+          </span>
         </div>
       </div>
 
-      {/* 3. Preparation Guidelines List */}
-      <div className="bg-white border border-navy-10 rounded-2xl p-5 mb-6 shadow-sm">
-        <h4 className="font-heading text-sm font-bold text-navy mb-4 text-left">Preparation guidelines</h4>
+      {/* 3. Preparation Guidelines List (Visual Timeline Cards) */}
+      <div className="space-y-3 mb-6">
+        <h4 className="font-heading text-xs font-bold text-navy-55 uppercase tracking-wider text-left pl-1">
+          Preparation guidelines
+        </h4>
         
-        <div className="flex flex-col gap-4">
-          {/* Step 1 */}
-          <div className="flex items-start gap-3.5">
-            <div className="w-5 h-5 rounded-full bg-sage-soft text-sage flex items-center justify-center mt-0.5 flex-none" aria-hidden="true">
-              <Check className="w-3.5 h-3.5 stroke-[3.5]" />
-            </div>
-            <p className="font-body text-xs text-navy-55 text-left leading-relaxed">
-              1. Wash your hands thoroughly with soap and water.
-            </p>
+        {/* Step 1 */}
+        <div className="timeline-card p-4 rounded-2xl bg-white border border-navy-10/50 text-left flex items-start gap-4 shadow-sm border-l-4 border-l-lavender">
+          <div className="w-5 h-5 rounded-full bg-sage-soft text-sage flex items-center justify-center mt-0.5 flex-none" aria-hidden="true">
+            <Check className="w-3.5 h-3.5 stroke-[3.5]" />
           </div>
+          <p className="font-body text-xs text-navy-55 leading-relaxed">
+            1. Wash your hands thoroughly with soap and water.
+          </p>
+        </div>
 
-          {/* Step 2 */}
-          <div className="flex items-start gap-3.5">
-            <div className="w-5 h-5 rounded-full bg-sage-soft text-sage flex items-center justify-center mt-0.5 flex-none" aria-hidden="true">
-              <Check className="w-3.5 h-3.5 stroke-[3.5]" />
-            </div>
-            <p className="font-body text-xs text-navy-55 text-left leading-relaxed">
-              2. Clean the injection site with an alcohol swab and let it air dry.
-            </p>
+        {/* Step 2 */}
+        <div className="timeline-card p-4 rounded-2xl bg-white border border-navy-10/50 text-left flex items-start gap-4 shadow-sm border-l-4 border-l-lavender">
+          <div className="w-5 h-5 rounded-full bg-sage-soft text-sage flex items-center justify-center mt-0.5 flex-none" aria-hidden="true">
+            <Check className="w-3.5 h-3.5 stroke-[3.5]" />
           </div>
+          <p className="font-body text-xs text-navy-55 leading-relaxed">
+            2. Clean the injection site with an alcohol swab and let it air dry.
+          </p>
+        </div>
 
-          {/* Step 3 */}
-          <div className="flex items-start gap-3.5">
-            <div className="w-5 h-5 rounded-full bg-sage-soft text-sage flex items-center justify-center mt-0.5 flex-none" aria-hidden="true">
-              <Check className="w-3.5 h-3.5 stroke-[3.5]" />
-            </div>
-            <p className="font-body text-xs text-navy-55 text-left leading-relaxed">
-              3. Prepare the injection device and select your prescribed dose.
-            </p>
+        {/* Step 3 */}
+        <div className="timeline-card p-4 rounded-2xl bg-white border border-navy-10/50 text-left flex items-start gap-4 shadow-sm border-l-4 border-l-lavender">
+          <div className="w-5 h-5 rounded-full bg-sage-soft text-sage flex items-center justify-center mt-0.5 flex-none" aria-hidden="true">
+            <Check className="w-3.5 h-3.5 stroke-[3.5]" />
           </div>
+          <p className="font-body text-xs text-navy-55 leading-relaxed">
+            3. Prepare the injection device and select your prescribed dose.
+          </p>
         </div>
       </div>
 
@@ -162,9 +193,9 @@ export const MedicationLogPage: React.FC = () => {
           <button
             onClick={handleConfirmDose}
             disabled={submitting}
-            className={`w-full py-4 rounded-xl font-heading text-sm font-bold text-white transition-all duration-300 shadow-md cursor-pointer flex items-center justify-center gap-2
+            className={`w-full py-4 rounded-xl font-heading text-sm font-bold text-white transition-all duration-300 shadow-md cursor-pointer flex items-center justify-center gap-2 btn-spring
               ${!submitting
-                ? 'bg-navy hover:bg-navy-80 hover:-translate-y-0.5 hover:shadow-lg' 
+                ? 'bg-gradient-to-r from-navy to-navy/90 hover:from-navy/95 hover:to-navy/85 hover:-translate-y-0.5 hover:shadow-lg' 
                 : 'bg-navy/40 cursor-not-allowed shadow-none'
               }`}
           >
