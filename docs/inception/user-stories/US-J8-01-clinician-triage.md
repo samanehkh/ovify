@@ -4,10 +4,10 @@
 |---|---|
 | **Journey** | J8 — Clinic Triage Console |
 | **Persona(s)** | P3 Mona (primary) |
-| **Primary intent** | Review clinical metrics, triage patient lists by risk, and access specific charts. |
+| **Primary intent** | Review clinical metrics, triage active patient lists by urgency, and identify dropout risks. |
 | **Scope** | ✅ MVP · SaMD: 🟢 Non-SaMD |
 | **Status** | ✅ Locked |
-| **Last updated** | 2026-07-11 |
+| **Last updated** | 2026-07-13 |
 
 ## 1. User story
 > As **Mona (the clinic nurse)**, I want to **view my active patients grouped by urgency and review clinical metrics on my dashboard**, so that **I can address missed injections, follow up on side-effects, and coordinate scans in under 10 minutes.**
@@ -72,7 +72,7 @@ Three side-by-side columns matching the urgency states:
     *   *AI Insight Alert Box:* *"Elevated Dropout Risk: Patient has logged anxiety for 4 consecutive days. Consider a proactive nurse check-in call."*
 
 #### 3. On Track Column (Green Outline - Compliant)
-*   *Card 1 (Maria S.):* Day 8 Antagonist · All confirmed on track.
+*   *Card 1 (Maria S.):* Day 8 Antagonist · Confirmed on track.
 *   *Card 2 (Anisha):* Day 3 Baseline · New patient · On track.
 *   *Card 3 (Hana):* Day 14 Trigger · 100% Adherence · Trigger Ready (ready for egg collection trigger check).
 

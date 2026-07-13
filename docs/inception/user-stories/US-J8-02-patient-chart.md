@@ -7,7 +7,7 @@
 | **Primary intent** | Review full patient demographics, cycle history, partner consent, dose logs, and update prescriptions. |
 | **Scope** | ✅ MVP · SaMD: 🟢 Non-SaMD |
 | **Status** | ✅ Locked |
-| **Last updated** | 2026-07-11 |
+| **Last updated** | 2026-07-13 |
 
 ## 1. User story
 > As **Mona (the clinic nurse)**, I want to **view a patient's full profile, log history, and current prescription protocol in a slide-over drawer**, so that **I can inspect compliance details and adjust their medication schedules without leaving the triage console.**
