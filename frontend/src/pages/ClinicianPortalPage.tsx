@@ -171,6 +171,13 @@ export const ClinicianPortalPage: React.FC = () => {
   React.useEffect(() => {
     if (clinicianToken) {
       fetchTriageData();
+      
+      // Background polling sync every 30 minutes (US-J8-01)
+      const interval = setInterval(() => {
+        fetchTriageData();
+      }, 30 * 60 * 1000);
+      
+      return () => clearInterval(interval);
     }
   }, [activeSubTab, clinicianToken]);
 
