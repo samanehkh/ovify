@@ -291,7 +291,7 @@ export async function fetchPartnerDashboard(partnerPhone: string): Promise<Partn
 }
 
 export interface TriagePatient {
-  id: number;
+  patient_id: number;
   name: string;
   phone: string;
   email: string;
@@ -300,13 +300,102 @@ export interface TriagePatient {
   cycle_type: string;
   cycle_outcome: string | null;
   callback_requested: boolean;
+  action_taken?: string | null;
+  ai_insight?: string | null;
 }
 
-export async function fetchTriagePatients(): Promise<TriagePatient[]> {
+export interface TriageSummaryCounts {
+  on_track: number;
+  needs_attention: number;
+  urgent: number;
+  total_active: number;
+}
+
+export interface TriageSummaryStats {
+  adherence_today_pct: number;
+  ai_questions_today: number;
+  avg_confirm_delay_mins: number;
+  partner_engagement_pct: number;
+}
+
+export interface TriageResponse {
+  counts: TriageSummaryCounts;
+  urgent: TriagePatient[];
+  needs_attention: TriagePatient[];
+  on_track: TriagePatient[];
+  summary_stats: TriageSummaryStats;
+}
+
+export interface DetailedPrescription {
+  id?: number;
+  name: string;
+  dosage: string;
+  route: string;
+  scheduled_time: string;
+  start_date: string;
+  end_date: string;
+}
+
+export interface DoseLogHistory {
+  id: number;
+  name: string;
+  scheduled_time: string;
+  logged_at: string | null;
+  status: string;
+}
+
+export interface DetailedPatientChart {
+  id: number;
+  first_name: string;
+  last_name: string;
+  dob: string;
+  email: string;
+  phone: string;
+  cycle_start_date: string;
+  current_cycle_number: number;
+  treatment_package: string;
+  partner_name: string;
+  partner_phone: string;
+  partner_relationship: string;
+  partner_consent: boolean;
+  next_appointment_datetime: string;
+  dropout_risk: string;
+  prescriptions: DetailedPrescription[];
+  dose_logs: DoseLogHistory[];
+}
+
+export async function fetchTriageResponse(): Promise<TriageResponse> {
   const res = await fetch(`${API_BASE_URL}/api/clinician/triage`, {
     headers: getClinicianHeaders(),
   });
-  await assertClinicianOk(res, 'Failed to fetch triage patients');
+  await assertClinicianOk(res, 'Failed to fetch triage dashboard');
+  return res.json();
+}
+
+// Wrapper for backward compatibility if needed
+export async function fetchTriagePatients(): Promise<TriagePatient[]> {
+  const data = await fetchTriageResponse();
+  return [...data.urgent, ...data.needs_attention, ...data.on_track];
+}
+
+export async function fetchPatientChart(patientId: number): Promise<DetailedPatientChart> {
+  const res = await fetch(`${API_BASE_URL}/api/clinician/patients/${patientId}`, {
+    headers: getClinicianHeaders(),
+  });
+  await assertClinicianOk(res, 'Failed to fetch patient chart');
+  return res.json();
+}
+
+export async function savePatientChart(
+  patientId: number,
+  data: Omit<DetailedPatientChart, 'id' | 'dropout_risk' | 'dose_logs'>
+): Promise<{ message: string }> {
+  const res = await fetch(`${API_BASE_URL}/api/clinician/patients/${patientId}`, {
+    method: 'POST',
+    headers: getClinicianHeaders(),
+    body: JSON.stringify(data),
+  });
+  await assertClinicianOk(res, 'Failed to save patient chart');
   return res.json();
 }
 
@@ -425,6 +514,44 @@ export async function reportDay1(userId: number): Promise<ReportDay1ResponseData
   if (!res.ok) {
     throw new Error('Failed to report Day 1 cycle start');
   }
+  return res.json();
+}
+
+export interface DirectoryPatient {
+  patient_id: number;
+  name: string;
+  email: string;
+  phone: string;
+  cycle_type: string;
+  created_at: string | null;
+  status: string;
+}
+
+export interface DirectoryResponse {
+  total_count: number;
+  page: number;
+  limit: number;
+  patients: DirectoryPatient[];
+}
+
+export async function fetchPatientDirectory(
+  search?: string,
+  registrationDate?: string,
+  packageFilter?: string,
+  page?: number,
+  limit?: number
+): Promise<DirectoryResponse> {
+  const params = new URLSearchParams();
+  if (search) params.append('search', search);
+  if (registrationDate) params.append('registration_date', registrationDate);
+  if (packageFilter) params.append('package', packageFilter);
+  if (page) params.append('page', page.toString());
+  if (limit) params.append('limit', limit.toString());
+
+  const res = await fetch(`${API_BASE_URL}/api/clinician/patients?${params.toString()}`, {
+    headers: getClinicianHeaders(),
+  });
+  await assertClinicianOk(res, 'Failed to fetch patient directory');
   return res.json();
 }
 

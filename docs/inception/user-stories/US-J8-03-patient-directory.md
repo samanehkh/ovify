@@ -4,13 +4,13 @@
 |---|---|
 | **Journey** | J8 — Clinic Triage Console |
 | **Persona(s)** | P3 Mona (primary) |
-| **Primary intent** | Search, filter, and browse the complete register of clinic patients and access their charts. |
+| **Primary intent** | Search, filter, and browse the complete register of clinic patients with paginated index controls. |
 | **Scope** | ✅ MVP · SaMD: 🟢 Non-SaMD |
 | **Status** | ✅ Locked |
 | **Last updated** | 2026-07-13 |
 
 ## 1. User story
-> As **Mona (the clinic nurse)**, I want to **search and filter the complete directory of clinic patients by name, phone, or registration date**, so that **I can inspect any patient's cycle chart without searching through separate registries.**
+> As **Mona (the clinic nurse)**, I want to **search and filter a paginated index of all registered patients in chunks of 20**, so that **the system loads rapidly even under high patient volume without cluttering my screen.**
 
 ## 2. Context & entry
 - **Entry point:** Nurse clicks "List of Patients" in the left sidebar navigation of the clinician portal.
@@ -31,6 +31,17 @@ Scenario: Filter patients by registration date range
   Given Mona is viewing the directory page
   When she selects a registration start date filter of "2026-07-01"
   Then the list updates to display only patients registered on or after "2026-07-01"
+
+Scenario: Paginate patient list
+  Given the clinic has 25 registered patients matching active filters
+  When Mona loads the Patient Directory page
+  Then she sees a list showing patients 1 to 20
+  And the "Previous" page button is disabled
+  And the "Next" page button is enabled
+  When she clicks "Next"
+  Then the table refreshes to show patients 21 to 25
+  And the "Previous" page button becomes enabled
+  And the "Next" page button becomes disabled
 ```
 
 ## 4. Screen Layout & States
@@ -52,6 +63,13 @@ A sleek, spacious table layout with clean hover transformations:
     4.  **Assigned Protocol:** Displays treatment package description.
 *   **Interactions:** Hovering over a row adds a soft background tint and a slight right translation (`translate-x-1`) to guide visual focus. Tapping a row slides open the Patient Detail Drawer (`US-J8-02`).
 
+### 3. Bottom Pagination Toolbar
+Placed directly below the table container:
+*   **Status Label:** Left-aligned text displaying: *"Showing [Start] - [End] of [Total] patients"* (e.g. *"Showing 1 - 20 of 25 patients"*).
+*   **Control Buttons:** Right-aligned interactive navigation:
+    *   `[Previous]` button: Triggers request for page - 1. Disabled on page 1.
+    *   `[Next]` button: Triggers request for page + 1. Disabled if on the final page of data.
+
 ---
 
 | State | Trigger | What the user sees |
@@ -62,20 +80,25 @@ A sleek, spacious table layout with clean hover transformations:
 
 ## 5. Data Contract
 - **Endpoint:** `GET /api/clinician/patients` — auth: **clinician session token**.
-  - Query parameters: `search?` (string), `registration_date?` (YYYY-MM-DD), `package?` (string).
+  - Query parameters: `search?` (string), `registration_date?` (YYYY-MM-DD), `package?` (string), `page?` (integer, default `1`), `limit?` (integer, default `20`).
 - **Response 200:**
   ```json
-  [
-    {
-      "patient_id": 1,
-      "name": "Sarah Khan",
-      "email": "sarah@example.com",
-      "phone": "+971501234567",
-      "cycle_type": "3-Cycle Egg/Embryo Accumulation",
-      "created_at": "2026-07-07T08:00:00Z",
-      "status": "Stimulation"
-    }
-  ]
+  {
+    "total_count": 25,
+    "page": 1,
+    "limit": 20,
+    "patients": [
+      {
+        "patient_id": 1,
+        "name": "Sarah Khan",
+        "email": "sarah@example.com",
+        "phone": "+971501234567",
+        "cycle_type": "3-Cycle Egg/Embryo Accumulation",
+        "created_at": "2026-07-07T08:00:00Z",
+        "status": "Stimulation"
+      }
+    ]
+  }
   ```
 
 ## 6. Design Tokens

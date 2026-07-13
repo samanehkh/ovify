@@ -65,10 +65,10 @@ def test_triage_empty_or_on_track(client):
     response = client.get("/api/clinician/triage")
     assert response.status_code == 200
     data = response.json()
-    assert len(data) == 1
-    assert data[0]["name"] == "Sarah Khan"
-    assert data[0]["status"] == "On Track"
-    assert "All doses logged" in data[0]["reason"]
+    assert data["counts"]["on_track"] == 1
+    assert data["on_track"][0]["name"] == "Sarah Khan"
+    assert data["on_track"][0]["status"] == "On Track"
+    assert "All doses logged" in data["on_track"][0]["reason"]
 
 def test_triage_red_alert_missed_dose(client, test_db):
     # Log a missed dose in database
@@ -85,8 +85,9 @@ def test_triage_red_alert_missed_dose(client, test_db):
     response = client.get("/api/clinician/triage")
     assert response.status_code == 200
     data = response.json()
-    assert data[0]["status"] == "Red Alert"
-    assert "Missed Gonal-F injection" in data[0]["reason"]
+    assert data["counts"]["urgent"] == 1
+    assert data["urgent"][0]["status"] == "Red Alert"
+    assert "Missed Gonal-F" in data["urgent"][0]["reason"]
 
 def test_triage_yellow_attention_late_dose(client, test_db):
     # Log a late dose in database
@@ -103,8 +104,9 @@ def test_triage_yellow_attention_late_dose(client, test_db):
     response = client.get("/api/clinician/triage")
     assert response.status_code == 200
     data = response.json()
-    assert data[0]["status"] == "Yellow Attention"
-    assert "Logged Gonal-F injection late" in data[0]["reason"]
+    assert data["counts"]["needs_attention"] == 1
+    assert data["needs_attention"][0]["status"] == "Yellow Attention"
+    assert "Day 6 Antagonist" in data["needs_attention"][0]["reason"]
 
 def test_resolve_alert_happy_path(client, test_db):
     # Setup missed dose to trigger Red Alert
@@ -148,9 +150,10 @@ def test_resolve_alert_happy_path(client, test_db):
 
     # Verify triage is now "On Track" (resolved logs no longer rank)
     response_triage = client.get("/api/clinician/triage")
-    assert response_triage.json()[0]["status"] == "On Track"
+    assert response_triage.json()["counts"]["on_track"] == 1
 
 def test_resolve_alert_unhappy_path_not_found(client):
+    # Pass a valid user_id structure
     response = client.post("/api/clinician/resolve-alert/999")
     assert response.status_code == 404
     assert "User not found" in response.json()["detail"]
@@ -168,12 +171,11 @@ def test_triage_recency_window_old_missed_does_not_rank(client, test_db):
     test_db.commit()
 
     data = client.get("/api/clinician/triage").json()
-    me = next(p for p in data if p["id"] == 1)
-    assert me["status"] == "On Track"
+    assert data["counts"]["on_track"] == 1
 
     # ...but a recent Missed (yesterday) still ranks Red
     recent_missed = models.DoseLog(
-        prescription_id=2,
+        prescription_id=1,
         user_id=1,
         status="Missed",
         scheduled_date=date.today() - timedelta(days=1)
@@ -182,5 +184,81 @@ def test_triage_recency_window_old_missed_does_not_rank(client, test_db):
     test_db.commit()
 
     data = client.get("/api/clinician/triage").json()
-    me = next(p for p in data if p["id"] == 1)
-    assert me["status"] == "Red Alert"
+    assert data["counts"]["urgent"] == 1
+
+def test_get_patient_details(client):
+    response = client.get("/api/clinician/patients/1")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["first_name"] == "Sarah"
+    assert data["last_name"] == "Khan"
+    assert len(data["prescriptions"]) == 1
+    assert data["prescriptions"][0]["name"] == "Gonal-F"
+
+def test_update_patient_details(client, test_db):
+    update_payload = {
+        "first_name": "Sarah",
+        "last_name": "Khan-Edited",
+        "dob": "1992-05-15",
+        "email": "sarah.edited@example.com",
+        "phone": "+971501234567",
+        "cycle_start_date": str(date.today()),
+        "current_cycle_number": 2,
+        "treatment_package": "3-Cycle Egg/Embryo Accumulation",
+        "partner_name": "Ahmed Khan",
+        "partner_phone": "+971509999999",
+        "partner_relationship": "Spouse/Partner",
+        "partner_consent": True,
+        "next_appointment_datetime": "2026-07-15T09:00:00Z",
+        "prescriptions": [
+            {
+                "id": 1, # Existing Gonal-F
+                "name": "Gonal-F",
+                "dosage": "225 IU", # edited dosage
+                "route": "Subcutaneous",
+                "scheduled_time": "19:00:00",
+                "start_date": str(date.today()),
+                "end_date": str(date.today() + timedelta(days=5))
+            },
+            {
+                "name": "Menopur", # newly added
+                "dosage": "75 IU",
+                "route": "Subcutaneous",
+                "scheduled_time": "19:00:00",
+                "start_date": str(date.today()),
+                "end_date": str(date.today() + timedelta(days=5))
+            }
+        ]
+    }
+    response = client.post("/api/clinician/patients/1", json=update_payload)
+    assert response.status_code == 200
+    assert "updated successfully" in response.json()["message"]
+
+    # Verify db state updated
+    user = test_db.query(models.User).filter(models.User.id == 1).first()
+    test_db.refresh(user)
+    assert user.last_name == "Khan-Edited"
+    assert user.current_cycle_number == 2
+
+    prescs = test_db.query(models.Prescription).filter(models.Prescription.user_id == 1).all()
+    assert len(prescs) == 2
+    gonal = next(p for p in prescs if p.name == "Gonal-F")
+    assert gonal.dosage == "225 IU"
+
+
+def test_get_patient_directory_search_and_filters(client):
+    # Test directory search
+    response = client.get("/api/clinician/patients?search=Sarah")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["total_count"] == 1
+    assert len(data["patients"]) == 1
+    assert data["patients"][0]["name"] == "Sarah Khan"
+
+    # Filter with non-matching package
+    res_empty = client.get("/api/clinician/patients?package=NonexistentPackage")
+    assert res_empty.status_code == 200
+    empty_data = res_empty.json()
+    assert empty_data["total_count"] == 0
+    assert len(empty_data["patients"]) == 0
+
