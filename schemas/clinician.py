@@ -42,3 +42,29 @@ class RegisterPatientRequest(BaseModel):
 class CycleOutcomeUpdate(BaseModel):
     cycle_outcome: Optional[str] = None
 
+class PrescriptionSave(BaseModel):
+    id: Optional[int] = None
+    name: str
+    dosage: str
+    route: str
+    scheduled_time: str
+    start_date: date
+    end_date: date
+
+class PatientUpdateSaveRequest(BaseModel):
+    first_name: str
+    last_name: str
+    dob: date
+    email: str
+    phone: str
+    cycle_start_date: date
+    current_cycle_number: int
+    treatment_package: str
+    partner_name: str
+    partner_phone: str
+    partner_relationship: str
+    partner_consent: bool
+    next_appointment_datetime: str
+    prescriptions: List[PrescriptionSave]
+
+

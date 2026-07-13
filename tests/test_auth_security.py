@@ -193,7 +193,8 @@ def test_nurse_callback_persisted_and_surfaced_in_triage(client, test_db):
 
     # Triage surfaces the pending callback as Yellow Attention
     triage = client.get("/api/clinician/triage").json()
-    me = next(p for p in triage if p["id"] == 1)
+    flat_list = triage["urgent"] + triage["needs_attention"] + triage["on_track"]
+    me = next(p for p in flat_list if p["patient_id"] == 1)
     assert me["callback_requested"] is True
     assert me["status"] == "Yellow Attention"
     assert "callback" in me["reason"].lower()

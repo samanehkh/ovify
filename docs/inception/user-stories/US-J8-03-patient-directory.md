@@ -10,7 +10,9 @@
 | **Last updated** | 2026-07-13 |
 
 ## 1. User story
-> As **Mona (the clinic nurse)**, I want to **search and filter a paginated index of all registered patients in chunks of 20**, so that **the system loads rapidly even under high patient volume without cluttering my screen.**
+> As **Mona (the clinic nurse)**, I want to **view a list of 20 patients immediately upon landing on the directory page, with the ability to click 'Next' and 'Previous' buttons to browse through the index of all registered patients, loading rapidly even under high patient volume without cluttering my screen.**
+> 
+> *If preferred, I can use the search bar to search for patients based on their name, phone number, or date of registration, and the moment I input text into the search bar, the list updates dynamically.*
 
 ## 2. Context & entry
 - **Entry point:** Nurse clicks "List of Patients" in the left sidebar navigation of the clinician portal.

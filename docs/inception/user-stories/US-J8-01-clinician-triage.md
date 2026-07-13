@@ -52,11 +52,11 @@ Four grid cards displaying high-level counts:
 3.  **Urgent:** Soft red/terracotta, bold count (e.g. `2`).
 4.  **Total Active:** Midnight Navy, bold count (e.g. `36`).
 
-### Triage Decks (Row 2 - Vertical Columns)
+### Triage Decks (Horizontal Stacked Rows)
 > [!IMPORTANT]
 > **DEVELOPER IMPLEMENTATION NOTE:** The patient records and reasons listed below are **illustrative examples** to show the target layout. Do not hardcode these cards. The system must query the database dynamically to group patient records based on real-time dose compliance, logged side-effects, and AI sentiment scores.
 
-Three side-by-side columns matching the urgency states:
+Three horizontal sections stacked vertically, each containing a vertical stack/list of cards matching the urgency states:
 
 #### 1. Urgent Alerts Column (Red Outline - Missed Doses / Retention Risks)
 *   *Card 1 (Sarah Khan):*
