@@ -34,6 +34,14 @@ Scenario: Toggle Privacy Mode
   When she toggles the "Privacy Mode" switch in the header
   Then all patient last names in the feeds are masked (e.g., "Sarah K." instead of "Sarah Khan")
   And diagnostic AI comments remain hidden until specifically tapped
+
+Scenario: Dynamic triage update upon patient dose logging
+  Given Sarah Khan has an unresolved missed dose alert in "Urgent Alerts"
+  When Sarah Khan logs the dose on her Patient PWA (changing database dose status to "Taken")
+  And the Clinician Triage dashboard performs its periodic poll or is manually refreshed
+  Then Sarah Khan's entry is automatically cleared from "Urgent Alerts"
+  And the "On Track" count increases by 1
+
 ```
 
 ## 4. Screen Layout & States

@@ -33,6 +33,13 @@ Scenario: View unified guide and confirm Gonal-F dose
   And redirects her back to the Home Page
   And she receives a success toast
   And the Gonal-F card on the home page is now disabled and displays: "✓ Taken at 19:00"
+
+Scenario: Cross-system real-time triage update
+  Given Sarah has an overdue Gonal-F dose that caused her to be flagged in "Urgent Alerts" on the Clinic Console
+  When Sarah logs into her Patient PWA and taps "Confirm Injection Completed"
+  Then the database updates the dose status to "Taken"
+  And when Mona refreshes or polls the Clinician Triage Console, Sarah's card is removed from "Urgent Alerts" and moved to "On Track"
+
 ```
 
 ## 4. Screen Layout & States
