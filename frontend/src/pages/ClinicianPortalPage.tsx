@@ -142,8 +142,8 @@ export const ClinicianPortalPage: React.FC = () => {
 
   // Patient Directory State (US-J8-03)
   const [directorySearch, setDirectorySearch] = useState('');
-  const [directoryDate, setDirectoryDate] = useState('');
-  const [directoryPackage, setDirectoryPackage] = useState('All Packages');
+  const directoryDate = '';
+  const directoryPackage = 'All Packages';
   const [directoryPatients, setDirectoryPatients] = useState<any[]>([]);
   const [directoryPage, setDirectoryPage] = useState(1);
   const [directoryTotal, setDirectoryTotal] = useState(0);
@@ -1048,40 +1048,16 @@ export const ClinicianPortalPage: React.FC = () => {
                 </p>
               </div>
 
-              {/* Header Toolbar (Search & Filters) */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-left">
-                <div>
-                  <label className="block text-[9px] font-bold text-navy-55 uppercase tracking-wider mb-1">Search Patients</label>
-                  <input
-                    type="text"
-                    placeholder="Search by name, email or phone..."
-                    value={directorySearch}
-                    onChange={(e) => setDirectorySearch(e.target.value)}
-                    className="w-full px-3 py-2 text-xs border border-navy-10 rounded-xl"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[9px] font-bold text-navy-55 uppercase tracking-wider mb-1">Registration Date (From)</label>
-                  <input
-                    type="date"
-                    value={directoryDate}
-                    onChange={(e) => setDirectoryDate(e.target.value)}
-                    className="w-full px-3 py-2 text-xs border border-navy-10 rounded-xl font-data"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[9px] font-bold text-navy-55 uppercase tracking-wider mb-1">Treatment Package</label>
-                  <select
-                    value={directoryPackage}
-                    onChange={(e) => setDirectoryPackage(e.target.value)}
-                    className="w-full px-3 py-2 text-xs border border-navy-10 rounded-xl bg-white"
-                  >
-                    <option value="All Packages">All Packages</option>
-                    <option value="3-Cycle Egg/Embryo Accumulation">3-Cycle Accumulation</option>
-                    <option value="Single Cycle IVF">Single Cycle IVF</option>
-                    <option value="Other (Custom)">Other (Custom)</option>
-                  </select>
-                </div>
+              {/* Header Toolbar (Search) */}
+              <div className="mb-6 text-left max-w-md">
+                <label className="block text-[9px] font-bold text-navy-55 uppercase tracking-wider mb-1.5">Search Patients</label>
+                <input
+                  type="text"
+                  placeholder="Search by name, email or phone..."
+                  value={directorySearch}
+                  onChange={(e) => setDirectorySearch(e.target.value)}
+                  className="w-full px-3 py-2 text-xs border border-navy-10 rounded-xl focus:outline-none focus:ring-1 focus:ring-lavender"
+                />
               </div>
 
               {/* Table View */}

@@ -29,11 +29,6 @@ Scenario: Search patient by name
   Then the list dynamically filters to show only patients matching "Sarah"
   And Sarah Khan is displayed in the results table
 
-Scenario: Filter patients by registration date range
-  Given Mona is viewing the directory page
-  When she selects a registration start date filter of "2026-07-01"
-  Then the list updates to display only patients registered on or after "2026-07-01"
-
 Scenario: Paginate patient list
   Given the clinic has 25 registered patients matching active filters
   When Mona loads the Patient Directory page
@@ -50,11 +45,9 @@ Scenario: Paginate patient list
 
 The page is designed as a clean, desktop/tablet directory feed within the right-side workspace:
 
-### 1. Header Toolbar (Search & Filters)
-A unified glassmorphic panel at the top containing search fields and filter dropdowns:
+### 1. Header Toolbar (Search)
+A unified glassmorphic panel at the top containing a search field:
 *   **Search Input:** A wide search bar with a search icon: *"Search by patient name or phone number..."* (Real-time dynamic typing filter).
-*   **Date Filter:** A date picker input label: *"Registration Date"* (filters patients by their creation timestamp).
-*   **Cycle Package Filter Dropdown:** Filter by treatment package (e.g. `All Packages`, `IVF/ICSI`, `Egg Freezing`, `FET`).
 
 ### 2. Patient Directory Grid/Table (Latest UI Trends)
 A sleek, spacious table layout with clean hover transformations:
