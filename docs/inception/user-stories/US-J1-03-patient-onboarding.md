@@ -101,19 +101,37 @@ The wizard is rendered as a clean, single-card layout with a **3-step progress b
     "active_status": "On Track"
   }
   ```
-- **Endpoint 2:** `POST /api/users/{user_id}/partner-consent` — auth: **patient Bearer token**.
-- **Request:**
+- Endpoint 2: `POST /api/users/{user_id}/partner-consent` — auth: **patient Bearer token**.
+- Request:
   ```json
   {
     "partner_phone": "string",
     "partner_consent": "boolean"
   }
   ```
-- **Response 200:**
+- Response 200:
   ```json
   {
     "partner_phone": "+971509999999",
     "partner_consent": true
+  }
+  ```
+
+- Endpoint 3: `POST /api/users/{user_id}/web-push-subscription` — auth: **patient Bearer token**.
+- Request:
+  ```json
+  {
+    "endpoint": "string",
+    "keys": {
+      "p256dh": "string",
+      "auth": "string"
+    }
+  }
+  ```
+- Response 200:
+  ```json
+  {
+    "message": "Web Push subscription saved successfully."
   }
   ```
 

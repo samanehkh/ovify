@@ -64,6 +64,10 @@ To avoid API premium costs associated with Twilio SMS / WhatsApp, the system pri
    - Level 2 Support Partner Backup: Twilio WhatsApp Gateway (Primary) / Twilio Programmable SMS (Secondary, if WhatsApp latencies > 10s or carrier block 30007 occur).
    - Level 3 Clinician Backup: Twilio Programmable SMS direct to Mona's on-call phone.
 
+> [!IMPORTANT]
+> **Launch & Operational Cost Recommendation:**
+> Integrating the Web Push primary + SMS fallback strategy is highly recommended for the launch. It minimizes early operational costs by keeping 95% of daily patient reminders free of carrier fees while maintaining the clinical safety net for non-responsive alerts.
+
 ## 6. Accessibility & DoD
 - [x] Clear logs kept in `ProcessedDate` ledger table to prevent double-alerts
 - [x] Consent gates checked before Level 2 dispatch
