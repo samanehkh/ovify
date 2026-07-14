@@ -262,3 +262,44 @@ def test_get_patient_directory_search_and_filters(client):
     assert empty_data["total_count"] == 0
     assert len(empty_data["patients"]) == 0
 
+
+def test_cross_system_real_time_triage_update(client, test_db):
+    # 1. Setup a missed dose to trigger Red Alert
+    missed_log = models.DoseLog(
+        prescription_id=1,
+        user_id=1,
+        status="Missed",
+        scheduled_date=date.today(),
+        resolved=False
+    )
+    test_db.add(missed_log)
+    # Mark user active_status to Action Required
+    user = test_db.query(models.User).filter(models.User.id == 1).first()
+    user.active_status = "Action Required"
+    test_db.commit()
+
+    # Verify triage catches the red alert
+    response = client.get("/api/clinician/triage")
+    assert response.status_code == 200
+    assert response.json()["counts"]["urgent"] == 1
+
+    # 2. Log injection from Patient PWA using patient token
+    from services.auth import generate_token
+    pt_token = generate_token(1, "patient")
+
+    confirm_res = client.post(
+        "/api/medications/1/confirm",
+        headers={"Authorization": f"Bearer {pt_token}"}
+    )
+    assert confirm_res.status_code == 200
+
+    # 3. Refreshed/polled triage dashboard shows patient is moved back to On Track
+    triage_res = client.get("/api/clinician/triage")
+    assert triage_res.status_code == 200
+    data = triage_res.json()
+
+    assert data["counts"]["urgent"] == 0
+    assert data["counts"]["on_track"] == 1
+    assert data["on_track"][0]["name"] == "Sarah Khan"
+    assert data["on_track"][0]["status"] == "On Track"
+

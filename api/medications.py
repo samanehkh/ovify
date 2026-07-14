@@ -187,6 +187,9 @@ def confirm_medication_dose(
             existing_log.status = status if status == "On Time" else "Late"
             existing_log.logged_at = log_time
             existing_log.self_reported = self_reported
+            existing_log.resolved = True
+            existing_log.resolved_by = "Patient (self-logged)"
+            existing_log.resolved_at = log_time
             db.commit()
             db.refresh(existing_log)
             adherence.auto_clear_user_alert(db, user_id)
