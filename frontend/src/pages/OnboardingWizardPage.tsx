@@ -3,7 +3,6 @@ import { useApp } from '../context/AppContext';
 import * as api from '../services/api';
 import { Bell, BellOff, CheckCircle2 } from 'lucide-react';
 
-// Step labels (US-J1-03 §4)
 const SLEEP_OPTIONS = [
   { label: 'Early Bird', value: '9:00 PM - 11:00 PM', time: '9:00 PM – 11:00 PM' },
   { label: 'Standard',   value: '10:00 PM - 12:00 AM', time: '10:00 PM – 12:00 AM' },
@@ -24,14 +23,14 @@ const OFFSET_OPTIONS = [
 export const OnboardingWizardPage: React.FC = () => {
   const { user, onboard } = useApp();
 
-  // Step 1 — Sleep window (US-J1-03 §4 Step 1)
+  // Step 1 — Sleep window
   const [sleepTime, setSleepTime] = useState('10:00 PM - 12:00 AM');
 
-  // Step 2 — Comfort & reminder offset (US-J1-03 §4 Step 2)
+  // Step 2 — Comfort & reminder offset
   const [comfortLevel, setComfortLevel] = useState('First time');
   const [reminderOffset, setReminderOffset] = useState(30);
 
-  // Step 3 — Consent & notifications (US-J1-03 §4 Step 3)
+  // Step 3 — Consent & notifications
   const [partnerConsent, setPartnerConsent] = useState(true);
   const [notifStatus, setNotifStatus] = useState<'idle' | 'granted' | 'denied'>('idle');
 
@@ -42,10 +41,9 @@ export const OnboardingWizardPage: React.FC = () => {
 
   if (!user) return null;
 
-  // ── Helpers ──────────────────────────────────────────────────
   const handleRequestNotifications = async () => {
     if (!('Notification' in window)) {
-      setNotifStatus('granted'); // silently pass on unsupported browsers
+      setNotifStatus('granted');
       return;
     }
     const result = await Notification.requestPermission();
@@ -56,10 +54,7 @@ export const OnboardingWizardPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      // 1. Save preferences  (US-J1-03 §5 endpoint 1)
       await onboard(sleepTime, comfortLevel, reminderOffset);
-
-      // 2. Save partner consent  (US-J1-03 §5 endpoint 2)
       if (user.partner_phone) {
         await api.updatePartnerConsent(user.id, user.partner_phone, partnerConsent);
       }
@@ -69,13 +64,12 @@ export const OnboardingWizardPage: React.FC = () => {
     }
   };
 
-  // ── Progress bar ─────────────────────────────────────────────
   const ProgressBar = () => (
     <div className="w-full flex items-center gap-2 mb-8">
       {[1, 2, 3].map((s) => (
         <div
           key={s}
-          className={`flex-1 h-1.5 rounded-full transition-all duration-500 ${
+          className={`flex-1 h-2 rounded-full transition-all duration-500 shadow-inner ${
             s <= step ? 'bg-lavender' : 'bg-navy-10'
           }`}
         />
@@ -83,19 +77,16 @@ export const OnboardingWizardPage: React.FC = () => {
     </div>
   );
 
-  // ── Selection button shared styles ───────────────────────────
   const selBtn = (active: boolean) =>
-    `w-full text-left px-5 py-4 rounded-xl border transition-all duration-200 flex items-center justify-between ${
+    `w-full text-left px-5 py-4 rounded-xl border transition-all duration-200 flex items-center justify-between min-h-[48px] active:scale-[0.99] ${
       active
-        ? 'border-lavender bg-[#F3F1FE] text-navy font-semibold ring-2 ring-lavender/20'
-        : 'border-navy-10 bg-white hover:border-lavender/40 text-navy-55'
+        ? 'border-lavender bg-[#F3F1FE] text-navy font-semibold ring-2 ring-lavender/10 shadow-sm'
+        : 'border-navy-10 bg-white hover:border-lavender/30 text-navy-55'
     }`;
 
-  // ─────────────────────────────────────────────────────────────
   return (
-    <div className="flex-1 flex flex-col justify-center px-6 py-10 bg-gradient-to-b from-[#F8F5F1] via-[#F8F5F1]/80 to-[#F8F5F1]/40 min-h-screen">
+    <div className="flex-1 flex flex-col justify-center px-6 py-10 bg-gradient-to-b from-bg-ivory via-bg-ivory/80 to-bg-ivory/40 min-h-screen">
       <div className="w-full max-w-sm mx-auto flex flex-col items-center">
-
         {/* Logo */}
         <img
           src="/static/logo.png"
@@ -107,32 +98,30 @@ export const OnboardingWizardPage: React.FC = () => {
         <ProgressBar />
 
         {/* Card */}
-        <div className="w-full bg-white/80 backdrop-blur-md rounded-3xl border border-navy-10 shadow-xl overflow-hidden">
+        <div className="w-full bg-white/80 backdrop-blur-md rounded-3xl border border-navy-10 shadow-xl overflow-hidden animate-in fade-in duration-300">
           <div className="p-7 flex flex-col gap-6">
-
-            {/* Error banner */}
             {error && (
-              <div className="p-3.5 rounded-xl bg-[#C24C57]/10 border border-[#C24C57]/25 text-[#C24C57] text-xs font-body leading-relaxed">
+              <div className="p-3.5 rounded-xl bg-due-soft border border-due/25 text-due text-xs font-body font-semibold leading-relaxed">
                 ⚠️ {error}
               </div>
             )}
 
             {/* ── STEP 1: Sleep Window ─────────────────────────── */}
             {step === 1 && (
-              <div className="flex flex-col gap-5 animate-fade-in">
+              <div className="flex flex-col gap-5 animate-in fade-in duration-200 text-left">
                 <div>
-                  <span className="font-data text-[10px] font-bold text-lavender tracking-widest uppercase">
-                    Step 1 of 3 · Customise your schedule
+                  <span className="font-data text-[9px] font-bold text-lavender tracking-widest uppercase">
+                    Step 1 of 3 · Schedule customization
                   </span>
-                  <h2 className="font-heading text-xl font-bold text-navy mt-1">
+                  <h2 className="font-heading text-lg font-bold text-navy mt-1">
                     When do you usually go to bed?
                   </h2>
-                  <p className="font-body text-xs text-navy-55 mt-1 leading-relaxed">
+                  <p className="font-body text-xs text-navy-55 mt-1 leading-relaxed font-semibold">
                     We use this to schedule your daily injection reminders outside your sleep window.
                   </p>
                 </div>
 
-                <div className="space-y-2.5">
+                <div className="space-y-3">
                   {SLEEP_OPTIONS.map((opt) => (
                     <button
                       key={opt.value}
@@ -142,7 +131,7 @@ export const OnboardingWizardPage: React.FC = () => {
                     >
                       <div>
                         <span className="block font-semibold text-sm text-navy">{opt.label}</span>
-                        <span className="block text-[11px] text-navy-55 font-normal font-data mt-0.5">{opt.time}</span>
+                        <span className="block text-[11px] text-navy-55 font-semibold font-data mt-0.5">{opt.time}</span>
                       </div>
                       {sleepTime === opt.value && (
                         <CheckCircle2 className="w-5 h-5 text-lavender flex-none" />
@@ -155,7 +144,7 @@ export const OnboardingWizardPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setStep(2)}
-                    className="py-3.5 px-7 bg-navy hover:bg-navy/85 text-white font-heading text-xs font-bold rounded-xl shadow-md transition-all"
+                    className="py-3.5 px-7 bg-navy hover:bg-navy-70 text-white font-heading text-xs font-bold rounded-xl shadow-md transition-all min-h-[48px] active:scale-[0.98]"
                   >
                     Next →
                   </button>
@@ -165,17 +154,17 @@ export const OnboardingWizardPage: React.FC = () => {
 
             {/* ── STEP 2: Comfort & Reminder Offset ───────────── */}
             {step === 2 && (
-              <div className="flex flex-col gap-5 animate-fade-in">
+              <div className="flex flex-col gap-5 animate-in fade-in duration-200 text-left">
                 <div>
-                  <span className="font-data text-[10px] font-bold text-lavender tracking-widest uppercase">
+                  <span className="font-data text-[9px] font-bold text-lavender tracking-widest uppercase">
                     Step 2 of 3 · Injection guidelines
                   </span>
-                  <h2 className="font-heading text-xl font-bold text-navy mt-1">
+                  <h2 className="font-heading text-lg font-bold text-navy mt-1">
                     Is this your first IVF cycle?
                   </h2>
                 </div>
 
-                <div className="space-y-2.5">
+                <div className="space-y-3">
                   {COMFORT_OPTIONS.map((opt) => (
                     <button
                       key={opt.value}
@@ -185,7 +174,7 @@ export const OnboardingWizardPage: React.FC = () => {
                     >
                       <div>
                         <span className="block font-semibold text-sm text-navy">{opt.label}</span>
-                        <span className="block text-[11px] text-navy-55 font-normal mt-0.5">{opt.desc}</span>
+                        <span className="block text-[11px] text-navy-55 font-semibold mt-0.5">{opt.desc}</span>
                       </div>
                       {comfortLevel === opt.value && (
                         <CheckCircle2 className="w-5 h-5 text-lavender flex-none" />
@@ -195,18 +184,18 @@ export const OnboardingWizardPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <p className="font-heading text-xs font-bold text-navy uppercase tracking-wider mb-2.5">
+                  <p className="font-heading text-[10px] font-bold text-navy uppercase tracking-wider mb-2.5">
                     When should we remind you before an injection?
                   </p>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2.5">
                     {OFFSET_OPTIONS.map((opt) => (
                       <button
                         key={opt.value}
                         type="button"
                         onClick={() => setReminderOffset(opt.value)}
-                        className={`flex-1 py-3 rounded-xl border text-center text-xs font-heading font-bold transition-all duration-200 ${
+                        className={`flex-1 py-3 rounded-xl border text-center text-xs font-heading font-bold transition-all duration-200 min-h-[48px] active:scale-[0.96] ${
                           reminderOffset === opt.value
-                            ? 'border-lavender bg-[#F3F1FE] text-lavender ring-2 ring-lavender/20'
+                            ? 'border-lavender bg-[#F3F1FE] text-lavender ring-2 ring-lavender/10 shadow-sm'
                             : 'border-navy-10 bg-white text-navy-55 hover:border-lavender/40'
                         }`}
                       >
@@ -220,14 +209,14 @@ export const OnboardingWizardPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setStep(1)}
-                    className="font-heading text-xs font-bold text-navy-55 hover:text-navy transition-colors"
+                    className="font-heading text-xs font-bold text-navy-55 hover:text-navy transition-colors min-h-[48px]"
                   >
                     ← Back
                   </button>
                   <button
                     type="button"
                     onClick={() => setStep(3)}
-                    className="py-3.5 px-7 bg-navy hover:bg-navy/85 text-white font-heading text-xs font-bold rounded-xl shadow-md transition-all"
+                    className="py-3.5 px-7 bg-navy hover:bg-navy-70 text-white font-heading text-xs font-bold rounded-xl shadow-md transition-all min-h-[48px] active:scale-[0.98]"
                   >
                     Next →
                   </button>
@@ -237,30 +226,30 @@ export const OnboardingWizardPage: React.FC = () => {
 
             {/* ── STEP 3: Consent & Push Notifications ─────────── */}
             {step === 3 && (
-              <div className="flex flex-col gap-5 animate-fade-in">
+              <div className="flex flex-col gap-5 animate-in fade-in duration-200 text-left">
                 <div>
-                  <span className="font-data text-[10px] font-bold text-lavender tracking-widest uppercase">
+                  <span className="font-data text-[9px] font-bold text-lavender tracking-widest uppercase">
                     Step 3 of 3 · Secure data sharing &amp; notifications
                   </span>
-                  <h2 className="font-heading text-xl font-bold text-navy mt-1">
+                  <h2 className="font-heading text-lg font-bold text-navy mt-1">
                     Stay connected
                   </h2>
                 </div>
 
                 {/* Partner consent toggle */}
                 {user.partner_phone && (
-                  <div className="p-4 rounded-2xl bg-[#F8F5F1] border border-navy-10">
+                  <div className="p-4 rounded-2xl bg-bg-ivory border border-navy-10 shadow-inner">
                     <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1">
+                      <div className="flex-1 text-left">
                         <p className="font-heading text-xs font-bold text-navy mb-1">Share my progress</p>
-                        <p className="font-body text-[11px] text-navy-55 leading-relaxed">
+                        <p className="font-body text-[11px] text-navy-70 leading-relaxed font-semibold">
                           Share my cycle compliance logs and support prompts with{' '}
-                          <span className="font-semibold text-navy">
+                          <span className="font-bold text-navy">
                             {user.partner_name || 'my partner'}
                           </span>{' '}
                           ({user.partner_phone})
                         </p>
-                        <p className="font-body text-[10px] text-navy-55/70 mt-1.5 leading-relaxed">
+                        <p className="font-body text-[10px] text-navy-55 mt-1.5 leading-relaxed font-medium">
                           We only share your daily injection check-in status and support tips. We never share raw clinical files or doctors' notes.
                         </p>
                       </div>
@@ -285,7 +274,7 @@ export const OnboardingWizardPage: React.FC = () => {
                 )}
 
                 {/* Push notifications pre-permission card */}
-                <div className="p-4 rounded-2xl border border-navy-10 bg-white">
+                <div className="p-4 rounded-2xl border border-navy-10 bg-white shadow-sm">
                   <div className="flex items-start gap-3">
                     <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-none ${
                       notifStatus === 'granted' ? 'bg-[#E6F4EF]' : 'bg-[#EEF1F6]'
@@ -295,27 +284,27 @@ export const OnboardingWizardPage: React.FC = () => {
                         : <BellOff className="w-4 h-4 text-navy-55" />
                       }
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 text-left">
                       <p className="font-heading text-xs font-bold text-navy mb-0.5">Enable notifications</p>
-                      <p className="font-body text-[11px] text-navy-55 leading-relaxed">
+                      <p className="font-body text-[11px] text-navy-70 leading-relaxed font-semibold">
                         Ovify needs your permission to send daily injection alarms. Missed alarms may lead to cycle cancellation.
                       </p>
                     </div>
                   </div>
 
                   {notifStatus === 'granted' ? (
-                    <div className="mt-3 flex items-center gap-1.5 text-[#3E8E6E] text-xs font-heading font-bold">
+                    <div className="mt-3 flex items-center gap-1.5 text-[#3E8E6E] text-xs font-heading font-bold pl-1 animate-pulse">
                       <CheckCircle2 className="w-4 h-4" /> Notifications enabled
                     </div>
                   ) : notifStatus === 'denied' ? (
-                    <p className="mt-3 text-[11px] text-[#C24C57] font-body">
+                    <p className="mt-3 text-[11px] text-[#C24C57] font-body font-semibold">
                       Permission denied. You can enable notifications in your browser settings.
                     </p>
                   ) : (
                     <button
                       type="button"
                       onClick={handleRequestNotifications}
-                      className="mt-3 w-full py-2.5 rounded-xl border border-lavender text-lavender font-heading text-xs font-bold hover:bg-lavender/5 transition-all"
+                      className="mt-3 w-full py-2.5 rounded-xl border border-lavender text-lavender font-heading text-xs font-bold hover:bg-lavender/5 transition-all min-h-[38px] active:scale-[0.98]"
                     >
                       Enable Notifications
                     </button>
@@ -326,7 +315,7 @@ export const OnboardingWizardPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setStep(2)}
-                    className="font-heading text-xs font-bold text-navy-55 hover:text-navy transition-colors"
+                    className="font-heading text-xs font-bold text-navy-55 hover:text-navy transition-colors min-h-[48px]"
                   >
                     ← Back
                   </button>
@@ -334,7 +323,7 @@ export const OnboardingWizardPage: React.FC = () => {
                     type="button"
                     disabled={loading || notifStatus === 'idle'}
                     onClick={handleStartCycle}
-                    className="py-3.5 px-7 bg-navy hover:bg-navy/85 text-white font-heading text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="py-3.5 px-7 bg-navy hover:bg-navy-70 text-white font-heading text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed min-h-[48px] active:scale-[0.98]"
                   >
                     {loading ? (
                       <>

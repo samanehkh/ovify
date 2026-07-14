@@ -60,28 +60,28 @@ export const SettingsPage: React.FC = () => {
     <div className={`flex-1 flex flex-col pt-4 px-5 pb-24 overflow-y-auto no-scrollbar ${t.textAlign}`}>
       {/* Header */}
       <div className="flex flex-col items-center text-center mt-2 mb-6">
-        <span className="font-data text-[12px] font-bold text-navy-55 tracking-widest uppercase">
+        <span className="font-data text-[10px] font-bold text-navy uppercase tracking-widest">
           {t.settingsSubtitle}
         </span>
-        <h2 className="font-heading text-2xl font-bold text-navy mt-1">
+        <h2 className="font-heading text-xl font-bold text-navy mt-1">
           {t.settingsTitle}
         </h2>
       </div>
 
       {/* Language Selector */}
-      <Card variant="glass" className="mb-6 p-5">
+      <Card variant="glass" className="mb-6 p-5 border border-navy-10 shadow-sm">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2.5">
             <Globe className="w-5 h-5 text-lavender-dark" />
-            <div>
+            <div className="text-left">
               <h4 className="font-heading text-xs font-bold text-navy">App Language / لغة التطبيق</h4>
-              <p className="font-body text-[10px] text-navy-55">Toggle layout and direction</p>
+              <p className="font-body text-[10px] text-navy-55 font-semibold">Toggle layout and direction</p>
             </div>
           </div>
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value as 'en' | 'ar')}
-            className="px-3 py-1.5 rounded-lg border border-navy-10 font-data text-xs text-navy focus:outline-none focus:ring-2 focus:ring-lavender bg-[#F8F5F1]/30 cursor-pointer"
+            className="px-3.5 py-2.5 rounded-xl border border-navy-10 font-data text-xs text-navy focus:outline-none focus:ring-2 focus:ring-lavender bg-[#F8F5F1]/30 cursor-pointer min-h-[44px]"
           >
             <option value="en">English (LTR)</option>
             <option value="ar">العربية (RTL)</option>
@@ -92,16 +92,16 @@ export const SettingsPage: React.FC = () => {
       {/* Account Settings Forms */}
       <div className="space-y-6">
         {/* Onboarding Preferences */}
-        <Card variant="glass">
-          <h3 className="font-heading text-sm font-bold text-navy mb-4 uppercase tracking-wider">{t.settingsOnboardingPrefs}</h3>
+        <Card variant="glass" className="border border-navy-10 p-5 shadow-sm text-left">
+          <h3 className="font-heading text-xs font-bold text-navy mb-4 uppercase tracking-wider">{t.settingsOnboardingPrefs}</h3>
           
           <form onSubmit={handleSavePreferences} className="space-y-4">
             <div>
-              <label className="block font-heading text-[10px] font-bold text-navy-55 mb-1.5 uppercase">{t.settingsSleepWindow}</label>
+              <label className="block font-heading text-[10px] font-bold text-navy mb-1.5 uppercase">{t.settingsSleepWindow}</label>
               <select
                 value={sleepTime}
                 onChange={(e) => setSleepTime(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-navy-10 font-data text-sm text-navy focus:outline-none focus:border-lavender focus:ring-2 focus:ring-lavender/50 bg-[#F8F5F1]/30 cursor-pointer"
+                className="w-full px-4 py-3 rounded-xl border border-navy-10 font-data text-sm text-navy focus:outline-none focus:border-lavender focus:ring-2 focus:ring-lavender/10 bg-white cursor-pointer min-h-[48px] shadow-inner font-semibold"
               >
                 <option value="9:00 PM - 11:00 PM">Early Bird · 9:00 PM – 11:00 PM</option>
                 <option value="10:00 PM - 12:00 AM">Standard · 10:00 PM – 12:00 AM</option>
@@ -110,11 +110,11 @@ export const SettingsPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block font-heading text-[10px] font-bold text-navy-55 mb-1.5 uppercase">{t.settingsComfortLevel}</label>
+              <label className="block font-heading text-[10px] font-bold text-navy mb-1.5 uppercase">{t.settingsComfortLevel}</label>
               <select
                 value={comfortLevel}
                 onChange={(e) => setComfortLevel(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-navy-10 font-data text-sm text-navy focus:outline-none focus:border-lavender focus:ring-2 focus:ring-lavender/50 bg-[#F8F5F1]/30 cursor-pointer"
+                className="w-full px-4 py-3 rounded-xl border border-navy-10 font-data text-sm text-navy focus:outline-none focus:border-lavender focus:ring-2 focus:ring-lavender/10 bg-white cursor-pointer min-h-[48px] shadow-inner font-semibold"
               >
                 <option value="First time">First time (Show full walkthroughs)</option>
                 <option value="Experienced">Experienced (Show minimal checklists)</option>
@@ -122,11 +122,11 @@ export const SettingsPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block font-heading text-[10px] font-bold text-navy-55 mb-1.5 uppercase">Injection Reminder</label>
+              <label className="block font-heading text-[10px] font-bold text-navy mb-1.5 uppercase">Injection Reminder</label>
               <select
                 value={reminderOffset}
                 onChange={(e) => setReminderOffset(Number(e.target.value))}
-                className="w-full px-4 py-3 rounded-xl border border-navy-10 font-data text-sm text-navy focus:outline-none focus:border-lavender focus:ring-2 focus:ring-lavender/50 bg-[#F8F5F1]/30 cursor-pointer"
+                className="w-full px-4 py-3 rounded-xl border border-navy-10 font-data text-sm text-navy focus:outline-none focus:border-lavender focus:ring-2 focus:ring-lavender/10 bg-white cursor-pointer min-h-[48px] shadow-inner font-semibold"
               >
                 <option value={0}>At scheduled time</option>
                 <option value={15}>15 minutes before</option>
@@ -138,6 +138,7 @@ export const SettingsPage: React.FC = () => {
               type="submit"
               disabled={savingPreferences}
               fullWidth
+              className="min-h-[48px] active:scale-[0.98]"
             >
               <Save className="w-4 h-4" />
               {savingPreferences ? '...' : t.settingsUpdateBtn}
@@ -146,8 +147,8 @@ export const SettingsPage: React.FC = () => {
         </Card>
 
         {/* Supporter Consent Setup */}
-        <Card variant="glass">
-          <h3 className="font-heading text-sm font-bold text-navy mb-4 uppercase tracking-wider">{t.settingsSupporterHeader}</h3>
+        <Card variant="glass" className="border border-navy-10 p-5 shadow-sm text-left">
+          <h3 className="font-heading text-xs font-bold text-navy mb-4 uppercase tracking-wider">{t.settingsSupporterHeader}</h3>
           
           <form onSubmit={handleSaveConsent} className="space-y-4">
             <div>
@@ -157,6 +158,7 @@ export const SettingsPage: React.FC = () => {
                 value={partnerPhone}
                 onChange={(e) => setPartnerPhone(e.target.value)}
                 placeholder="e.g. +971509999999"
+                className="min-h-[48px] shadow-inner font-semibold"
               />
             </div>
 
@@ -167,6 +169,7 @@ export const SettingsPage: React.FC = () => {
                 checked={partnerConsent}
                 onChange={(e) => setPartnerConsent(e.target.checked)}
                 label={t.settingsConsentText}
+                className="cursor-pointer"
               />
             </div>
 
@@ -174,6 +177,7 @@ export const SettingsPage: React.FC = () => {
               type="submit"
               disabled={savingConsent}
               fullWidth
+              className="min-h-[48px] active:scale-[0.98]"
             >
               <Save className="w-4 h-4" />
               {savingConsent ? '...' : t.settingsSaveSupporterBtn}
@@ -182,13 +186,14 @@ export const SettingsPage: React.FC = () => {
         </Card>
 
         {/* Discoverable Clear Sign Out Button */}
-        <Card variant="glass" className="border-due/30 bg-due-soft/5">
-          <h4 className="font-heading text-sm font-bold text-due mb-1">{t.settingsExitAccount}</h4>
-          <p className="font-body text-xs text-navy-55 mb-4">Click below to sign out and clear your active local session.</p>
+        <Card variant="glass" className="border-due/30 bg-due-soft/5 p-5 shadow-sm text-left">
+          <h4 className="font-heading text-xs font-bold text-due mb-1 uppercase tracking-wider">{t.settingsExitAccount}</h4>
+          <p className="font-body text-xs text-navy-55 mb-4 font-semibold">Click below to sign out and clear your active local session.</p>
           <Button
             variant="due"
             onClick={logout}
             fullWidth
+            className="min-h-[48px] active:scale-[0.98]"
           >
             <LogOut className="w-4 h-4" />
             {t.settingsSignOutBtn}

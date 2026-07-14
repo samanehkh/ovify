@@ -24,7 +24,7 @@ export const LoginPage: React.FC = () => {
     return window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true;
   };
 
-  // Platform and Browser detection (US-J1-02)
+  // Platform and Browser detection
   const getPlatform = () => {
     const ua = window.navigator.userAgent.toLowerCase();
     const isIOS = /iphone|ipad|ipod/.test(ua);
@@ -37,7 +37,7 @@ export const LoginPage: React.FC = () => {
     return 'desktop';
   };
 
-  // Android Chrome beforeinstallprompt event listener (US-J1-02)
+  // Android Chrome beforeinstallprompt event listener
   useEffect(() => {
     const handleBeforeInstall = (e: Event) => {
       e.preventDefault();
@@ -112,27 +112,27 @@ export const LoginPage: React.FC = () => {
 
   const platform = getPlatform();
 
-  // If successfully verified and not standalone, show PWA installation guide screen (US-J1-02)
+  // If successfully verified and not standalone, show PWA installation guide screen
   if (isVerified) {
     return (
-      <div className="flex-1 flex flex-col justify-center px-6 py-12 bg-gradient-to-b from-[#F8F5F1] via-[#F8F5F1]/80 to-[#F8F5F1]/40 min-h-screen">
-        <div className="w-full max-w-sm mx-auto flex flex-col items-center">
+      <div className="flex-1 flex flex-col justify-center px-6 py-12 bg-gradient-to-b from-bg-ivory via-bg-ivory/80 to-bg-ivory/40 min-h-screen">
+        <div className="w-full max-w-sm mx-auto flex flex-col items-center animate-in fade-in duration-300">
           <div className="mb-8 text-center flex flex-col items-center">
             <img 
               src="/static/logo.png" 
               alt="Ovify Logo" 
               className="w-20 h-20 object-contain rounded-3xl shadow-lg mb-4 animate-pulse"
             />
-            <h2 className="font-heading text-xl font-bold text-navy tracking-tight mb-2">Install Ovify App</h2>
-            <p className="font-body text-xs text-navy-55">Add to your home screen to access your companion app.</p>
+            <h2 className="font-heading text-xl font-bold text-navy tracking-tight mb-2 uppercase">Install Ovify App</h2>
+            <p className="font-body text-xs text-navy-55 font-semibold">Add to your home screen to access your companion app.</p>
           </div>
 
-          <div className="w-full bg-white rounded-3xl p-6 border border-navy-10 shadow-xl space-y-6">
+          <div className="w-full bg-white rounded-3xl p-7 border border-navy-10 shadow-xl space-y-6">
             {platform === 'webview' && (
-              <div className="p-4 rounded-2xl bg-blush-10 border border-blush/25 text-left text-xs text-due space-y-2">
+              <div className="p-4 rounded-2xl bg-due-soft border border-due/25 text-left text-xs text-due space-y-2">
                 <p className="font-bold">⚠️ WebView Detected</p>
-                <p>In-app browsers do not support installation. Please copy this link and open in Safari (iOS) or Chrome (Android) to install the app.</p>
-                <div className="bg-[#F8F5F1] p-2.5 rounded-xl border border-navy-10 font-data select-all break-all overflow-hidden text-[10px]">
+                <p className="font-semibold leading-relaxed">In-app browsers do not support installation. Please copy this link and open in Safari (iOS) or Chrome (Android) to install the app.</p>
+                <div className="bg-bg-ivory p-2.5 rounded-xl border border-navy-10 font-data select-all break-all overflow-hidden text-[10px] font-bold">
                   {window.location.href}
                 </div>
               </div>
@@ -140,35 +140,35 @@ export const LoginPage: React.FC = () => {
 
             {platform === 'ios' && (
               <div className="text-left space-y-4">
-                <div className="p-4 rounded-2xl bg-lavender/10 border border-lavender/25">
-                  <h3 className="font-heading text-sm font-bold text-navy mb-2">Safari (iPhone/iPad) Instructions:</h3>
-                  <ol className="list-decimal list-inside space-y-2 text-xs font-body text-navy-70">
+                <div className="p-5 rounded-2xl bg-lavender-soft border border-lavender/25 shadow-sm">
+                  <h3 className="font-heading text-xs font-bold text-navy uppercase tracking-wider mb-3">Safari (iPhone/iPad) Instructions:</h3>
+                  <ol className="list-decimal list-inside space-y-2.5 text-xs font-body text-navy-70 font-semibold leading-relaxed">
                     <li>Tap the <strong>Share</strong> icon (square with arrow up) in Safari's bottom toolbar.</li>
                     <li>Scroll down and select <strong>"Add to Home Screen"</strong> from the menu.</li>
                     <li>Tap <strong>"Add"</strong> in the top-right corner to complete installation.</li>
                   </ol>
                 </div>
                 <div className="flex justify-center py-2 animate-bounce">
-                  <span className="text-2xl">🗳️</span>
+                  <span className="text-3xl">🗳️</span>
                 </div>
               </div>
             )}
 
             {platform === 'android' && (
               <div className="text-left space-y-4">
-                <div className="p-4 rounded-2xl bg-sage-10 border border-sage/25 text-xs text-navy-70">
+                <div className="p-4 rounded-2xl bg-sage-soft border border-sage/25 text-xs text-navy-70 font-semibold leading-relaxed">
                   <p>Tap the button below to prompt Chrome's native installer and add Ovify to your home screen.</p>
                 </div>
                 {deferredPrompt ? (
                   <button
                     type="button"
                     onClick={handleAndroidPrompt}
-                    className="w-full py-4 bg-sage hover:bg-[#3E8E6E]/85 text-white font-heading text-sm font-semibold rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
+                    className="w-full py-4 bg-sage hover:bg-sage/90 text-white font-heading text-sm font-semibold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 min-h-[48px] active:scale-[0.98]"
                   >
                     <span>📲</span> Install Ovify App
                   </button>
                 ) : (
-                  <div className="p-3 bg-[#F8F5F1] rounded-xl text-center text-xs text-navy-55 italic border border-navy-10">
+                  <div className="p-3.5 bg-bg-ivory rounded-xl text-center text-xs text-navy-55 italic border border-navy-10 font-semibold">
                     Native prompt already triggered. Check your system toolbar or settings.
                   </div>
                 )}
@@ -177,7 +177,7 @@ export const LoginPage: React.FC = () => {
 
             {platform === 'desktop' && (
               <div className="text-left space-y-4">
-                <div className="p-4 rounded-2xl bg-navy-10 border border-navy-20 text-xs text-navy-70">
+                <div className="p-4 rounded-2xl bg-navy-10 border border-navy-20 text-xs text-navy-70 font-semibold leading-relaxed">
                   <p>Please open this link on your mobile phone to install the daily companion application, or install it via your browser's address bar installer icon.</p>
                 </div>
               </div>
@@ -187,7 +187,7 @@ export const LoginPage: React.FC = () => {
               type="button"
               disabled={loading}
               onClick={handleCompleteActivation}
-              className="w-full py-4 bg-navy hover:bg-[#13233C]/90 text-white font-heading text-sm font-semibold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2"
+              className="w-full py-4 bg-navy hover:bg-navy-70 text-white font-heading text-sm font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 min-h-[48px] active:scale-[0.98]"
             >
               {loading ? (
                 <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
@@ -202,7 +202,7 @@ export const LoginPage: React.FC = () => {
   }
 
   return (
-    <div className="flex-1 flex flex-col justify-center px-6 py-12 bg-gradient-to-b from-[#F8F5F1] via-[#F8F5F1]/80 to-[#F8F5F1]/40 min-h-screen">
+    <div className="flex-1 flex flex-col justify-center px-6 py-12 bg-gradient-to-b from-bg-ivory via-bg-ivory/80 to-bg-ivory/40 min-h-screen">
       <div className="w-full max-w-sm mx-auto flex flex-col items-center">
         {/* Animated App Logo Header */}
         <div className="mb-10 text-center flex flex-col items-center">
@@ -214,14 +214,14 @@ export const LoginPage: React.FC = () => {
               e.currentTarget.style.display = 'none';
             }}
           />
-          <h2 className="font-heading text-2xl font-bold text-navy tracking-tight mb-2">Welcome to Ovify</h2>
-          <p className="font-body text-sm text-navy-55">Your personalized Ovarian Stimulation Companion</p>
+          <h2 className="font-heading text-2xl font-bold text-navy tracking-tight mb-2 uppercase">Welcome to Ovify</h2>
+          <p className="font-body text-sm text-navy-55 font-semibold">Your personalized Ovarian Stimulation Companion</p>
         </div>
 
         {/* Auth Box Container */}
-        <div className="w-full bg-white/70 backdrop-blur-md rounded-3xl p-8 border border-navy-10 shadow-xl relative overflow-hidden transition-all duration-300">
+        <div className="w-full bg-white/80 backdrop-blur-md rounded-3xl p-8 border border-navy-10 shadow-xl relative overflow-hidden transition-all duration-300">
           {error && (
-            <div className="mb-6 p-4 rounded-xl bg-[#C24C57]/10 border border-[#C24C57]/25 text-[#C24C57] text-xs font-body leading-relaxed flex items-center gap-2 animate-pulse">
+            <div className="mb-6 p-4 rounded-xl bg-due-soft border border-due/25 text-due text-xs font-body leading-relaxed flex items-center gap-2 animate-pulse font-semibold">
               <span>⚠️</span>
               <span>{error}</span>
             </div>
@@ -230,7 +230,7 @@ export const LoginPage: React.FC = () => {
           {!otpSent ? (
             <form onSubmit={handleRequestOTP} className="space-y-6">
               <div>
-                <label htmlFor="phone" className="block font-heading text-xs font-semibold text-navy uppercase tracking-wider mb-2">
+                <label htmlFor="phone" className="block font-heading text-[10px] font-bold text-navy uppercase tracking-wider mb-2">
                   Registered Phone Number
                 </label>
                 <div className="relative">
@@ -241,10 +241,10 @@ export const LoginPage: React.FC = () => {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     disabled={loading}
-                    className="w-full px-4 py-3.5 rounded-xl border border-navy-20 bg-white font-data text-sm text-navy placeholder-navy-30 focus:border-lavender focus:ring-2 focus:ring-lavender/10 focus:outline-none transition-all duration-200"
+                    className="w-full px-4 py-3.5 rounded-xl border border-navy-20 bg-white font-data text-sm text-navy placeholder-navy-30 focus:border-lavender focus:ring-2 focus:ring-lavender/10 focus:outline-none transition-all duration-200 min-h-[48px] shadow-inner font-semibold"
                   />
                 </div>
-                <p className="mt-2 text-[11px] font-body text-navy-55 leading-relaxed">
+                <p className="mt-2.5 text-[11px] font-body text-navy-55 leading-relaxed font-semibold">
                   Enter the phone number registered by your clinic to load your treatment schedule.
                 </p>
               </div>
@@ -252,7 +252,7 @@ export const LoginPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-4 px-4 bg-navy hover:bg-[#13233C]/80 text-white font-heading text-sm font-semibold rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full py-4 px-4 bg-navy hover:bg-navy-70 text-white font-heading text-sm font-bold rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 min-h-[48px] active:scale-[0.98]"
               >
                 {loading ? (
                   <>
@@ -268,13 +268,13 @@ export const LoginPage: React.FC = () => {
             <form onSubmit={handleVerifyOTP} className="space-y-6">
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <label htmlFor="otp" className="block font-heading text-xs font-semibold text-navy uppercase tracking-wider">
+                  <label htmlFor="otp" className="block font-heading text-[10px] font-bold text-navy uppercase tracking-wider">
                     Enter Verification Code
                   </label>
                   <button
                     type="button"
                     onClick={() => setOtpSent(false)}
-                    className="font-body text-xs text-lavender hover:underline"
+                    className="font-body text-xs text-lavender font-bold hover:underline"
                   >
                     Edit Phone
                   </button>
@@ -288,9 +288,9 @@ export const LoginPage: React.FC = () => {
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
                   disabled={loading}
-                  className="w-full px-4 py-3.5 rounded-xl border border-navy-20 bg-white font-data text-center text-lg font-semibold tracking-[0.4em] text-navy placeholder-navy-20 focus:border-lavender focus:ring-2 focus:ring-lavender/10 focus:outline-none transition-all duration-200"
+                  className="w-full px-4 py-3.5 rounded-xl border border-navy-20 bg-white font-data text-center text-lg font-bold tracking-[0.4em] text-navy placeholder-navy-20 focus:border-lavender focus:ring-2 focus:ring-lavender/10 focus:outline-none transition-all duration-200 min-h-[48px] shadow-inner"
                 />
-                <p className="mt-2 text-[11px] font-body text-navy-55 leading-relaxed">
+                <p className="mt-2.5 text-[11px] font-body text-navy-55 leading-relaxed font-semibold">
                   A verification code has been simulated. Use code <span className="font-semibold text-lavender font-data">123456</span> to log in.
                 </p>
               </div>
@@ -298,7 +298,7 @@ export const LoginPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-4 px-4 bg-navy hover:bg-[#13233C]/85 text-white font-heading text-sm font-semibold rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full py-4 px-4 bg-navy hover:bg-navy-70 text-white font-heading text-sm font-bold rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 min-h-[48px] active:scale-[0.98]"
               >
                 {loading ? (
                   <>

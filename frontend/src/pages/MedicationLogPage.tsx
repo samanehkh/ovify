@@ -19,6 +19,7 @@ const UI_STYLE_INJECT = `
 .timeline-card:hover {
   transform: translateX(4px);
   border-color: rgba(158, 140, 239, 0.4);
+  background-color: rgba(255, 255, 255, 0.9);
 }
 .btn-spring {
   transition: transform 0.1s ease;
@@ -39,7 +40,7 @@ export const MedicationLogPage: React.FC = () => {
         <p className="font-body text-sm text-navy-55 mb-4">No medication selected.</p>
         <button 
           onClick={() => changeTab('dashboard')}
-          className="px-4 py-2 bg-lavender-dark text-white rounded-lg font-data text-sm font-semibold"
+          className="px-4 py-2 bg-lavender-dark text-white rounded-lg font-data text-sm font-semibold min-h-[48px] active:scale-95"
         >
           Go Back
         </button>
@@ -78,23 +79,23 @@ export const MedicationLogPage: React.FC = () => {
       <style>{UI_STYLE_INJECT}</style>
 
       {/* Top Navigation Bar */}
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-3.5 mb-6">
         <button 
           onClick={() => changeTab('dashboard')}
           aria-label="Back to Home Dashboard"
-          className="w-10 h-10 rounded-full bg-white border border-navy-10 flex items-center justify-center text-navy cursor-pointer hover:bg-navy-10/40 transition-colors"
+          className="w-10 h-10 rounded-full bg-white border border-navy-10 flex items-center justify-center text-navy cursor-pointer hover:bg-navy-10/40 transition-all active:scale-90 shadow-sm"
         >
-          <ArrowLeft className="w-5 h-5 stroke-[2]" />
+          <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
         </button>
-        <div>
+        <div className="text-left">
           <h3 className="font-heading text-base font-bold text-navy leading-tight">
-            Step-by-step Guide: {selectedMedication.name}
+            {selectedMedication.name}
           </h3>
         </div>
       </div>
 
-      {/* 1. Device Graphic Header (Glassmorphic Container) */}
-      <div className="w-full h-44 rounded-2xl overflow-hidden mb-6 border border-navy-10/50 bg-white flex items-center justify-center relative shadow-sm">
+      {/* 1. Device Graphic Header */}
+      <div className="w-full h-44 rounded-2xl overflow-hidden mb-6 border border-navy-10 bg-white flex items-center justify-center relative shadow-sm">
         <img 
           src={getMedicationImage(selectedMedication.name)} 
           alt={`${selectedMedication.name} device`} 
@@ -104,12 +105,12 @@ export const MedicationLogPage: React.FC = () => {
           }}
         />
         {/* Stylized Glass-Pill Badge */}
-        <div className="absolute bottom-3 right-3 bg-white/70 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-bold font-data text-navy shadow-sm border border-white/40">
+        <div className="absolute bottom-3 right-3 bg-white/80 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-bold font-data text-navy shadow-sm border border-white/40">
           Dosage: {selectedMedication.dosage}
         </div>
       </div>
 
-      {/* 2. Video Demonstration Block (Interactive Glow Player) */}
+      {/* 2. Video Demonstration Block */}
       <div className="mb-6">
         <div className="w-full h-40 rounded-2xl bg-navy/90 relative overflow-hidden flex items-center justify-center shadow-inner border border-navy-10/30">
           <img 
@@ -117,7 +118,6 @@ export const MedicationLogPage: React.FC = () => {
             alt="Video Demonstration Guide Preview" 
             className="absolute inset-0 w-full h-full object-cover opacity-60"
           />
-          {/* Centered Translucent Play Button with pulse glow */}
           <button 
             type="button"
             aria-label="Play demonstration video guide"
@@ -126,52 +126,51 @@ export const MedicationLogPage: React.FC = () => {
             <Play className="w-5 h-5 stroke-[2.5] fill-current translate-x-0.5" />
           </button>
           
-          {/* Duration Pill */}
           <span className="absolute bottom-3 left-3 bg-navy/65 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-bold font-data text-white">
             1:45 mins
           </span>
         </div>
       </div>
 
-      {/* 3. Preparation Guidelines List (Visual Timeline Cards) */}
+      {/* 3. Preparation Guidelines List */}
       <div className="space-y-3 mb-6">
-        <h4 className="font-heading text-xs font-bold text-navy-55 uppercase tracking-wider text-left pl-1">
+        <h4 className="font-heading text-[10px] font-bold text-navy uppercase tracking-wider text-left pl-1">
           Preparation guidelines
         </h4>
         
         {/* Step 1 */}
-        <div className="timeline-card p-4 rounded-2xl bg-white border border-navy-10/50 text-left flex items-start gap-4 shadow-sm border-l-4 border-l-lavender">
+        <div className="timeline-card p-4 rounded-2xl bg-white/70 backdrop-blur-sm border border-navy-10 text-left flex items-start gap-4 shadow-sm border-l-4 border-l-lavender">
           <div className="w-5 h-5 rounded-full bg-sage-soft text-sage flex items-center justify-center mt-0.5 flex-none" aria-hidden="true">
             <Check className="w-3.5 h-3.5 stroke-[3.5]" />
           </div>
-          <p className="font-body text-xs text-navy-55 leading-relaxed">
+          <p className="font-body text-xs text-navy-70 leading-relaxed font-semibold">
             1. Wash your hands thoroughly with soap and water.
           </p>
         </div>
 
         {/* Step 2 */}
-        <div className="timeline-card p-4 rounded-2xl bg-white border border-navy-10/50 text-left flex items-start gap-4 shadow-sm border-l-4 border-l-lavender">
+        <div className="timeline-card p-4 rounded-2xl bg-white/70 backdrop-blur-sm border border-navy-10 text-left flex items-start gap-4 shadow-sm border-l-4 border-l-lavender">
           <div className="w-5 h-5 rounded-full bg-sage-soft text-sage flex items-center justify-center mt-0.5 flex-none" aria-hidden="true">
             <Check className="w-3.5 h-3.5 stroke-[3.5]" />
           </div>
-          <p className="font-body text-xs text-navy-55 leading-relaxed">
+          <p className="font-body text-xs text-navy-70 leading-relaxed font-semibold">
             2. Clean the injection site with an alcohol swab and let it air dry.
           </p>
         </div>
 
         {/* Step 3 */}
-        <div className="timeline-card p-4 rounded-2xl bg-white border border-navy-10/50 text-left flex items-start gap-4 shadow-sm border-l-4 border-l-lavender">
+        <div className="timeline-card p-4 rounded-2xl bg-white/70 backdrop-blur-sm border border-navy-10 text-left flex items-start gap-4 shadow-sm border-l-4 border-l-lavender">
           <div className="w-5 h-5 rounded-full bg-sage-soft text-sage flex items-center justify-center mt-0.5 flex-none" aria-hidden="true">
             <Check className="w-3.5 h-3.5 stroke-[3.5]" />
           </div>
-          <p className="font-body text-xs text-navy-55 leading-relaxed">
+          <p className="font-body text-xs text-navy-70 leading-relaxed font-semibold">
             3. Prepare the injection device and select your prescribed dose.
           </p>
         </div>
       </div>
 
       {error && (
-        <div className="p-3 bg-due-soft border border-due/30 rounded-lg text-due font-body text-xs font-semibold text-left flex items-start gap-2 mb-4">
+        <div className="p-3.5 bg-due-soft border border-due/30 rounded-xl text-due font-body text-xs font-semibold text-left flex items-start gap-2 mb-4">
           <AlertCircle className="w-4 h-4 flex-none mt-0.5" />
           <span>{error}</span>
         </div>
@@ -179,12 +178,12 @@ export const MedicationLogPage: React.FC = () => {
 
       {/* 4. Bottom Action Panel */}
       {isTaken ? (
-        <div className="bg-sage-soft/10 border-sage-soft border rounded-2xl p-5 text-center shadow-sm">
-          <span className="inline-flex w-10 h-10 rounded-full bg-sage-soft text-sage items-center justify-center mb-3">
+        <div className="bg-sage-soft/10 border-sage/20 border rounded-2xl p-5 text-center shadow-sm">
+          <span className="inline-flex w-10 h-10 rounded-full bg-sage-soft text-sage items-center justify-center mb-3 border border-sage/20 shadow-inner">
             <Check className="w-5 h-5 stroke-[2.5]" />
           </span>
-          <h4 className="font-heading text-sm font-bold text-navy">Injection Completed Today</h4>
-          <p className="font-body text-xs text-navy-55 mt-1">
+          <h4 className="font-heading text-sm font-bold text-navy uppercase tracking-wider">Injection Completed Today</h4>
+          <p className="font-body text-xs text-navy-70 mt-1 font-semibold">
             Dose has been successfully logged.
           </p>
         </div>
@@ -193,9 +192,9 @@ export const MedicationLogPage: React.FC = () => {
           <button
             onClick={handleConfirmDose}
             disabled={submitting}
-            className={`w-full py-4 rounded-xl font-heading text-sm font-bold text-white transition-all duration-300 shadow-md cursor-pointer flex items-center justify-center gap-2 btn-spring
+            className={`w-full py-4 rounded-xl font-heading text-sm font-bold text-white transition-all duration-300 shadow-md cursor-pointer flex items-center justify-center gap-2 btn-spring min-h-[48px] active:scale-[0.98]
               ${!submitting
-                ? 'bg-gradient-to-r from-navy to-navy/90 hover:from-navy/95 hover:to-navy/85 hover:-translate-y-0.5 hover:shadow-lg' 
+                ? 'bg-navy hover:bg-navy-70' 
                 : 'bg-navy/40 cursor-not-allowed shadow-none'
               }`}
           >

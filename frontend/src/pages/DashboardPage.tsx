@@ -7,7 +7,7 @@ import { Sparkles, AlertTriangle, ChevronDown, ChevronUp, CheckCircle2, Heart, C
 const UI_STYLE_INJECT = `
 @keyframes breathe {
   0% { transform: scale(1); opacity: 0.35; box-shadow: 0 0 0 0 rgba(158, 140, 239, 0.4); }
-  50% { transform: scale(1.3); opacity: 0.8; box-shadow: 0 0 0 20px rgba(158, 140, 239, 0); }
+  50% { transform: scale(1.25); opacity: 0.75; box-shadow: 0 0 0 16px rgba(158, 140, 239, 0); }
   100% { transform: scale(1); opacity: 0.35; box-shadow: 0 0 0 0 rgba(158, 140, 239, 0); }
 }
 .breathing-bubble {
@@ -17,8 +17,8 @@ const UI_STYLE_INJECT = `
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .glow-pill-card:hover {
-  transform: translateY(-2px) scale(1.015);
-  box-shadow: 0 12px 24px -10px rgba(19, 35, 60, 0.08), 0 0 0 1px rgba(158, 140, 239, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px -10px rgba(19, 35, 60, 0.08), 0 0 0 1px rgba(158, 140, 239, 0.2);
 }
 `;
 
@@ -98,7 +98,7 @@ export const DashboardPage: React.FC = () => {
         <p className="font-body text-xs text-navy-55 mb-5 max-w-xs">{dbError}</p>
         <button
           onClick={loadDashboard}
-          className="py-2.5 px-5 bg-navy text-white font-heading text-xs font-bold rounded-xl shadow-md"
+          className="py-3 px-6 bg-navy text-white font-heading text-xs font-bold rounded-xl shadow-md active:scale-95 transition-all"
         >
           Try Again
         </button>
@@ -113,7 +113,7 @@ export const DashboardPage: React.FC = () => {
       <style>{UI_STYLE_INJECT}</style>
 
       {/* Greeting Header */}
-      <div className="flex items-center justify-between mt-2 mb-6">
+      <div className="flex items-center justify-between mt-2 mb-6 text-left">
         <div>
           <span className="font-data text-[10px] font-bold text-navy-55 tracking-widest uppercase">
             {getGreeting()}
@@ -148,7 +148,7 @@ export const DashboardPage: React.FC = () => {
       {!isPreCycle ? (
         <>
           {/* ACTIVE CYCLE: SVG Circular Progress Ring */}
-          <div className="mb-6 p-6 rounded-3xl bg-white border border-navy-10 shadow-sm flex flex-col items-center justify-center relative overflow-hidden">
+          <div className="mb-6 p-6 rounded-3xl bg-white border border-navy-10 shadow-sm flex flex-col items-center justify-center relative overflow-hidden transition-all duration-300 hover:shadow-md">
             {/* Subtle glowing backdrop */}
             <div className="absolute inset-0 bg-radial-gradient from-lavender/5 to-transparent pointer-events-none" />
             
@@ -171,7 +171,6 @@ export const DashboardPage: React.FC = () => {
                   strokeWidth="8"
                   fill="transparent"
                   strokeDasharray={402}
-                  // Mock active cycle day progress (say day 5 of 12)
                   strokeDashoffset={402 - (402 * Math.min(dashboardData.cycle_day || 1, 12)) / 12}
                   strokeLinecap="round"
                   className="transition-all duration-1000 ease-out"
@@ -182,7 +181,7 @@ export const DashboardPage: React.FC = () => {
                 <span className="font-heading text-3xl font-extrabold text-navy leading-none mt-1">
                   {dashboardData.cycle_day || 1}
                 </span>
-                <span className="font-body text-[10px] text-navy-55/70 mt-1">of 12</span>
+                <span className="font-body text-[10px] text-navy-55/70 mt-1 font-semibold">of 12</span>
               </div>
             </div>
 
@@ -194,13 +193,13 @@ export const DashboardPage: React.FC = () => {
 
           {/* Next Scan Appointment Card */}
           {dashboardData.next_appointment_datetime && (
-            <div className="mb-6 p-5 rounded-2xl bg-white border border-navy-10 shadow-sm flex items-start gap-3 text-left">
-              <div className="w-9 h-9 rounded-xl bg-[#F3F1FE] flex items-center justify-center text-lavender-mid flex-none">
+            <div className="mb-6 p-5 rounded-2xl bg-white border border-navy-10 shadow-sm flex items-start gap-3.5 text-left hover:border-lavender/25 transition-all duration-200">
+              <div className="w-9 h-9 rounded-xl bg-[#F3F1FE] flex items-center justify-center text-lavender-dark flex-none shadow-sm">
                 <Calendar className="w-4 h-4" />
               </div>
               <div className="flex-1">
-                <span className="block text-[10px] font-bold text-navy-55 uppercase tracking-wider">Scheduled Check</span>
-                <p className="font-heading text-xs font-bold text-navy mt-1">
+                <span className="block text-[10px] font-bold text-navy uppercase tracking-wider">Scheduled Check</span>
+                <p className="font-heading text-xs font-bold text-navy-70 mt-1">
                   Next scan appointment: {(() => {
                     try {
                       const d = new Date(dashboardData.next_appointment_datetime!);
@@ -220,28 +219,35 @@ export const DashboardPage: React.FC = () => {
         </>
       ) : (
         // PRE-CYCLE: Awaiting Cycle Start and Next Scan cards
-        <div className="space-y-4 mb-6 text-left">
+        <div className="space-y-4 mb-6 text-left animate-in fade-in duration-300">
           {/* Awaiting Cycle Start Card */}
           <div className="p-6 rounded-3xl bg-white border border-lavender shadow-md relative overflow-hidden">
             <div className="absolute inset-0 bg-radial-gradient from-lavender/5 to-transparent pointer-events-none" />
             <h3 className="font-heading text-base font-extrabold text-navy flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-lavender animate-pulse" />
+              <span className="w-2.5 h-2.5 rounded-full bg-lavender animate-pulse" />
               Awaiting Cycle Start
             </h3>
-            <p className="font-body text-xs text-navy-55 mt-2.5 leading-relaxed">
+            <p className="font-body text-xs text-navy-70 mt-2.5 leading-relaxed">
               Your clinic has registered your profile. Your daily medication timeline will go live here once your cycle starts.
             </p>
+            
+            <button
+              onClick={() => setShowDay1Modal(true)}
+              className="mt-4 w-full py-3 bg-navy hover:bg-navy-70 text-white font-heading text-xs font-bold rounded-xl transition-all shadow active:scale-[0.98]"
+            >
+              Report Day 1 of Period
+            </button>
           </div>
 
           {/* Next Scan Appointment Card */}
           {dashboardData.next_appointment_datetime && (
-            <div className="p-5 rounded-2xl bg-white border border-navy-10 shadow-sm flex items-start gap-3">
-              <div className="w-9 h-9 rounded-xl bg-[#F3F1FE] flex items-center justify-center text-lavender-mid flex-none">
+            <div className="p-5 rounded-2xl bg-white border border-navy-10 shadow-sm flex items-start gap-3.5 hover:border-lavender/25 transition-all duration-200">
+              <div className="w-9 h-9 rounded-xl bg-[#F3F1FE] flex items-center justify-center text-lavender-dark flex-none shadow-sm">
                 <Calendar className="w-4 h-4" />
               </div>
               <div className="flex-1">
-                <span className="block text-[10px] font-bold text-navy-55 uppercase tracking-wider">Scheduled Check</span>
-                <p className="font-heading text-xs font-bold text-navy mt-1">
+                <span className="block text-[10px] font-bold text-navy uppercase tracking-wider">Scheduled Check</span>
+                <p className="font-heading text-xs font-bold text-navy-70 mt-1">
                   Next scan appointment: {(() => {
                     try {
                       const d = new Date(dashboardData.next_appointment_datetime!);
@@ -266,9 +272,9 @@ export const DashboardPage: React.FC = () => {
           ───────────────────────────────────────────────────────────── */}
       {!isPreCycle && (
         <div className="mb-6">
-          <div className="flex justify-between items-baseline mb-3">
-            <h3 className="font-heading text-sm font-bold text-navy uppercase tracking-wider">Today's Injections</h3>
-            <span className="font-data text-[11px] text-navy-55 font-bold">
+          <div className="flex justify-between items-baseline mb-3.5">
+            <h3 className="font-heading text-xs font-bold text-navy uppercase tracking-wider">Today's Injections</h3>
+            <span className="font-data text-[11px] text-navy font-bold">
               {dashboardData.today_schedule.filter(m => m.status !== 'Due').length}/{dashboardData.today_schedule.length} Done
             </span>
           </div>
@@ -291,28 +297,28 @@ export const DashboardPage: React.FC = () => {
                       } as any);
                     }
                   }}
-                  className={`p-4 rounded-2xl border text-left flex justify-between items-center transition-all ${
+                  className={`p-4.5 rounded-2xl border text-left flex justify-between items-center transition-all ${
                     isTaken 
-                      ? 'bg-[#E6F4EF] border-sage/35 opacity-60 pointer-events-none select-none' 
-                      : 'glow-pill-card bg-white border-lavender cursor-pointer'
+                      ? 'bg-[#E6F4EF]/75 border-sage/20 opacity-60 pointer-events-none select-none shadow-sm' 
+                      : 'glow-pill-card bg-white border-navy-10 hover:border-lavender cursor-pointer shadow-sm hover:shadow-md'
                   }`}
                 >
                   <div className="flex-1 min-w-0 pr-3">
                     <div className="flex items-center gap-2">
                       <h4 className="font-heading text-sm font-bold text-navy truncate">{med.name}</h4>
-                      <span className={`text-[9px] font-data font-bold px-2 py-0.5 rounded-full ${
-                        isTaken ? 'bg-sage-soft text-sage' : 'bg-[#F3F1FE] text-lavender'
+                      <span className={`text-[9px] font-data font-bold px-2 py-0.5 rounded-full border ${
+                        isTaken ? 'bg-sage-soft text-sage border-sage/10' : 'bg-[#F3F1FE] text-lavender border-[#F3F1FE]/30'
                       }`}>
                         {isTaken ? `✓ ${med.status}` : med.status}
                       </span>
                     </div>
-                    <p className="font-body text-[11px] text-navy-55 mt-1">
+                    <p className="font-body text-[11px] text-navy-55 mt-1 font-semibold">
                       {med.dosage} · {med.route}
                     </p>
                   </div>
                   <div className="flex flex-col items-end flex-none">
                     <span className="font-data text-xs text-navy font-bold">{med.scheduled_time.slice(0, 5)}</span>
-                    <span className="text-[10px] text-navy-55/70 mt-0.5 font-body">Target</span>
+                    <span className="text-[10px] text-navy-55 mt-0.5 font-body font-semibold">Target</span>
                   </div>
                 </div>
               );
@@ -324,30 +330,30 @@ export const DashboardPage: React.FC = () => {
       {/* ─────────────────────────────────────────────────────────────
           3. SUPPORT TOOLS GRID (CalmSeed Companion + Ask Me Anything)
           ───────────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 gap-3.5 mb-6">
+      <div className="grid grid-cols-2 gap-4 mb-6">
         {/* CalmSeed somatic breathing card */}
-        <div className="p-4 rounded-3xl bg-white border border-navy-10 shadow-sm flex flex-col justify-between items-center text-center relative overflow-hidden h-[155px]">
+        <div className="p-5 rounded-3xl bg-white border border-navy-10 shadow-sm flex flex-col justify-between items-center text-center relative overflow-hidden h-[155px] hover:border-lavender/35 hover:shadow-md transition-all duration-200">
           <div className="relative w-12 h-12 flex items-center justify-center mt-1">
-            <div className="absolute w-8 h-8 rounded-full bg-lavender/30 breathing-bubble" />
+            <div className="absolute w-9 h-9 rounded-full bg-lavender/25 breathing-bubble" />
             <Heart className="w-5 h-5 text-lavender-dark z-10" />
           </div>
           <div>
-            <h4 className="font-heading text-xs font-bold text-navy">CalmSeed</h4>
-            <p className="font-body text-[10px] text-navy-55 mt-0.5 leading-tight">Breathing cycle</p>
+            <h4 className="font-heading text-xs font-bold text-navy uppercase tracking-wider">CalmSeed</h4>
+            <p className="font-body text-[10px] text-navy-55 mt-0.5 leading-tight font-medium">Breathing cycle</p>
           </div>
         </div>
 
         {/* Ask Me Anything (FAQ link) */}
         <div
           onClick={() => setInfoModalText("Ask Ovify AI is in Phase 2 development.")}
-          className="p-4 rounded-3xl bg-white border border-navy-10 shadow-sm flex flex-col justify-between items-center text-center h-[155px] cursor-pointer hover:border-lavender/50 transition-all"
+          className="p-5 rounded-3xl bg-white border border-navy-10 shadow-sm flex flex-col justify-between items-center text-center h-[155px] cursor-pointer hover:border-lavender hover:shadow-md transition-all duration-200"
         >
-          <div className="w-10 h-10 rounded-full bg-[#F3F1FE] flex items-center justify-center text-lavender-dark mt-2">
+          <div className="w-10 h-10 rounded-full bg-[#F3F1FE] flex items-center justify-center text-lavender-dark mt-2 shadow-sm">
             <Sparkles className="w-4 h-4" />
           </div>
           <div>
-            <h4 className="font-heading text-xs font-bold text-navy">Ask Me Anything</h4>
-            <p className="font-body text-[10px] text-navy-55 mt-0.5 leading-tight">Search clinic FAQs</p>
+            <h4 className="font-heading text-xs font-bold text-navy uppercase tracking-wider">Ask Me Anything</h4>
+            <p className="font-body text-[10px] text-navy-55 mt-0.5 leading-tight font-medium">Search clinic FAQs</p>
           </div>
         </div>
       </div>
@@ -357,38 +363,38 @@ export const DashboardPage: React.FC = () => {
           ───────────────────────────────────────────────────────────── */}
       {isPreCycle && (
         <div className="mb-6 text-left">
-          <h3 className="font-heading text-sm font-bold text-navy uppercase tracking-wider mb-3">Follicle scan preparation</h3>
+          <h3 className="font-heading text-xs font-bold text-navy uppercase tracking-wider mb-3.5 pl-1">Follicle scan preparation</h3>
           
           {user?.injection_comfort === 'First time' ? (
             // Expanded accordion view for first timers
-            <div className="space-y-2">
-              <div className="p-4 rounded-2xl bg-white border border-navy-10">
+            <div className="space-y-2.5">
+              <div className="p-4 rounded-2xl bg-white border border-navy-10 shadow-sm">
                 <button
                   type="button"
                   onClick={() => setExpandedSection(expandedSection === 'scan' ? null : 'scan')}
-                  className="w-full flex justify-between items-center text-left font-heading text-xs font-bold text-navy uppercase tracking-wider"
+                  className="w-full flex justify-between items-center text-left font-heading text-xs font-bold text-navy uppercase tracking-wider min-h-[36px]"
                 >
                   <span>1. Ultrasound follicular scan</span>
                   {expandedSection === 'scan' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                 </button>
                 {expandedSection === 'scan' && (
-                  <p className="font-body text-xs text-navy-55 leading-relaxed mt-2.5 pt-2 border-t border-navy-10/40">
+                  <p className="font-body text-xs text-navy-55 leading-relaxed mt-2.5 pt-2 border-t border-navy-10/40 font-medium">
                     Your baseline scan will occur on Day 2 or 3 of your period. This checks your ovaries before starting daily hormone injections.
                   </p>
                 )}
               </div>
 
-              <div className="p-4 rounded-2xl bg-white border border-navy-10">
+              <div className="p-4 rounded-2xl bg-white border border-navy-10 shadow-sm">
                 <button
                   type="button"
                   onClick={() => setExpandedSection(expandedSection === 'blood' ? null : 'blood')}
-                  className="w-full flex justify-between items-center text-left font-heading text-xs font-bold text-navy uppercase tracking-wider"
+                  className="w-full flex justify-between items-center text-left font-heading text-xs font-bold text-navy uppercase tracking-wider min-h-[36px]"
                 >
                   <span>2. Blood hormone check</span>
                   {expandedSection === 'blood' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                 </button>
                 {expandedSection === 'blood' && (
-                  <p className="font-body text-xs text-navy-55 leading-relaxed mt-2.5 pt-2 border-t border-navy-10/40">
+                  <p className="font-body text-xs text-navy-55 leading-relaxed mt-2.5 pt-2 border-t border-navy-10/40 font-medium">
                     We check estrogen, progesterone, and LH levels to confirm your body is fully ready for stimulation.
                   </p>
                 )}
@@ -396,11 +402,11 @@ export const DashboardPage: React.FC = () => {
             </div>
           ) : (
             // Streamlined checklist for experienced patients
-            <div className="p-4 rounded-2xl bg-white border border-navy-10 flex gap-3">
+            <div className="p-4 rounded-2xl bg-white border border-navy-10 flex gap-3 shadow-sm hover:border-lavender/25 transition-all">
               <CheckCircle2 className="w-5 h-5 text-lavender flex-none mt-0.5" />
               <div className="flex-1">
                 <p className="font-heading text-xs font-bold text-navy">Baseline Check Reminder</p>
-                <p className="font-body text-xs text-navy-55 mt-1 leading-relaxed">
+                <p className="font-body text-xs text-navy-55 mt-1 leading-relaxed font-semibold">
                   Book scan on Day 2 or 3 of menstruation. Remember to bring your prescription sheets.
                 </p>
               </div>
@@ -415,9 +421,9 @@ export const DashboardPage: React.FC = () => {
       {/* Day 1 period report confirmation modal */}
       {showDay1Modal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/40 backdrop-blur-sm p-5" role="dialog" aria-modal="true">
-          <div className="bg-white border border-navy-10 rounded-3xl p-6 shadow-xl max-w-sm w-full text-center relative animate-fade-in">
+          <div className="bg-white border border-navy-10 rounded-3xl p-6 shadow-xl max-w-sm w-full text-center relative animate-in fade-in zoom-in-95 duration-200">
             <h4 className="font-heading text-base font-bold text-navy mb-2">Report Day 1?</h4>
-            <p className="font-body text-xs text-navy-55 leading-relaxed mb-6">
+            <p className="font-body text-xs text-navy-70 leading-relaxed mb-6">
               Please confirm that you have started your period today. We will notify your clinic team to book your baseline scan.
             </p>
             <div className="flex gap-3">
@@ -425,14 +431,14 @@ export const DashboardPage: React.FC = () => {
                 type="button"
                 disabled={reportingDay1}
                 onClick={handleReportDay1}
-                className="flex-1 py-3 bg-navy hover:bg-navy-80 text-white font-heading text-xs font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5"
+                className="flex-1 py-3.5 bg-navy hover:bg-navy-80 text-white font-heading text-xs font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5 min-h-[48px] active:scale-[0.98]"
               >
                 {reportingDay1 ? 'Notifying...' : 'Confirm Flow'}
               </button>
               <button
                 type="button"
                 onClick={() => setShowDay1Modal(false)}
-                className="flex-1 py-3 border border-navy-10 bg-white hover:bg-navy-10/10 text-navy font-heading text-xs font-bold rounded-xl transition-all"
+                className="flex-1 py-3 border border-navy-10 bg-white hover:bg-bg-ivory text-navy font-heading text-xs font-bold rounded-xl transition-all min-h-[48px] active:scale-[0.98]"
               >
                 Go Back
               </button>
@@ -444,12 +450,12 @@ export const DashboardPage: React.FC = () => {
       {/* Info notice dialog */}
       {infoModalText && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/40 backdrop-blur-sm p-5" role="dialog" aria-modal="true">
-          <div className="bg-white border border-navy-10 rounded-3xl p-6 shadow-xl max-w-sm w-full text-center relative">
+          <div className="bg-white border border-navy-10 rounded-3xl p-6 shadow-xl max-w-sm w-full text-center relative animate-in fade-in zoom-in-95 duration-200">
             <h4 className="font-heading text-base font-bold text-navy mb-2">Cycle Notice</h4>
-            <p className="font-body text-xs text-navy-55 leading-relaxed mb-6">{infoModalText}</p>
+            <p className="font-body text-xs text-navy-70 leading-relaxed mb-6 font-semibold">{infoModalText}</p>
             <button
               onClick={() => setInfoModalText(null)}
-              className="w-full py-3 bg-navy hover:bg-navy-80 text-white font-heading text-xs font-bold rounded-xl shadow-md"
+              className="w-full py-3.5 bg-navy hover:bg-navy-80 text-white font-heading text-xs font-bold rounded-xl shadow-md min-h-[48px] active:scale-[0.98]"
             >
               Close
             </button>
