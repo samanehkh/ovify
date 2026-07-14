@@ -8,12 +8,13 @@ from main import app
 from db.session import get_db, Base
 from db import models
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test_temp_triage.db"
+SQLALCHEMY_DATABASE_URL = "sqlite:///file:test_triage_db?mode=memory&cache=shared"
 engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 @pytest.fixture(scope="function")
 def test_db():
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     db = TestingSessionLocal()
     
@@ -302,4 +303,23 @@ def test_cross_system_real_time_triage_update(client, test_db):
     assert data["counts"]["on_track"] == 1
     assert data["on_track"][0]["name"] == "Sarah Khan"
     assert data["on_track"][0]["status"] == "On Track"
+
+
+def test_websocket_triage_sync(client, test_db):
+    # Connect to websocket
+    from services.auth import generate_token
+    clinician_token = generate_token(1, "clinician", name="Mona")
+    
+    with client.websocket_connect(f"/api/clinician/ws/triage?token={clinician_token}") as websocket:
+        # Trigger a patient dose confirmation
+        pt_token = generate_token(1, "patient")
+        confirm_res = client.post(
+            "/api/medications/1/confirm",
+            headers={"Authorization": f"Bearer {pt_token}"}
+        )
+        assert confirm_res.status_code == 200
+        
+        # Read broadcast event from websocket
+        message = websocket.receive_json()
+        assert message["event"] == "triage_update_trigger"
 

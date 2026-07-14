@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
 from db.session import get_db
 from db import models
 from schemas.user import UserCreate, UserResponse, UserOnboardUpdate, OTPRequest, OTPVerify, PartnerConsentUpdate, UserAuthResponse, ReportDay1Response, DashboardResponse
@@ -7,6 +8,14 @@ from services.auth import verify_patient_token, generate_token
 from core.phone import normalize_phone
 
 router = APIRouter()
+
+class WebPushKeys(BaseModel):
+    p256dh: str
+    auth: str
+
+class WebPushSubscriptionRequest(BaseModel):
+    endpoint: str
+    keys: WebPushKeys
 
 @router.post("/", response_model=UserResponse)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
@@ -245,4 +254,38 @@ def get_user_dashboard(
         "day1_reported_at": user.day1_reported_at,
         "next_appointment_datetime": user.next_appointment_datetime
     }
+
+
+@router.post("/{user_id}/web-push-subscription")
+def create_web_push_subscription(
+    user_id: int,
+    req: WebPushSubscriptionRequest,
+    token_payload: dict = Depends(verify_patient_token),
+    db: Session = Depends(get_db)
+):
+    if user_id != token_payload.get("user_id"):
+        raise HTTPException(status_code=403, detail="Forbidden: You cannot access another patient's data")
+        
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    # Check if subscription endpoint already exists
+    sub = db.query(models.PushSubscription).filter(models.PushSubscription.endpoint == req.endpoint).first()
+    if not sub:
+        sub = models.PushSubscription(
+            user_id=user_id,
+            endpoint=req.endpoint,
+            p256dh=req.keys.p256dh,
+            auth=req.keys.auth
+        )
+        db.add(sub)
+    else:
+        # Update user association or keys if needed
+        sub.user_id = user_id
+        sub.p256dh = req.keys.p256dh
+        sub.auth = req.keys.auth
+    
+    db.commit()
+    return {"message": "Web Push subscription saved successfully."}
 

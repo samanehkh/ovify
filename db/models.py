@@ -107,3 +107,13 @@ class Clinician(Base):
     role = Column(String, default="coordinator", nullable=False)  # coordinator / admin
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
 
+
+class PushSubscription(Base):
+    __tablename__ = "push_subscriptions"
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    endpoint = Column(String, nullable=False, unique=True)
+    p256dh = Column(String, nullable=False)
+    auth = Column(String, nullable=False)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
+

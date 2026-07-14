@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Depends, HTTPException
+from typing import List, Optional
+from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from core.time import UAE_TZ
@@ -18,6 +19,16 @@ TRIAGE_RECENCY_WINDOW = timedelta(days=7)
 # Public sub-router: login only. All other clinician routes require a Bearer token.
 router = APIRouter()
 protected = APIRouter(dependencies=[Depends(verify_clinician_token)])
+
+active_websockets: List[WebSocket] = []
+
+async def broadcast_triage_update():
+    for ws in list(active_websockets):
+        try:
+            await ws.send_json({ "event": "triage_update_trigger" })
+        except Exception:
+            if ws in active_websockets:
+                active_websockets.remove(ws)
 
 class ClinicianLoginRequest(BaseModel):
     email: str
@@ -576,6 +587,28 @@ def update_cycle_outcome(
     db.commit()
     db.refresh(user)
     return {"message": f"Cycle outcome for {user.name} updated to {user.cycle_outcome}.", "cycle_outcome": user.cycle_outcome}
+
+@router.websocket("/ws/triage")
+async def websocket_triage(websocket: WebSocket, token: Optional[str] = None):
+    if not token:
+        await websocket.close(code=4001)
+        return
+    
+    from services.auth import verify_token
+    payload = verify_token(token)
+    if not payload or payload.get("role") != "clinician":
+        await websocket.close(code=4002)
+        return
+
+    await websocket.accept()
+    active_websockets.append(websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        if websocket in active_websockets:
+            active_websockets.remove(websocket)
+
 
 # Mount the token-protected clinician routes
 router.include_router(protected)

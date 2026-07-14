@@ -193,6 +193,17 @@ def confirm_medication_dose(
             db.commit()
             db.refresh(existing_log)
             adherence.auto_clear_user_alert(db, user_id)
+            
+            # Broadcast WebSocket triage update event
+            import asyncio
+            from api import clinician
+            try:
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    loop.create_task(clinician.broadcast_triage_update())
+            except Exception:
+                pass
+
             return existing_log
         raise HTTPException(status_code=400, detail="Medication already logged for today")
 
@@ -219,6 +230,16 @@ def confirm_medication_dose(
 
     # Auto-resolve alert status if all overdue doses today are successfully logged
     adherence.auto_clear_user_alert(db, user_id)
+
+    # Broadcast WebSocket triage update event
+    import asyncio
+    from api import clinician
+    try:
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            loop.create_task(clinician.broadcast_triage_update())
+    except Exception:
+        pass
 
     return db_log
 
