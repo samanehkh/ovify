@@ -203,7 +203,10 @@ def confirm_medication_dose(
         logged_at=log_time,
         scheduled_date=target_date,
         status=status,
-        self_reported=self_reported
+        self_reported=self_reported,
+        resolved=True,
+        resolved_by="Patient (self-logged)",
+        resolved_at=log_time
     )
     db.add(db_log)
     try:
