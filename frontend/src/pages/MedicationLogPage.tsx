@@ -95,11 +95,11 @@ export const MedicationLogPage: React.FC = () => {
       </div>
 
       {/* 1. Device Graphic Header */}
-      <div className="w-full h-44 rounded-2xl overflow-hidden mb-6 border border-navy-10 bg-white flex items-center justify-center relative shadow-sm">
+      <div className="w-full h-44 rounded-2xl overflow-hidden mb-6 border border-navy-10 bg-white flex items-center justify-center relative shadow-md group hover:border-lavender/35 transition-all duration-300">
         <img 
           src={getMedicationImage(selectedMedication.name)} 
           alt={`${selectedMedication.name} device`} 
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
           onError={(e) => {
             e.currentTarget.src = `${API_BASE_URL}/static/injection_guide.png`;
           }}
@@ -112,21 +112,24 @@ export const MedicationLogPage: React.FC = () => {
 
       {/* 2. Video Demonstration Block */}
       <div className="mb-6">
-        <div className="w-full h-40 rounded-2xl bg-navy/90 relative overflow-hidden flex items-center justify-center shadow-inner border border-navy-10/30">
+        <div className="w-full h-40 rounded-2xl bg-navy relative overflow-hidden flex items-center justify-center shadow-lg border border-navy-10/40">
           <img 
             src={`${API_BASE_URL}/static/video_poster.jpg`} 
             alt="Video Demonstration Guide Preview" 
-            className="absolute inset-0 w-full h-full object-cover opacity-60"
+            className="absolute inset-0 w-full h-full object-cover opacity-50"
           />
+          {/* Glass blur reflection overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-navy/30 via-transparent to-white/5 pointer-events-none" />
+          
           <button 
             type="button"
             aria-label="Play demonstration video guide"
-            className="w-14 h-14 rounded-full bg-lavender flex items-center justify-center text-white cursor-pointer play-btn-glow shadow-lg z-10 border border-white/20 transition-transform duration-300 active:scale-95"
+            className="w-14 h-14 rounded-full bg-lavender flex items-center justify-center text-white cursor-pointer play-btn-glow shadow-xl z-10 border border-white/30 transition-transform duration-300 hover:scale-105 active:scale-95"
           >
             <Play className="w-5 h-5 stroke-[2.5] fill-current translate-x-0.5" />
           </button>
           
-          <span className="absolute bottom-3 left-3 bg-navy/65 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-bold font-data text-white">
+          <span className="absolute bottom-3 left-3 bg-navy/70 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold font-data text-white border border-white/10">
             1:45 mins
           </span>
         </div>
