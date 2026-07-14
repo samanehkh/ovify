@@ -7,7 +7,7 @@ from core.time import UAE_TZ
 from core.phone import normalize_phone
 from db.session import get_db
 from db import models
-from services import protocol_parser
+from services import protocol_parser, adherence
 from services.auth import check_clinic_access_key, generate_token, verify_clinician_token, verify_password
 from schemas.clinician import ProtocolParseRequest, ProtocolParseResponse, RegisterPatientRequest, CycleOutcomeUpdate, PatientUpdateSaveRequest
 
@@ -284,12 +284,18 @@ def get_triage_data(db: Session = Depends(get_db)):
             models.SymptomLog.value == "Anxious"
         ).count()
 
+        overdue_status, overdue_reason, overdue_action = adherence.get_user_overdue_escalation_status(db, u.id)
+
         if missed_logs:
             status = "Red Alert"
             presc = db.query(models.Prescription).filter(models.Prescription.id == missed_logs[0].prescription_id).first()
             presc_name = presc.name if presc else "medication"
             reason = f"Missed {presc_name} (2h overdue)"
             action_taken = "Partner notified via SMS 15m ago"
+        elif overdue_status == "Red Alert":
+            status = "Red Alert"
+            reason = overdue_reason
+            action_taken = overdue_action
         elif u.id == 2:  # Fatima M: mock intent to discontinue
             status = "Red Alert"
             reason = "Intent to Discontinue (AI detected in conversation)"
@@ -306,6 +312,10 @@ def get_triage_data(db: Session = Depends(get_db)):
             presc = db.query(models.Prescription).filter(models.Prescription.id == late_logs[0].prescription_id).first()
             presc_name = presc.name if presc else "medication"
             reason = f"Day 6 Antagonist ({len(late_logs)} late logs this week)"
+        elif overdue_status == "Yellow Attention":
+            status = "Yellow Attention"
+            reason = overdue_reason
+            action_taken = overdue_action
         elif u.active_status == "Action Required":
             status = "Yellow Attention"
             reason = "Overdue task check-in alert active."

@@ -5,9 +5,10 @@ from core.time import UAE_TZ
 
 def check_overdue_doses(db: Session) -> list[str]:
     """
-    Checks active prescriptions for today. If any dose is more than 60 minutes
-    overdue and has not been logged, trigger a partner notification and return the logged message.
+    Checks active prescriptions for today. Runs multi-level escalation logic
+    for any unconfirmed dose at T+30, T+60, and T+120 minutes overdue.
     """
+    from services import notifications
     uae_now = datetime.now(UAE_TZ)
     today = uae_now.date()
     alerts = []
@@ -25,31 +26,141 @@ def check_overdue_doses(db: Session) -> list[str]:
             models.DoseLog.scheduled_date == today
         ).first()
 
-        if not log:
-            # Parse scheduled time
-            try:
-                parts = p.scheduled_time.split(":")
-                if len(parts) == 2:
-                    hour, minute = map(int, parts)
-                    second = 0
-                else:
-                    hour, minute, second = map(int, parts)
-                scheduled_dt = datetime.combine(today, time(hour, minute, second)).replace(tzinfo=UAE_TZ)
-            except ValueError:
-                continue
+        if log:
+            continue
 
-            # Check if current time is more than 60 minutes past scheduled time
-            if uae_now > (scheduled_dt + timedelta(minutes=60)):
+        # Parse scheduled time
+        try:
+            parts = p.scheduled_time.split(":")
+            if len(parts) == 2:
+                hour, minute = map(int, parts)
+                second = 0
+            else:
+                hour, minute, second = map(int, parts)
+            scheduled_dt = datetime.combine(today, time(hour, minute, second)).replace(tzinfo=UAE_TZ)
+        except ValueError:
+            continue
+
+        time_diff_mins = (uae_now - scheduled_dt).total_seconds() / 60.0
+
+        # Level 1 Escalation (T+30 mins overdue)
+        if time_diff_mins >= 30.0:
+            escalated_l1 = db.query(models.EscalationLog).filter(
+                models.EscalationLog.prescription_id == p.id,
+                models.EscalationLog.scheduled_date == today,
+                models.EscalationLog.level == 1
+            ).first()
+            if not escalated_l1:
                 user = db.query(models.User).filter(models.User.id == p.user_id).first()
-                username = user.name if user else f"User {p.user_id}"
-                
-                # Format the webhook alert message
-                message = f"{username} has not confirmed her {format_time_12h(p.scheduled_time)} {p.name} injection yet."
-                alert_log = f"[PARTNER WEBHOOK ALERT] {message}"
-                print(alert_log)
-                alerts.append(message)
-                
+                if user:
+                    notifications.send_web_push(user.id, f"Time for your {p.name} injection. Please log it once completed.", db)
+                    user.active_status = "Action Required"
+                    db.commit()
+                elog = models.EscalationLog(
+                    prescription_id=p.id,
+                    user_id=p.user_id,
+                    scheduled_date=today,
+                    level=1
+                )
+                db.add(elog)
+                db.commit()
+
+        # Level 2 Escalation (T+60 mins overdue)
+        if time_diff_mins >= 60.0:
+            escalated_l2 = db.query(models.EscalationLog).filter(
+                models.EscalationLog.prescription_id == p.id,
+                models.EscalationLog.scheduled_date == today,
+                models.EscalationLog.level == 2
+            ).first()
+            if not escalated_l2:
+                user = db.query(models.User).filter(models.User.id == p.user_id).first()
+                if user and user.partner_consent and user.partner_phone:
+                    # WhatsApp primary, fallback to SMS
+                    notifications.send_whatsapp_partner(user.partner_name or "Partner", user.name, format_time_12h(p.scheduled_time), p.name, user.partner_phone)
+                elog = models.EscalationLog(
+                    prescription_id=p.id,
+                    user_id=p.user_id,
+                    scheduled_date=today,
+                    level=2
+                )
+                db.add(elog)
+                db.commit()
+                alerts.append(f"{user.name if user else 'Patient'} has not confirmed her {format_time_12h(p.scheduled_time)} {p.name} injection yet.")
+
+        # Level 3 Escalation (T+120 mins overdue)
+        if time_diff_mins >= 120.0:
+            escalated_l3 = db.query(models.EscalationLog).filter(
+                models.EscalationLog.prescription_id == p.id,
+                models.EscalationLog.scheduled_date == today,
+                models.EscalationLog.level == 3
+            ).first()
+            if not escalated_l3:
+                user = db.query(models.User).filter(models.User.id == p.user_id).first()
+                if user:
+                    user.active_status = "Action Required"
+                    notifications.send_sms_clinician(user.name, p.name, format_time_12h(p.scheduled_time), "+971501111111")
+                    db.commit()
+                elog = models.EscalationLog(
+                    prescription_id=p.id,
+                    user_id=p.user_id,
+                    scheduled_date=today,
+                    level=3
+                )
+                db.add(elog)
+                db.commit()
+
     return alerts
+
+
+def get_user_overdue_escalation_status(db: Session, user_id: int):
+    """
+    Checks if the user has any unconfirmed scheduled doses today.
+    Returns (status, reason, action_taken) if overdue, otherwise (None, None, None).
+    """
+    uae_now = datetime.now(UAE_TZ)
+    today = uae_now.date()
+
+    prescriptions = db.query(models.Prescription).filter(
+        models.Prescription.user_id == user_id,
+        models.Prescription.start_date <= today,
+        models.Prescription.end_date >= today
+    ).all()
+
+    highest_status = None
+    highest_reason = None
+    highest_action = None
+
+    for p in prescriptions:
+        log = db.query(models.DoseLog).filter(
+            models.DoseLog.prescription_id == p.id,
+            models.DoseLog.scheduled_date == today
+        ).first()
+
+        if log:
+            continue
+
+        try:
+            parts = p.scheduled_time.split(":")
+            if len(parts) == 2:
+                hour, minute = map(int, parts)
+                second = 0
+            else:
+                hour, minute, second = map(int, parts)
+            scheduled_dt = datetime.combine(today, time(hour, minute, second)).replace(tzinfo=UAE_TZ)
+        except ValueError:
+            continue
+
+        time_diff_mins = (uae_now - scheduled_dt).total_seconds() / 60.0
+
+        if time_diff_mins >= 120.0:
+            return "Red Alert", f"Missed {p.name} (2h overdue)", "Partner notified via SMS 15m ago"
+        elif time_diff_mins >= 30.0:
+            if not highest_status or highest_status == "On Track":
+                highest_status = "Yellow Attention"
+                highest_reason = f"{p.name} dose overdue"
+                highest_action = "Patient notified via Web Push"
+
+    return highest_status, highest_reason, highest_action
 
 def process_end_of_day_missed_doses(db: Session, target_date: date) -> int:
     """
