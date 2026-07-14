@@ -56,9 +56,13 @@ Scenario: Multi-level escalation triggers when patient is unresponsive
 
 ---
 
-## 5. Technical Safeguards (Carrier Failovers)
-*   **Primary Channel:** Twilio WhatsApp Gateway.
-*   **Carrier Failover Rules:** If the WhatsApp API experiences latencies exceeding 10 seconds or returns delivery error 30007 (carrier filtering/block), the system must fallback to **Twilio Programmable SMS** within 5 seconds to ensure critical cycle-cancellation prevention notifications are received.
+## 5. Free Dispatch Alternative (Web Push) & Carrier Failovers
+To avoid API premium costs associated with Twilio SMS / WhatsApp, the system prioritizes free **Web Push Notifications** (Push API via PWA service worker):
+1. **Primary Dispatch Channel:** Free Browser Web Push is triggered first to Sarah's device.
+2. **Consent Gating:** Relies on browser-native prompt permissions requested during user onboarding (`US-J1-03`).
+3. **SMS / WhatsApp Fallback:** If the browser does not support the Push API (e.g., standard iOS PWA standalone limitations or permission is denied), or if the patient remains unresponsive after T+60/T+120 minutes, the system automatically falls back to:
+   - Level 2 Support Partner Backup: Twilio WhatsApp Gateway (Primary) / Twilio Programmable SMS (Secondary, if WhatsApp latencies > 10s or carrier block 30007 occur).
+   - Level 3 Clinician Backup: Twilio Programmable SMS direct to Mona's on-call phone.
 
 ## 6. Accessibility & DoD
 - [x] Clear logs kept in `ProcessedDate` ledger table to prevent double-alerts

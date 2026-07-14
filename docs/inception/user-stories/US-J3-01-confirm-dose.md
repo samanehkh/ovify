@@ -114,5 +114,6 @@ Instead of a simple list, steps are displayed as individual **Timeline Cards** t
 
 ## 9. Traceability
 - **Journey:** `docs/inception/user-journeys.md` → J3
-- **Endpoints:** `api/medications.py`
+- **Endpoints:** `api/medications.py` (Broadcasts `triage_update_trigger` WebSocket event upon successful log save)
 - **Frontend:** `frontend/src/pages/MedicationLogPage.tsx` (Combined guide/log workspace)
+

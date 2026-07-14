@@ -183,3 +183,14 @@ A full-width bar at the very bottom of the viewport showing aggregate daily comp
 - **Journey:** `docs/inception/user-journeys.md` → J8
 - **Endpoints:** `api/clinician.py` (`get_triage_data`)
 - **Frontend:** `frontend/src/pages/ClinicianPortalPage.tsx` (Triage sub-tab console)
+
+## 9. Real-Time WebSockets Sync Contract
+To eliminate polling latency and ensure the triage console updates within 200ms when a patient logs their dose:
+*   **Websocket Route:** `ws://localhost:8000/api/clinician/ws/triage`
+*   **Authentication:** Clinicians authenticate during handshake using the clinician token passed in query parameters (`ws://.../ws/triage?token=...`).
+*   **Event Messages:** When the server receives a dose confirmation from any patient (`POST /api/medications/{prescription_id}/confirm`), it broadcasts a reload signal to all active clinician WebSocket connections:
+    ```json
+    { "event": "triage_update_trigger" }
+    ```
+*   **Frontend Action:** Upon receiving the trigger event, the React context listener automatically refetches triage data, flashing the affected card with a subtle green border before shifting its deck position.
+
